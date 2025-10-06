@@ -121,28 +121,27 @@ A diferencia de los sistemas operativos convencionales, Desind no solo se ejecut
 
 ---
 
-## German (Deutsch)
+## Simplified Chinese (简体中文)
 
-**Desind OS: Das ultimative leichte Erlebnis**
+Desind 操作系统：极致轻量体验
 
-Desind ist ein revolutionäres Betriebssystem, das von Grund auf für Geschwindigkeit, Effizienz und Eleganz entwickelt wurde. Auf Wayland basierend mit einer QML-basierten Oberfläche bietet Desind ein beispielloses Nutzererlebnis mit Reaktionszeiten unter 5 ms, im Einklang mit den strengen MCX-Maximalstandards.
+Desind 是一款革命性的操作系统，其设计理念从头到尾都以速度、效率和优雅为核心。Desind 基于 Wayland 构建，采用 QML 界面，提供无与伦比的用户体验，响应时间低于 5 毫秒，并严格遵循 MCX 的最高标准。
 
-Im Herzen von Desind liegt sein innovatives "Kapsel"-basiertes UI-Paradigma. Anstelle traditioneller Symbole oder Menüs präsentiert Desind eine saubere, minimalistische Oberfläche, bei der jede Funktion durch eine dynamische "Kapsel" dargestellt wird, die sich bei Bedarf ausdehnt, um Funktionalität zu enthüllen. Dieses Design beseitigt visuellen Lärm, während es gleichzeitig sofortigen Zugriff auf alle Systemfunktionen gewährleistet.
+Desind 的核心在于其创新的胶囊式 UI 模式。Desind 摒弃了传统的图标或菜单，而是呈现了一个简洁、极简的界面，每个功能都由一个动态“胶囊”来表示，并在需要时展开显示。这种设计消除了视觉混乱，同时保持了对所有系统功能的即时访问。
 
-Hauptmerkmale:
+主要功能包括：
 
-- **ArchStart Launcher**: Ein leistungsstarker Anwendungsstarter mit dynamischen Suchfähigkeiten
-- **Crosire AI**: Ein integrierter KI-Assistent, der kontextbezogene Hilfe und Systemoptimierung bietet
-- **Drile Dateiverwaltung**: Ein leichtgewichtiges, leistungsstarkes Dateiverwaltungssystem
-- **Dynamischer Farbmotor**: Echtzeit-Farbanpassung mit Pywal für ein personalisiertes visuelles Erlebnis
-- **Arbeitsbereichsverwaltung**: Intuitive Navigation zwischen Arbeitsbereichen mit visuellen Indikatoren
-- **Mehrsprachige Unterstützung**: Vollständige RTL/LTR-Unterstützung für 7+ Sprachen
-- **Energieeffizienz**: Für Akkulaufzeit optimiert mit intelligenter Stromverwaltung
-- **Nahtlose Integration**: Alle Komponenten arbeiten harmonisch zusammen ohne Performance-Overhead
+ArchStart 启动器：一款功能强大的应用程序启动器，具有动态搜索功能
+Crosire AI：一款集成人工智能助手，提供上下文帮助和系统优化
+Drile 文件管理器：一款轻量级、高性能的文件管理系统
+动态色彩引擎：使用 Pywal 实时色彩自适应，带来个性化的视觉体验
+工作区管理：直观的工作区导航，带有可视化指示器
+多语言支持：全面支持 7 种以上语言的 RTL/LTR 格式
+节能：通过智能电源管理优化电池续航
+无缝集成：所有组件协同工作，性能无任何开销
+Desind 的架构将性能放在首位。通过避免传统桌面环境的臃肿，Desind 实现了近乎即时的响应时间，同时保持了美观现代的界面。该系统采用模块化设计，允许用户在不影响速度的情况下扩展功能。
 
-Die Architektur von Desind priorisiert die Leistung über alles. Durch die Vermeidung traditioneller Desktop-Umgebungs-Bloat erreicht Desind nahezu sofortige Reaktionszeiten, während es eine schöne, moderne Oberfläche beibehält. Das System wurde mit Modularität im Sinn entwickelt, was Benutzern ermöglicht, Funktionalität zu erweitern, ohne die Geschwindigkeit zu beeinträchtigen.
-
-Im Gegensatz zu herkömmlichen Betriebssystemen läuft Desind nicht nur auf Ihrer Hardware - es passt sich ihr an und bietet optimale Leistung sowohl auf High-End-Arbeitsstationen als auch auf ressourcenbegrenzten Geräten. Diese Anpassungsfähigkeit, kombiniert mit seiner eleganten Designphilosophie, macht Desind zur perfekten Wahl für Benutzer, die sowohl Ästhetik als auch Leistung schätzen.
+与传统操作系统不同，Desind 不仅能在您的硬件上运行，还能适应硬件，无论是在高端工作站还是资源受限的设备上都能提供最佳性能。这种适应性，加上其优雅的设计理念，使 Desind 成为兼顾美观和性能的用户的理想之选。
 
 ---
 
