@@ -7,7 +7,7 @@ At the heart of Desind lies its innovative capsule-based UI paradigm. Instead of
 Key features include:
 
 - **ArchStart Launcher**: A powerful application launcher with dynamic search capabilities
-- **Crosire AI**: An integrated artificial intelligence assistant that provides contextual help and system optimization
+- **Crosire**: An integrated artificial intelligence assistant that provides contextual help and system optimization
 - **Drile File Manager**: A lightweight, high-performance file management system
 - **Dynamic Color Engine**: Real-time color adaptation using Pywal for personalized visual experience
 - **Workspaces Management**: Intuitive workspace navigation with visual indicators
@@ -31,7 +31,7 @@ Unlike conventional operating systems, Desind doesn't just run on your hardware�
 الميزات الرئيسية تشمل:
 
 - **مشغل التطبيقات ArchStart**: أداة قوية لتشغيل التطبيقات مع إمكانية بحث ديناميكية
-- **Crosire AI**: مساعد ذكاء اصطناعي مدمج يوفر مساعدة سياقية وتحسين النظام
+- **Crosire**: مساعد ذكاء اصطناعي مدمج يوفر مساعدة سياقية وتحسين النظام
 - **مدير الملفات Drile**: نظام إدارة ملفات خفيف وعالي الأداء
 - **محرك الألوان الديناميكي**: تكيف لوني فوري باستخدام Pywal لتجربة بصرية شخصية
 - **إدارة مساحات العمل**: ملاحة بديهية لمساحات العمل مع مؤشرات مرئية
@@ -55,7 +55,7 @@ Desind - это революционная операционная систем
 Основные особенности:
 
 - **Запуск приложений ArchStart**: Мощный запуск приложений с динамическими возможностями поиска
-- **Crosire AI**: Встроенный искусственный интеллект, обеспечивающий контекстную помощь и оптимизацию системы
+- **Crosire**: Встроенный искусственный интеллект, обеспечивающий контекстную помощь и оптимизацию системы
 - **Файловый менеджер Drile**: Легкий и высокопроизводительная система управления файлами
 - **Динамический цветовой движок**: Реальная адаптация цвета с использованием Pywal для персонализированного визуального опыта
 - **Управление рабочими пространствами**: Интуитивная навигация по рабочим пространствам с визуальными индикаторами
@@ -79,7 +79,7 @@ Desindの中心には、画期的な「カプセル」ベースのUIパラダイ
 主な特徴：
 
 - **ArchStartランチャー**：動的な検索機能を備えた強力なアプリケーションランチャー
-- **Crosire AI**：コンテキストヘルプとシステム最適化を提供する統合型AIアシスタント
+- **Crosire**：コンテキストヘルプとシステム最適化を提供する統合型AIアシスタント
 - **Drileファイルマネージャー**：軽量で高性能なファイル管理システム
 - **ダイナミックカラーエンジン**：Pywalを使用したパーソナライズされたビジュアルエクスペリエンスのためのリアルタイム色適応
 - **ワークスペース管理**：ビジュアルインジケーターによる直感的なワークスペースナビゲーション
@@ -103,7 +103,7 @@ En el corazón de Desind se encuentra su innovador paradigma de interfaz de usua
 Características principales:
 
 - **Lanzador ArchStart**: Un potente lanzador de aplicaciones con capacidades de búsqueda dinámica
-- **Crosire AI**: Un asistente de inteligencia artificial integrado que proporciona ayuda contextual y optimización del sistema
+- **Crosire**: Un asistente de inteligencia artificial integrado que proporciona ayuda contextual y optimización del sistema
 - **Administrador de archivos Drile**: Un sistema de gestión de archivos ligero y de alto rendimiento
 - **Motor de color dinámico**: Adaptación de color en tiempo real utilizando Pywal para una experiencia visual personalizada
 - **Gestión de espacios de trabajo**: Navegación intuitiva de espacios de trabajo con indicadores visuales
@@ -127,7 +127,7 @@ Desind 的核心在于其创新的胶囊式 UI 模式。Desind 摒弃了传统�
 主要功能包括：
 
 - ArchStart 启动器：一款功能强大的应用程序启动器，具有动态搜索功能
-- Crosire AI：一款集成人工智能助手，提供上下文帮助和系统优化
+- Crosire：一款集成人工智能助手，提供上下文帮助和系统优化
 - Drile 文件管理器：一款轻量级、高性能的文件管理系统
 - 动态色彩引擎：使用 Pywal 实时色彩自适应，带来个性化的视觉体验
 - 工作区管理：直观的工作区导航，带有可视化指示器
@@ -150,7 +150,7 @@ Au cœur de Desind se trouve son paradigme innovant d'interface utilisateur bas�
 Fonctionnalités principales :
 
 - **Lanceur ArchStart** : Un lanceur d'applications puissant avec des capacités de recherche dynamiques
-- **Crosire AI** : Un assistant d'intelligence artificielle intégré fournissant une aide contextuelle et une optimisation du système
+- **Crosire** : Un assistant d'intelligence artificielle intégré fournissant une aide contextuelle et une optimisation du système
 - **Gestionnaire de fichiers Drile** : Un système de gestion de fichiers léger et haute performance
 - **Moteur de couleur dynamique** : Adaptation en temps réel des couleurs utilisant Pywal pour une expérience visuelle personnalisée
 - **Gestion des espaces de travail** : Navigation intuitive des espaces de travail avec des indicateurs visuels
