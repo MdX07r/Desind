@@ -11,7 +11,6 @@ Key features include:
 - **Drile File Manager**: A lightweight, high-performance file management system
 - **Dynamic Color Engine**: Real-time color adaptation using Pywal for personalized visual experience
 - **Workspaces Management**: Intuitive workspace navigation with visual indicators
-- **Multi-language Support**: Full RTL/LTR support for 7+ languages
 - **Energy Efficient**: Optimized for battery life with intelligent power management
 - **Seamless Integration**: All components work together harmoniously without performance overhead
 
@@ -36,7 +35,6 @@ Unlike conventional operating systems, Desind doesn't just run on your hardware�
 - **مدير الملفات Drile**: نظام إدارة ملفات خفيف وعالي الأداء
 - **محرك الألوان الديناميكي**: تكيف لوني فوري باستخدام Pywal لتجربة بصرية شخصية
 - **إدارة مساحات العمل**: ملاحة بديهية لمساحات العمل مع مؤشرات مرئية
-- **دعم متعدد اللغات**: دعم كامل للاتجاهات من اليمين لليسار ومن اليسار لليمين لـ 7+ لغات
 - **كفاءة الطاقة**: محسّن لعمر البطارية مع إدارة طاقة ذكية
 - **التكامل السلس**: جميع المكونات تعمل معاً بانسجام دون عبء أداء
 
@@ -61,7 +59,6 @@ Desind - это революционная операционная систем
 - **Файловый менеджер Drile**: Легкий и высокопроизводительная система управления файлами
 - **Динамический цветовой движок**: Реальная адаптация цвета с использованием Pywal для персонализированного визуального опыта
 - **Управление рабочими пространствами**: Интуитивная навигация по рабочим пространствам с визуальными индикаторами
-- **Поддержка нескольких языков**: Полная поддержка RTL/LTR для 7+ языков
 - **Энергоэффективность**: Оптимизирован для срока службы батареи с интеллектуальным управлением питанием
 - **Бесшовная интеграция**: Все компоненты работают вместе гармонично без потери производительности
 
@@ -86,7 +83,6 @@ Desindの中心には、画期的な「カプセル」ベースのUIパラダイ
 - **Drileファイルマネージャー**：軽量で高性能なファイル管理システム
 - **ダイナミックカラーエンジン**：Pywalを使用したパーソナライズされたビジュアルエクスペリエンスのためのリアルタイム色適応
 - **ワークスペース管理**：ビジュアルインジケーターによる直感的なワークスペースナビゲーション
-- **多言語サポート**：7+言語のRTL/LTR完全サポート
 - **省電力設計**：インテリジェント電源管理によるバッテリー寿命の最適化
 - **シームレス統合**：すべてのコンポーネントがパフォーマンスオーバーヘッドなしに調和して動作
 
@@ -111,7 +107,6 @@ Características principales:
 - **Administrador de archivos Drile**: Un sistema de gestión de archivos ligero y de alto rendimiento
 - **Motor de color dinámico**: Adaptación de color en tiempo real utilizando Pywal para una experiencia visual personalizada
 - **Gestión de espacios de trabajo**: Navegación intuitiva de espacios de trabajo con indicadores visuales
-- **Soporte multilingüe**: Soporte completo RTL/LTR para 7+ idiomas
 - **Eficiencia energética**: Optimizado para la duración de la batería con gestión inteligente de energía
 - **Integración perfecta**: Todos los componentes trabajan juntos armoniosamente sin sobrecarga de rendimiento
 
@@ -131,15 +126,14 @@ Desind 的核心在于其创新的胶囊式 UI 模式。Desind 摒弃了传统�
 
 主要功能包括：
 
-ArchStart 启动器：一款功能强大的应用程序启动器，具有动态搜索功能
-Crosire AI：一款集成人工智能助手，提供上下文帮助和系统优化
-Drile 文件管理器：一款轻量级、高性能的文件管理系统
-动态色彩引擎：使用 Pywal 实时色彩自适应，带来个性化的视觉体验
-工作区管理：直观的工作区导航，带有可视化指示器
-多语言支持：全面支持 7 种以上语言的 RTL/LTR 格式
-节能：通过智能电源管理优化电池续航
-无缝集成：所有组件协同工作，性能无任何开销
-Desind 的架构将性能放在首位。通过避免传统桌面环境的臃肿，Desind 实现了近乎即时的响应时间，同时保持了美观现代的界面。该系统采用模块化设计，允许用户在不影响速度的情况下扩展功能。
+- ArchStart 启动器：一款功能强大的应用程序启动器，具有动态搜索功能
+- Crosire AI：一款集成人工智能助手，提供上下文帮助和系统优化
+- Drile 文件管理器：一款轻量级、高性能的文件管理系统
+- 动态色彩引擎：使用 Pywal 实时色彩自适应，带来个性化的视觉体验
+- 工作区管理：直观的工作区导航，带有可视化指示器
+- 节能：通过智能电源管理优化电池续航
+- 无缝集成：所有组件协同工作，性能无任何开销
+- Desind 的架构将性能放在首位。通过避免传统桌面环境的臃肿，Desind 实现了近乎即时的响应时间，同时保持了美观现代的界面。该系统采用模块化设计，允许用户在不影响速度的情况下扩展功能。
 
 与传统操作系统不同，Desind 不仅能在您的硬件上运行，还能适应硬件，无论是在高端工作站还是资源受限的设备上都能提供最佳性能。这种适应性，加上其优雅的设计理念，使 Desind 成为兼顾美观和性能的用户的理想之选。
 
@@ -160,7 +154,6 @@ Fonctionnalités principales :
 - **Gestionnaire de fichiers Drile** : Un système de gestion de fichiers léger et haute performance
 - **Moteur de couleur dynamique** : Adaptation en temps réel des couleurs utilisant Pywal pour une expérience visuelle personnalisée
 - **Gestion des espaces de travail** : Navigation intuitive des espaces de travail avec des indicateurs visuels
-- **Prise en charge multilingue** : Support complet RTL/LTR pour plus de 7 langues
 - **Efficacité énergétique** : Optimisé pour la durée de vie de la batterie avec une gestion intelligente de l'alimentation
 - **Intégration transparente** : Tous les composants fonctionnent ensemble harmonieusement sans surcharge de performance
 
