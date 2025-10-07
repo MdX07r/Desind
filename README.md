@@ -1,3 +1,6 @@
+[English](https://github.com/MdX07r/Desind) | [Español](https://github.com/MdX07r/Desind/tree/ES) | [Français](https://github.com/MdX07r/Desind/tree/FR) | [Pусский](https://github.com/MdX07r/Desind/tree/RU) | [العربية](https://github.com/MdX07r/Desind/tree/AR) | [日本語](https://github.com/MdX07r/Desind/tree/JP) | [简体中文](https://github.com/MdX07r/Desind/tree/CN)
+---
+
 ## Japanese (日本語)
 
 **Desind: 軽量で高速なインターフェース**
