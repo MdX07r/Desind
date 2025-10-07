@@ -26,7 +26,7 @@ Desind 的架构将性能放在首位。Desind 摒弃了传统桌面环境的臃
 
 1. 克隆代码库：
 ```bash
-git clone --branch Cn --single-branch --depth 1 https://github.com/MdX07r/Desind.git
+git clone --branch CN --single-branch --depth 1 https://github.com/MdX07r/Desind.git
 ```
 2. 授予运行权限：
 ```bash
