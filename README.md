@@ -1,7 +1,7 @@
 [English](https://github.com/MdX07r/Desind) | [Español](https://github.com/MdX07r/Desind/tree/ES) | [Français](https://github.com/MdX07r/Desind/tree/FR) | [Pусский](https://github.com/MdX07r/Desind/tree/RU) | [العربية](https://github.com/MdX07r/Desind/tree/AR) | [日本語](https://github.com/MdX07r/Desind/tree/JP) | [简体中文](https://github.com/MdX07r/Desind/tree/CN)
 ---
 
-## Arabic (العربية)
+## العربية (Arabic)
 **نظام Desind: تجربة خفيفة في الوزن والسرعة**
 
 نظام Desind هو نظام تشغيل ثوري صمم من الصفر لتحقيق السرعة والكفاءة والأناقة. مبني على Wayland مع واجهة تعتمد على QML، يقدم Desind تجربة مستخدم لا تضاهى.
