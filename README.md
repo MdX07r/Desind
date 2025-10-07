@@ -26,7 +26,7 @@
 
 1. استنساخ المستودع:
 ```bash
-git clone --branch Ar --single-branch --depth 1 https://github.com/MdX07r/Desind.git
+git clone --branch AR --single-branch --depth 1 https://github.com/MdX07r/Desind.git
 ```
 2. اعطاء صلاحيات التشغيل:
 ```bash
