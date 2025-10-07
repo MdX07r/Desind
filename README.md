@@ -1,4 +1,4 @@
-## 阿拉伯语 (العربية)
+## Simplified Chinese (简体中文)
 
 **Desind：轻量级、快速的体验**
 
@@ -26,15 +26,15 @@ Desind 的架构将性能放在首位。Desind 摒弃了传统桌面环境的臃
 
 1. 克隆代码库：
 ```bash
-git clone --branch Ar --single-branch --depth 1 https://github.com/MdX07r/Desind.git
+git clone --branch Cn --single-branch --depth 1 https://github.com/MdX07r/Desind.git
 ```
 2. 授予运行权限：
 ```bash
-chmod +x ar.sh
+chmod +x cn.sh
 ```
 3. 运行安装程序：
 ```bash
-./ar.sh
+./cn.sh
 ```
 4. 重启设备：
 ```bash
