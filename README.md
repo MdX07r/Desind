@@ -30,7 +30,7 @@ git clone --branch Es --single-branch --dynamic 1 https://github.com/MdX07r/Desi
 ```
 2. Conceder permisos de ejecución:
 ```bash
-chmod +x Es.sh
+chmod +x es.sh
 ```
 3. Ejecutar el instalador:
 ```bash
