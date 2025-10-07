@@ -26,7 +26,7 @@ A diferencia de los sistemas operativos tradicionales, Desind no solo administra
 
 1. Clonar el repositorio:
 ```bash
-git clone --branch Es --single-branch --dynamic 1 https://github.com/MdX07r/Desind.git
+git clone --branch ES --single-branch --dynamic 1 https://github.com/MdX07r/Desind.git
 ```
 2. Conceder permisos de ejecución:
 ```bash
