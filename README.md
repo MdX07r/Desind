@@ -1,4 +1,4 @@
-## España (Español)
+## Spanish (Español)
 
 **Desind: Una interfaz ligera y rápida**
 
