@@ -1,4 +1,4 @@
-## Espagne (français)
+## French (Français)
 
 **Desind : Une interface légère et rapide**
 
