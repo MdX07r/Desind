@@ -1,0 +1,33 @@
+<RCC>
+    <qresource prefix="/">
+        <!-- JPG -->
+        <file alias="wallpaper.jpg">images/wallpaper.jpg</file>
+	<file alias="wallpaper2.jpg">images/wallpaper2.jpg</file>
+	<file alias="wallpaper3.jpg">images/wallpaper3.jpg</file>
+	<file alias="wallpaper4.jpg">images/wallpaper4.jpg</file>
+	<file alias="wallpaper5.jpg">images/wallpaper5.jpg</file>
+	<file alias="wallpaper6.jpg">images/wallpaper6.jpg</file>
+	<file alias="wallpaper7.jpg">images/wallpaper7.jpg</file>
+	<file alias="wallpaper8.jpg">images/wallpaper8.jpg</file>
+	<file alias="wallpaper9.jpg">images/wallpaper9.jpg</file>
+	<file alias="wallpaper10.jpg">images/wallpaper10.jpg</file>
+
+        <!-- JSON -->
+        <file alias="settings.json">data/settings.json</file>
+
+        <!-- QML -->
+        <file alias="shell.qml">qml/shell.qml</file>
+        <file alias="settingsapp.qml">qml/settingsapp.qml</file>
+        <file alias="welcome.qml">qml/drile.qml</file>
+	<file alias="welcome.qml">qml/welcome.qml</file>
+
+	<!-- Config -->
+        <file alias="alacritty.toml">/.config/alacritty/alactritty.toml</file>
+        <file alias="fastfetch.conf">/.config/fastfetch/config.jsonc</file>
+        <file alias="hyprland.conf">/.config/hypr/hyprland.conf</file>
+
+        <!-- Docs -->
+        <file alias="README.md">docs/README.md</file>
+        <file alias="LICENSE">docs/LICENSE</file>
+    </qresource>
+</RCC>
