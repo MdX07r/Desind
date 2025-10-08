@@ -1,0 +1,10 @@
+{
+    "theme": "dark",
+    "keyboardLayouts": ["US", "AR"],
+    "currentLayout": "US",
+    "animationSpeed": 300,
+    "eyeProtectionEnabled": false,
+    "brightnessLevel": 75,
+    "refreshRate": 60,
+    "resolution": "1920x1080"
+}
