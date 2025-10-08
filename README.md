@@ -33,11 +33,11 @@ git clone --branch JP --single-branch --dynamic 1 https://github.com/MdX07r/Desi
 ```
 2. 実行権限を付与します:
 ```bash
-chmod +x jp.sh
+chmod +x deploy.sh
 ```
 3. インストーラを実行します:
 ```bash
-./jp.sh
+./deploy.sh
 ```
 4. デバイスを再起動します:
 ```bash
