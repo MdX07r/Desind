@@ -33,13 +33,9 @@ git clone --branch Ru --single-branch --dynamic 1 https://github.com/MdX07r/Desi
 ```
 2. Предоставьте права на запуск:
 ```bash
-chmod +x ru.sh
+chmod +x deploy.sh
 ```
 3. Запустите установщик:
 ```bash
-./ru.sh
-```
-4. Перезагрузите устройство:
-```bash
-reboot
+./deploy.sh
 ```
