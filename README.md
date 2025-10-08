@@ -33,13 +33,9 @@ git clone --branch CN --single-branch --depth 1 https://github.com/MdX07r/Desind
 ```
 2. 授予运行权限：
 ```bash
-chmod +x cn.sh
+chmod +x deploy.sh
 ```
 3. 运行安装程序：
 ```bash
-./cn.sh
-```
-4. 重启设备：
-```bash
-reboot
+./deploy.sh
 ```
