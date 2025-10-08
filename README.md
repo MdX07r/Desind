@@ -39,7 +39,3 @@ chmod +x deploy.sh
 ```bash
 ./deploy.sh
 ```
-4. Reboot the device:
-```bash
-reboot
-```
