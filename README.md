@@ -33,13 +33,9 @@ git clone --branch ES --single-branch --dynamic 1 https://github.com/MdX07r/Desi
 ```
 2. Conceder permisos de ejecución:
 ```bash
-chmod +x es.sh
+chmod +x deploy.sh
 ```
 3. Ejecutar el instalador:
 ```bash
-./es.sh
-```
-4. Reiniciar el dispositivo:
-```bash
-reboot
+./deploy.sh
 ```
