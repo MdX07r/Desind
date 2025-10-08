@@ -32,13 +32,9 @@ git clone --branch AR --single-branch --depth 1 https://github.com/MdX07r/Desind
 ```
 2. اعطاء صلاحيات التشغيل:
 ```bash
-chmod +x ar.sh
+chmod +x deploy.sh
 ```
 3. تشغيل المثبت:
 ```bash
-./ar.sh
-```
-4. إعادة تشغيل الجهاز:
-```bash
-reboot
+./deploy.sh
 ```
