@@ -33,11 +33,11 @@ git clone --branch Home --single-branch --depth 1 https://github.com/MdX07r/Desi
 ```
 2. Grant run privileges:
 ```bash
-chmod +x en.sh
+chmod +x deploy.sh
 ```
 3. Run the installer:
 ```bash
-./en.sh
+./deploy.sh
 ```
 4. Reboot the device:
 ```bash
