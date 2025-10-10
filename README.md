@@ -1,5 +1,10 @@
 <h1 align=center>Desind Shell Desktop (DSD)</h1>
 
+[![Discord](https://img.shields.io/discord/YOUR_SERVER_ID?label=Discord&logo=discord&logoColor=white&labelColor=1e90ff&color=000000&style=for-the-badge)](https://discord.com/invite/sVdmwUd2pz)
+![Reddit](https://img.shields.io/badge/dynamic/json?url=https://raw.githubusercontent.com/MdX07r/Desind/Home/.github/data/reddit.json&label=r%2FDaruza&query=$.subscribers&labelColor=1e90ff&color=000000&logo=reddit&logoColor=white&style=for-the-badge)
+![Stars](https://img.shields.io/dynamic/json.svg?label=Stars&query=$.stargazers_count&url=https%3A%2F%2Fapi.github.com%2Frepos%2FMdX07r%2FDesind&labelColor=1e90ff&color=000000&logo=github&logoColor=white&style=for-the-badge)
+
+
 **[[English](https://github.com/MdX07r/Desind)] [[العربية](https://github.com/MdX07r/Desind/tree/AR)]**
 
 **Desind** is a revolutionary operating system designed from the ground up for speed, efficiency, and elegance. Built on `Wayland` with a `QML-based interface`, Desind offers an unparalleled user experience.
