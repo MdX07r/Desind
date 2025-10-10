@@ -1,8 +1,8 @@
-<h1 align=center>Desind Shell Desktop (DSD)</h1>
+## Desind Shell Desktop (DSD)
 
-![Discord](./badges/discord.svg)
-![Reddit](./badges/reddit.svg)
-![Stars](./badges/stars.svg)
+[![Discord](./badges/discord.svg)](https://discord.com/invite/sVdmwUd2pz)
+[![Reddit](./badges/reddit.svg)](https://www.reddit.com/r/Daruza/)
+[![Stars](./badges/stars.svg)](https://github.com/MdX07r/Desind)
 
 **[[English](https://github.com/MdX07r/Desind)] [[العربية](https://github.com/MdX07r/Desind/tree/AR)]**
 
