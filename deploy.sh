@@ -611,19 +611,19 @@ env = SDL_VIDEODRIVER, wayland
 # -------
 # Language settings
 # -------
-env = LANG, ar_IQ.UTF-8
-env = LC_ALL, ar_IQ.UTF-8
-env = LC_CTYPE, ar_IQ.UTF-8
-env = LC_MESSAGES, ar_IQ.UTF-8
-env = LC_TIME, ar_IQ.UTF-8
-env = LC_NUMERIC, ar_IQ.UTF-8
-env = LC_MONETARY, ar_IQ.UTF-8
-env = LC_PAPER, ar_IQ.UTF-8
-env = LC_NAME, ar_IQ.UTF-8
-env = LC_ADDRESS, ar_IQ.UTF-8
-env = LC_TELEPHONE, ar_IQ.UTF-8
-env = LC_MEASUREMENT, ar_IQ.UTF-8
-env = LC_IDENTIFICATION, ar_IQ.UTF-8
+env = LANG, en_US.UTF-8
+env = LC_ALL, en_US.UTF-8
+env = LC_CTYPE, en_US.UTF-8
+env = LC_MESSAGES, en_US.UTF-8
+env = LC_TIME, en_US.UTF-8
+env = LC_NUMERIC, en_US.UTF-8
+env = LC_MONETARY, en_US.UTF-8
+env = LC_PAPER, en_US.UTF-8
+env = LC_NAME, en_US.UTF-8
+env = LC_ADDRESS, en_US.UTF-8
+env = LC_TELEPHONE, en_US.UTF-8
+env = LC_MEASUREMENT, en_US.UTF-8
+env = LC_IDENTIFICATION, en_US.UTF-8
 
 # ------
 # QuickShell Default Settings
@@ -1028,7 +1028,7 @@ ApplicationWindow {
     color: "#000000"
     title: "Desind"
     
-    locale: Qt.locale("ar_IQ")
+    locale: Qt.locale("en_US")
     LayoutMirroring.enabled: true
     LayoutMirroring.childrenInherit: true
 
