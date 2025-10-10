@@ -48,30 +48,45 @@ def xml_escape(s):
     return html.escape(s)
 
 def make_badge(label, value, filename):
-    height = 32
-    stroke_w = 3
-    rx = height // 2
-    pad_x = 10
-    char_w = 8.6
-    font_size = 13
+    # تصميم: ارتفاع 36px، ألوان: أزرق (الجهة اليسرى) #1e90ff، بقية الخلفية أسود #000000
+    height = 36
+    rx = height // 2  # مستدير بالكامل
+    pad_x = 12
+    char_w = 8.5  # تقريب لحجم الحروف
+    font_size = 14
 
     label_s = xml_escape(label)
     value_s = xml_escape(value)
 
-    left_w = max(70, int(pad_x*2 + len(label)*char_w))
-    right_w = max(70, int(pad_x*2 + len(value)*char_w))
+    left_w = max(84, int(pad_x*2 + len(label)*char_w))
+    right_w = max(84, int(pad_x*2 + len(value)*char_w))
     total_w = left_w + right_w
 
+    # نستخدم @font-face للإشارة إلى ملف woff2 داخل badges/fonts/
+    # ملاحظة: إن لم يكن الملف موجوداً أو منعته المتصفح، سيُستخدم الخط الاحتياطي.
+    style_block = """
+    <style type="text/css"><![CDATA[
+      @font-face {
+        font-family: 'IBMPlex';
+        src: url('fonts/IBMPlexSans-Regular.woff2') format('woff2');
+        font-weight: normal;
+        font-style: normal;
+      }
+      text { font-family: 'IBMPlex', 'Segoe UI', Roboto, Arial, sans-serif; }
+    ]]></style>
+    """
+
     svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{total_w}" height="{height}" viewBox="0 0 {total_w} {height}" role="img" aria-label="{label_s} {value_s}">
-  <!-- outer rounded black with white border -->
-  <rect x="0" y="0" width="{total_w}" height="{height}" rx="{rx}" fill="#000000" stroke="#ffffff" stroke-width="{stroke_w}"/>
+  {style_block}
+  <!-- outer rounded (لا حدود بيضاء) -->
+  <rect x="0" y="0" width="{total_w}" height="{height}" rx="{rx}" fill="#000000"/>
   <!-- left blue pill -->
   <rect x="0" y="0" width="{left_w}" height="{height}" rx="{rx}" fill="#1e90ff"/>
-  <!-- cover the right rounded of left pill to make straight seam -->
+  <!-- تغطية لقطاع الانعطاف لإظهار تقاطع مستقيم -->
   <rect x="{left_w - rx}" y="0" width="{rx}" height="{height}" fill="#000000"/>
   <!-- texts -->
-  <text x="{left_w/2}" y="{height/2}" dominant-baseline="middle" text-anchor="middle" font-family="Segoe UI, Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="{font_size}" fill="#ffffff">{label_s}</text>
-  <text x="{left_w + right_w/2}" y="{height/2}" dominant-baseline="middle" text-anchor="middle" font-family="Segoe UI, Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="{font_size}" fill="#ffffff">{value_s}</text>
+  <text x="{left_w/2}" y="{height/2}" dominant-baseline="middle" text-anchor="middle" font-size="{font_size}" fill="#ffffff">{label_s}</text>
+  <text x="{left_w + right_w/2}" y="{height/2}" dominant-baseline="middle" text-anchor="middle" font-size="{font_size}" fill="#ffffff">{value_s}</text>
 </svg>'''
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w", encoding="utf-8") as f:
@@ -86,7 +101,7 @@ def git_commit_push():
             return
         subprocess.run('git config user.name "github-actions[bot]"', shell=True, check=True)
         subprocess.run('git config user.email "41898282+github-actions[bot]@users.noreply.github.com"', shell=True, check=True)
-        subprocess.run('git add badges/*.svg', shell=True, check=True)
+        subprocess.run('git add badges/*.svg badges/fonts/* || true', shell=True, check=True)
         subprocess.run('git commit -m "chore: update dynamic badges [auto]"', shell=True, check=True)
         subprocess.run('git push', shell=True, check=True)
         print("[git] pushed changes")
