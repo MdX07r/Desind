@@ -582,7 +582,7 @@ exec-once = wal
 exec-once = quickshell
 exec-once = xdg-desktop-portal-hyprland
 exec-once = xdg-desktop-portal
-exec-once = alactritty
+exec-once = alactritty-smooth-cursor-git
 exec-once = mpd
 exec-once = mpd-mpris
 
@@ -679,10 +679,10 @@ device:* {
 EOL
 
 cat <<EOL > ~/.config/quickshell/welcome.qml
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-import QtGraphicalEffects 1.15
+import QtQuick 6.8
+import QtQuick.Controls 6.8
+import QtQuick.Layouts 6.8
+import QtGraphicalEffects 6.8
 
 ApplicationWindow {
     id: root
