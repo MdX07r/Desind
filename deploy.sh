@@ -1,15 +1,15 @@
 #!/bin/bash
                                                                                                                     
 echo "                      @@@@@@@@@@@@                         
-                       @@@@@@@@@@@@@@@@@@@@@                    
+                       @@@@@@@@@@@@@@@@@@@@                    
                     @@@@@@@@                @@@                 
                    @@@@@       @@@@@@@@@@@     @@               
-               @           @@@@@@@@@@@@@@@@@     @@             
-             @@         @@@@@@@@@@@@@@@@@@@@      @@@           
-            @@       @@@@@@@@@@@@@@@@@@@@@@@       @@@          
-           @@@     @@@@@@@@@@@@@@@@@@@@@@@@         @@@         
+               @           @@@@@@@@@@@@@@@@     @@             
+             @@         @@@@@@@@@@@@@@@@@@@      @@@           
+            @@       @@@@@@@@@@@@@@@@@@@@@       @@@          
+           @@@     @@@@@@@@@@@@@@@@@@@@@@         @@@         
           @@@@   @@@@@@@@@         @@@@@@           @@@@        
-          @@@@@@@@@@@@@@          @@@@@              @@@        
+          @@@@@@@@@@@@@          @@@@@              @@@        
          @@@@@@@@@@@@@           @@@@                @@@@       
          @@@@@@@@@@@            @@@@                 @@@@       
          @@@@@@@@@@@          @@@@                  @@@@@       
@@ -22,42 +22,66 @@ echo "                      @@@@@@@@@@@@
             @@@@@@@@   @@@@                 @@@@@@@@@@          
              @@@@@@@   @@@@               @@@@@@@@@@@           
                @@@@@   @@@@@@         @@@@@@@@@@@@@             
-                       @@@@@@@@@@@@@@@@@@@@@@@@@@               
-                       @@@@@@@@@@@@@@@@@@@@@@@@                 
-                        @@@@@@@@@@@@@@@@@@@@                    
+                       @@@@@@@@@@@@@@@@@@@@@@@@               
+                       @@@@@@@@@@@@@@@@@@@@@@                 
+                        @@@@@@@@@@@@@@@@@@@                    
                            @@@@@@@@@@@@"                                                                                  
 
-echo "التحضير للتثبيت..."
-echo "=========================="
+# ==================================
+# System: Installing essential tools
+# ==================================
+echo "Preparing for installation..."
+echo "==========================
 sudo pacman -Syu --noconficonf
 sudo pacman -S --noconfirm base-devel git
 
-if ! command -v yay &> /dev/null; then
-    git clone https:
+# ------
+# Installing Yay if it is not installed
+# ------
+if! command -v yay &> /dev/null; then
+    git clone https://aur.archlinux.org/yay.git 
     cd yay
     makepkg -si --noconfirm
-    cd ..
+    cd..
     rm -rf yay
 fi
 
-echo "تثبيت الحزم..."
-echo "========================="
+# -------
+# Installing the essential packages from the official repositories
+# -------
+echo "Install packages..."
+echo "=========================
 sudo pacman -S --noconfirm hyprland quickshell fastfetch grim slurp wl-copy swappy cmake qt6 nvim playerctl wtype hyprcursor nautilus chromium noto-fonts noto-fonts-emoji noto-fonts-cjk noto-fonts-extra ttf-nerd-fonts-symbols ttf-ibm-plex ttf-jetbrains-mono networkmanager pavucontrol brightnessctl wpctl pactl python-pywal arabic-indic-digit-utils telegram-desktop discord code vs-code libreoffice-fresh bottles gimp steam lutris audacity kdenlive obs-studio flatpak
 
 yay -S alacritty-smooth-cursor-git heroic-games-launcher waydroid
 
+# ------
+# Installing Icon Packages
+# ------
 sudo pacman -S --noconfirm otf-font-awesome awesome-terminal-fonts papirus-icon-theme
 
+# ------
+# Installing additional fonts (if necessary)
+# ------
 sudo pacman -S --noconfirm ttf-dejavu ttf-liberation
 
-echo " بدء إعداد النظام..."
-echo "======================="
+# ======================
+# Starting system setup
+# ======================
+echo "Start system setup..."
+echo "=======================
 
-echo "-------------------------"
-echo "(1/3) تثبيت الخط..."
+# ------
+# 2. Installing IBM Plex Fonts
+# ------
+echo "------------------------
+echo "(1/3) Install font..."
 sudo pacman -S --needed --noconfirm ttf-ibm-plex otf-ibm-plex
 fc-cache -fv
 
+# -------
+# 3. Setting the default font via Fontconfig for the system
+# -------
 FONTCONF_FILE="$HOME/.config/fontconfig/fonts.conf"
 mkdir -p "$(dirname "$FONTCONF_FILE")"
 
@@ -75,76 +99,130 @@ EOL
 
 fc-cache -fv
 
+# -------
+# Install xkb or sway-input-tools if not already installed
+# -------
 sudo pacman -S --needed --noconfirm xkeyboard-config
 
-echo "-------------------"
-echo "(2/3) اعداد Alactritty..."
+# =========================
+# Alactritty Configuration
+# =========================
+echo "-------------------
+echo "(2/3) Setting up Alactritty..."
 cat <<EOL > ~/.config/alactritty/alactritty.toml
 import = [
     "~/.cache/wal/alacritty.toml"
 ]
 
 [window]
+# Window dimensions at startup (optional)
+# dimensions = {columns = 82, lines = 24}
 
+# Specify the window display location (optional)
+# position = { x = 0, y = 0}
 
-padding = { x = 10, y = 10 }
+# Internal padding to leave space between the window edge and the text
+padding = { x = 10, y = 10}
 
+# Window Decoration (Title Bar)
+# You can choose "none" to hide it completely and rarely on your window manager.
 decorations = "full"
 
+# Transparency and Ambiguity
+# Here we adjust the simple transparency and pure blur.
 opacity = 0.95 # Simple transparency (95%). You can adjust it between 0.0 and 1.0.
-blur = true   # Enable blur. Requires a compositor like picom.
+blur = true   # Enable blur. Requires a composer like picom.
 
 [scrolling]
+# The number of lines kept in memory for backward scrolling.
 history = 10000
+# Multiplication factor for scrolling speed.
 multiplier = 3
 
 [font]
-normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
-bold = { family = "JetBrainsMono Nerd Font", style = "Bold" }
-italic = { family = "JetBrainsMono Nerd Font", style = "Italic" }
-bold_italic = { family = "JetBrainsMono Nerd Font", style = "Bold Italic" }
+# Basic Font Settings
+normal = {family = "JetBrainsMono Nerd Font", style = "Regular" }
+bold = {family = "JetBrainsMono Nerd Font", style = "Bold"}
+italic = {family = "JetBrainsMono Nerd Font", style = "Italic" }
+bold_italic = {family = "JetBrainsMono Nerd Font", style = "Bold Italic" }
 
+# Font Size
 size = 11.0
 
-glyph_offset = { x = 0, y = 0 }
+# Additional settings to improve the appearance of the font
+# Glyph displacement to adjust the letters of the letters (useful for some lines)
+glyph_offset = { x = 0, y = 0}
+# Calligraphy thickness (not supported by all systems)
+# builtin_box_drawing = true
 
 [bell]
+# Alarm Sound (Bell) Settings
 animation = "EaseOutExpo"
 duration = 100 # in ms
 color = "#ffffff"
 
 [selection]
+# When determining the text with the mouse button, it is automatically copied to the clipboard.
 save_to_clipboard = true
 
 [cursor]
-style = { shape = "Block", blinking = "On" }
+# Indicator Settings
+# Indicator style: Block, Beam, Underline
+style = {shape = "Block", blinking = "On"}
 
+# Smooth Indicator Settings
+# These settings are specific to the modified version you are using.
+# Make the cursor movement smooth instruction of jumping initially.
 smooth_cursor = true
 
 [keyboard]
+# Key Bindings
+# You can add custom shortcuts here. For example, to copy and paste:
+# (These are usually the default settings on Linux)
+# bindings = [
+#   { key = "C", mods = "Control|Shift", action = "Copy"},
+#   { key = "V", mods = "Control|Shift", action = "Paste"},
+# ]
 
 [mouse]
+# Hide the cursor while typing.
 hide_when_typing = true
 
+# Mouse Bindings
+# For example, to change the font size using Ctrl + Scroll
 bindings = [
-  { mouse = "ScrollUp", mods = "Control", action = "IncreaseFontSize" },
-  { mouse = "ScrollDown", mods = "Control", action = "DecreaseFontSize" },
+  { mouse = "ScrollUp", mods = "Control", action = "IncreaseFontSize"},
+  { mouse = "ScrollDown", mods = "Control", action = "DecreaseFontSize"},
 ]
 
 [colors]
+# Color settings
+# When using PYWAL, most color settings should be in a file
+# ~/.
+# But we will put here the basic "pure black" color settings as a background
+# Default if PYWAL does not work for any reason.
 
-primary = { background = "#000000", foreground = "#ffffff" }
+# Primary Colors
+primary = {background = "#000000", foreground = "#ffffff" }
 
-cursor = { text = "CellBackground", cursor = "CellForeground" }
-vi_mode_cursor = { text = "CellBackground", cursor = "CellForeground" }
+# Indicator Colors
+cursor = {text = "CellBackground", cursor = "CellForeground"}
+vi_mode_cursor = {text = "CellBackground", cursor = "CellForeground"}
 
-selection = { text = "CellBackground", background = "#b3b3b3" }
+# Selection Colors
+selection = {text = "CellBackground", background = "#b3b3b3" }
 
-normal = { black = "#1d1f21", red = "#cc6666", green = "#b5bd68", yellow = "#f0c674", blue = "#81a2be", magenta = "#b294bb", cyan = "#8abeb7", white = "#c5c8c6" }
+# Normal colors (will be overridden by pywal)
+normal = {black = "#1d1f21", red = "#cc6666", green = "#b5bd68", yellow = "#f0c674", blue = "#81a2be", magenta = "#b294bb", cyan = "#8abeb7", white = "#c5c8c6" }
 
-bright = { black = "#666666", red = "#d54e53", green = "#b9ca4a", yellow = "#e7c547", blue = "#7aa6da", magenta = "#c397d8", cyan = "#70c0b1", white = "#eaeaea" }
+# Bright colors (will be overridden by pywal)
+bright = {black = "#666666", red = "#d54e53", green = "#b9ca4a", yellow = "#e7c547", blue = "#7aa6da", magenta = "#c397d8", cyan = "#70c0b1", white = "#eaeaea" }
 
+# Fake colors (unused in abundance)
+# dim = { ... }
 
+# The main window wallpaper
+# Here we guide that the background is fully pure black.
 draw_bold_text_with_bright_colors = true
 
 [terminal.shell]
@@ -155,21 +233,24 @@ args = [
 ]
 EOL
 
+# ========================
+# FastFetch Configuration
+# ========================
 cat <<EOL > ~/.config/fastfetch/config.jsonc
 {
-    
+    // === Logo Settings (ASCII Art) ===
     "logo": {
-        
+        // Logo type: "file" to use custom ASCII from an external file.
         "type": "file",
-        
+        // Path to the custom ASCII technical file. 
         "key": "~/.config/fastfetch/desind.txt",
         
-        
-        
+        // Use Pywal colors to encode ASCII art
+        // These colors are set as environment variables by Pywal
         "color": {
-            
+            //$color0: background color (dark color)
             "0": "$color0", 
-            
+            // $color1: First highlight color (Pywal red)
             "1": "$color1",
             "2": "$color2", 
             "3": "$color3", 
@@ -177,7 +258,7 @@ cat <<EOL > ~/.config/fastfetch/config.jsonc
             "5": "$color5", 
             "6": "$color6", 
             "7": "$color7",
-            
+            // Bright colors
             "8": "$color8",
             "9": "$color9",
             "A": "$colorA",
@@ -188,7 +269,7 @@ cat <<EOL > ~/.config/fastfetch/config.jsonc
             "F": "$colorF"
         },
         
-        
+        // Logo and text formatting settings
         "padding": {
             "top": 0,
             "right": 4, 
@@ -198,43 +279,43 @@ cat <<EOL > ~/.config/fastfetch/config.jsonc
         "side": "left"
     },
 
-    
-    
+    // === Information Modules Settings (Modules) ===
+    // This order will determine the sequence in which information is displayed
     "modules": [
-        "os",             
-        "host",           
-        "kernel",         
-        "uptime",         
-        "packages",       
-        "shell",          
-        "display",        
-        "wm",             
-        "cpu",            
-        "gpu",            
-        "memory",         
-        "disk",           
-        "terminal"        
+        "os",             // Operating system
+        "host",           //Host/Model
+        "kernel",         // Kernel version
+        "uptime",         // System runtime
+        "packages",       // Number of installed packages
+        "shell",          // Shell used
+        "display",        // Screen resolution
+        "wm",             // Window Manager
+        "cpu",            // Processor
+        "gpu",            // Graphics card
+        "memory",         // Random Access Memory (RAM) Usage
+        "disk",           // Disk usage
+        "Terminal"        // Name of the terminal used
     ],
 
-    
-    
+    // === General Formatting Settings (Using Pywal Colors) ===
+    // Display a header (Header) that includes the username and hostname
     "display-header": true,
     "header": {
         "format": "$user@$hostname"
     },
     
-    
-    
+    // Color of information keys (e.g. "OS:", "CPU:")
+    // We use $color4 (usually blue or purple from Pywal)
     "key-color": "$color4",   
     
-    
-    
+    // Color the information value (e.g. "Arch Linux", "Intel i7")
+    // We use $colorF (usually white or a light foreground color)
     "text-color": "$colorF", 
     
-    
+    // Separator color
     "separator-color": "default", 
     
-    
+    // The symbol separating the key from the value
     "separator": ": "
 }
 EOL
@@ -243,9 +324,9 @@ cat <<EOL > ~/.config/fastfetch/desind.txt
                  *@@@@@@@@@@@@@                   
               @@@@@@@           :@@               
              @@@@      @@@@@@@@    -@+            
-         =         @@@@@@@@@@@@@@    *@           
+         =         @@@@@@@@@@@@@    *@           
         @       @@@@@@@@@@@@@@@@@+     @@         
-      -@      @@@@@@@@@@@@@@@@@@@       @@        
+      -@      @@@@@@@@@@@@@@@@@@       @@        
       @@    @@@@@@@.      @@@@@         @@@       
      @@@@@@@@@@@.        %@@@=           @@       
     +@@@@@@@@@=         @@@+             @@@      
@@ -263,13 +344,22 @@ cat <<EOL > ~/.config/fastfetch/desind.txt
                   @@@@@@@@@@@@@
 EOL
 
-echo "===================="
-echo "تكوين Hyprland..."
-echo "===================="
+# =======================
+# Hyprland Configuration
+# =======================
+echo "====================
+echo "Hyprland Configuration..."
+echo "====================
 cat <<EOL > ~/.config/hypr/hyprland.conf
+# =========================
+# Basic input settings
+# =========================
 
+# ------
+# Keyboard settings
+# ------
 input {
-    kb_layout = ar,us
+    kb_layout = ar, us
     kb_variant = ,
     kb_options = grp:super_space_toggle
     follow_mouse = 1
@@ -281,6 +371,9 @@ input {
     scroll_button_lock = false
 }
 
+# -------
+# Mouse settings
+# -------
 device:* {
     sensitivity = 0.0
     scroll_factor = 1.0
@@ -298,16 +391,22 @@ device:* {
     disable_while_typing = false
 }
 
+# =================
+# Window settings
+# =================
 
+# ------
+# Default window behavior
+# ------
 general {
     gaps_in = 10
     gaps_out = 25
-    border_size = 2
+    border_size=2
     col.active_border = rgba(4169E1FF)
     col.inactive_border = rgba(00000000)
     rounding = 15
     layout = dwindle
-    border_size = 2
+    border_size=2
     full_no_gaps = true
     allow_tearing = false
     resize_on_border = true
@@ -317,9 +416,12 @@ general {
     focus_on_activate = true
     swallow = true
     cursor_inactive_timeout = 0
-    initial_workspace = 1
+    initial_workspace=1
 }
 
+# ------
+# Animation settings
+# ------
 decoration {
     rounding = 15
     active_opacity = 1.0
@@ -329,18 +431,24 @@ decoration {
     dim_strength = 0.0
     blur = true
     blur_size = 4
-    blur_passes = 1
+    blur_passes=1
     blur_new_optimizations = true
     drop_shadow = true
     shadow_range = 10
-    shadow_render_power = 2
+    shadow_render_power=2
     col.shadow = rgba(000000AA)
     no_vfr = false
     no_rdr = false
     no_maps = false
 }
 
+# ==============
+# Performance settings
+# ==============
 
+# -------
+# Performance improvements
+# -------
 misc {
     vfr = true
     vrr = 2
@@ -359,22 +467,37 @@ misc {
     focus_on_activate = true
     swallow = true
     cursor_inactive_timeout = 0
-    initial_workspace = 1
+    initial_workspace=1
     debug {
         enable_rendering = true
         enable_debug_marks = false
     }
 }
 
-monitor = ,preferred,auto,auto,1
+# ===============
+# Screen settings
+# ===============
+monitor = ,preferred, auto, auto,1
 
+# =========
+# Abbreviations
+# =========
 
+# ------
+# Abbreviation of the basic system
+# ------
 $mainMod = SUPER
 
-env = TERMINAL,alacritty-smooth-cursor-git
-env = BROWSER,chromium
-env = EDITOR,nvim
+# ------
+# Virtual applications
+# ------
+env = TERMINAL, alacritty-smooth-cursor-git
+env = BROWSER, chromium
+env = EDITOR, nvim
 
+# ------
+# Application shortcuts
+# ------
 bind = $mainMod, RETURN, exec, $TERMINAL
 bind = $mainMod, T, exec, $TERMINAL -e $EDITOR 
 bind = $mainMod, K, killactive,
@@ -385,6 +508,9 @@ bind = $mainMod, Z, togglefloating,
 bind = $mainMod, J, toggleopaque,
 bind = $mainMod, B, toggleborder,
 
+# ------
+# Shortcuts for navigating between workspaces
+# ------
 bind = $mainMod, 1, workspace, 1
 bind = $mainMod, 2, workspace, 2
 bind = $mainMod, 3, workspace, 3
@@ -396,27 +522,46 @@ bind = $mainMod, 8, workspace, 8
 bind = $mainMod, 9, workspace, 9
 bind = $mainMod, 0, workspace, 10
 
+# ------
+# Shortcuts for navigating between windows
+# ------
 bind = $mainMod, LEFT, movefocus, l
 bind = $mainMod, RIGHT, movefocus, r
 bind = $mainMod, UP, movefocus, u
 bind = $mainMod, DOWN, movefocus, d
 
-bind = $mainMod SHIFT, LEFT, resizeactive, -10 0
-bind = $mainMod SHIFT, RIGHT, resizeactive, 10 0
+# ------
+# Window resize shortcuts
+# ------
+bind=$mainMod SHIFT, LEFT, resizeactive, -10 0
+bind=$mainMod SHIFT, RIGHT, resizeactive, 10 0
 bind = $mainMod SHIFT, UP, resizeactive, 0 -10
 bind = $mainMod SHIFT, DOWN, resizeactive, 0 10
-bind = $mainMod SHIFT, J, resizeactive, -10 0
-bind = $mainMod SHIFT, L, resizeactive, 10 0
+bind=$mainMod SHIFT, J, resizeactive, -10 0
+bind=$mainMod SHIFT, L, resizeactive, 10 0
 bind = $mainMod SHIFT, I, resizeactive, 0 -10
 bind = $mainMod SHIFT, K, resizeactive, 0 10
 
+# -------
+# Shortcut to change ratios in Dwindle mode
+# -------
 bind = $mainMod, H, togglesplit,
 
-bind = SUPER, F12, exec, grim ~/Pictures/Screenshots/screenshot_$(date '+%Y-%m-%d_%H-%M-%S').png && swappy -f ~/Pictures/Screenshots/screenshot_$(date '+%Y-%m-%d_%H-%M-%S').png
+# ------
+# Screenshot Shortcuts
+# ------
+# Capture the entire screen
+bind = SUPER, F12, exec, grim ~/Pictures/Screenshots/screenshot_$(date '+%Y-%m-%d_%H-%M-%S').png && swappy -f ~/Pictures/Screenshot_$(date '+%Y-%m-%d_%H-%M-%S').png
+# Capture a specific area
 bind = SUPER, F11, exec, grim -g "$(slurp)" ~/Pictures/Screenshots/screenshot_$(date '+%Y-%m-%d_%H-%M-%S').png && swappy -f ~/Pictures/Screenshots/screenshot_$(date '+%Y-%m-%d_%H-%M-%S').png
-bind = SUPER, F10, exec, grim -g "$(hyprctl activewindow | grep 'at: ' | cut -d' ' -f3 | sed 's/,.*
-bind = SUPER, F9, exec, sleep 5 && grim ~/Pictures/Screenshots/screenshot_$(date '+%Y-%m-%d_%H-%M-%S').png && swappy -f ~/Pictures/Screenshots/screenshot_$(date '+%Y-%m-%d_%H-%M-%S').png
+# Capture the active window
+bind = SUPER, F10, exec, grim -g "$(hyprctl activewindow | grep 'at: ' | cut -d' ' -f3 | sed 's/,.*//;s/^/0x/')+$(hyprctl activewindow | grep 'size: ' | cut -d' ' -f3)" ~/Pictures/Screenshots/screenshot_$(date '+%Y-%m-%d_%H-%M-%S').png && swappy -f ~/Pictures/Screenshots/screenshot_$(date '+%Y-%m-%d_%H-%M-%S').png
+# Capture with 5 second timer
+bind = SUPER, F9, exec, sleep 5 && grim ~/Pictures/Screenshots/screenshot_$(date '+%Y-%m-%d_%H-%M-%S').png && swappy -f ~/Pictures/Screenshot_$(date '+%Y-%m-%d_%H-%M-%S').png
 
+# ------
+# QuickShell Shortcuts
+# ------
 bind = , XF86AudioMicMute, exec, pamixer --default-source -m
 bind = , XF86AudioMute, exec, pamixer -t
 bind = , XF86AudioPlay, exec, playerctl play-pause
@@ -428,6 +573,9 @@ bind = , XF86AudioRaiseVolume, exec, pamixer --increase 1
 bind = , XF86MonBrightnessDown, exec, brightnessctl set 1%-
 bind = , XF86MonBrightnessUp, exec, brightnessctl set 1%+
 
+# ==========================
+# Run applications automatically
+# ==========================
 exec-once = dbus-update-activation-environment --systemd DISPLAY
 exec-once = systemctl --user import-environment DISPLAY
 exec-once = wal
@@ -438,10 +586,19 @@ exec-once = alactritty
 exec-once = mpd
 exec-once = mpd-mpris
 
+# ===============
+# Additional settings
+# ===============
 
-env = HYPRCURSOR_THEME,Bibata-Modern-Ice
+# ------
+# Customize mouse pointer
+# ------
+env = HYPRCURSOR_THEME, Bibata-Modern-Ice
 env = HYPRCURSOR_SIZE,12
 
+# ------
+# Interface settings
+# ------
 env = QT_QPA_PLATFORM, wayland
 env = QT_WAYLAND_DISABLE_WINDOWDECORATION, 1
 env = XDG_CURRENT_DESKTOP, Hyprland
@@ -451,6 +608,9 @@ env = QT_QPA_PLATFORMTHEME, qt6ct
 env = QT_AUTO_SCREEN_SCALE_FACTOR, 1
 env = SDL_VIDEODRIVER, wayland
 
+# -------
+# Language settings
+# -------
 env = LANG, ar_IQ.UTF-8
 env = LC_ALL, ar_IQ.UTF-8
 env = LC_CTYPE, ar_IQ.UTF-8
@@ -465,12 +625,18 @@ env = LC_TELEPHONE, ar_IQ.UTF-8
 env = LC_MEASUREMENT, ar_IQ.UTF-8
 env = LC_IDENTIFICATION, ar_IQ.UTF-8
 
+# ------
+# QuickShell Default Settings
+# ------
 env = QUICKSHELL_THEME, pure-black
 env = QUICKSHELL_LAYOUT_DIRECTION, rtl
 env = QUICKSHELL_BLUR_EFFECT, true
 env = QUICKSHELL_ANIMATIONS, smooth
 env = QUICKSHELL_FONT, "IBM Plex Sans Thin"
 
+# ------
+# Touch screen settings
+# ------
 gestures {
     workspace_swipe = true
     workspace_swipe_fingers = 3
@@ -491,6 +657,9 @@ gestures {
     workspace_swipe_cancel_direction = 0
 }
 
+# -------
+# Display settings
+# -------
 device:* {
     sensitivity = 0.0
     scroll_factor = 1.0
@@ -520,19 +689,19 @@ ApplicationWindow {
     visible: true
     width: 1024
     height: 768
-    color: isDarkTheme ? "#000000" : "#FFFFFF"
+    color: isDarkTheme ? "#000000": "#FFFFFF"
 
-    
+    // Dynamic color scheme
     property var pywalColors: {
         "colors": [
-            "#000000", 
-            "#BC412B", 
-            "#568C3B", 
-            "#F7D000", 
-            "#4169E1", 
-            "#A020F0", 
-            "#00CED1", 
-            "#F5F5F5"  
+            "#000000", // background color
+            "#BC412B", // base color 1
+            "#568C3B", // base color 2
+            "#F7D000", // base color 3
+            "#4169E1", // base color 4
+            "#A020F0", // base color 5
+            "#00CED1", // base color 6
+            "#F5F5F5"  // Text color
         ],
         "special": {
             "background": "#000000",
@@ -541,36 +710,36 @@ ApplicationWindow {
         }
     }
 
-    
+    //State variables
     property bool isDarkTheme: true
     property int currentPage: 0
     property var keyboardLayouts: ["US", "AR"]
-    property var notificationMessages: ["Welcome to Desind OS", "نظام تشغيل مبتكر يجمع بين السرعة والجمال"]
+    property var notificationMessages: ["Welcome to Desind OS", "An innovative operating system that combines speed and beauty"]
 
-    
+    // Application settings
     Settings {
         property bool isFirstRun: true
     }
 
-    
+    // Check the first run
     Component.onCompleted: {
-        if (!settings.isFirstRun) {
-            rootLoader.source = "shell.qml" 
+        if(!settings.isFirstRun) {
+            rootLoader.source = "shell.qml" // Go directly to the home screen
         } else {
-            settings.isFirstRun = false 
+            settings.isFirstRun = false // Update the state after the first run
         }
     }
 
-    
+    //Welcome home page
     Rectangle {
         id: welcomeScreen
         anchors.fill: parent
         color: pywalColors.special.background
-        visible: currentPage === 0
+        visible: currentPage===0
 
         Column {
             anchors.centerIn: parent
-            spacing: 20
+            Spacing: 20
 
             Text {
                 text: "Welcome to Desind OS"
@@ -580,7 +749,7 @@ ApplicationWindow {
             }
 
             Text {
-                text: "An innovative OS combining speed, simplicity, and beauty."
+                text: "An innovative operating system that combines speed, simplicity, and beauty."
                 font.family: "IBM Plex Sans Thin"
                 font.pixelSize: 18
                 color: pywalColors.colors[5]
@@ -590,7 +759,7 @@ ApplicationWindow {
             }
 
             Button {
-                text: "Let's begin >"
+                text: "Let's get started >"
                 width: 150
                 height: 50
                 radius: 25
@@ -599,18 +768,18 @@ ApplicationWindow {
                 border.width: 1
 
                 onClicked: {
-                    currentPage = 1 
+                    currentPage = 1 // Go to the first page
                 }
             }
         }
     }
 
-    
+    //Feature pages
     StackView {
         id: featurePages
         anchors.fill: parent
         visible: currentPage > 0
-        initialItem: FeaturePage { featureIndex: 0 }
+        initialItem: FeaturePage {featureIndex: 0}
 
         onCurrentIndexChanged: {
             if (featurePages.depth === 0) {
@@ -619,7 +788,7 @@ ApplicationWindow {
         }
     }
 
-    
+    // Feature page component
     Component {
         id: featurePageComponent
         Item {
@@ -630,7 +799,7 @@ ApplicationWindow {
 
             Column {
                 anchors.centerIn: parent
-                spacing: 20
+                Spacing: 20
 
                 Text {
                     text: getFeatureTitle(featureIndex)
@@ -651,10 +820,10 @@ ApplicationWindow {
 
                 RowLayout {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 10
+                    Spacing: 10
 
                     Button {
-                        text: "< السابق"
+                        text: "< previous"
                         width: 100
                         height: 40
                         radius: 20
@@ -667,7 +836,7 @@ ApplicationWindow {
                     }
 
                     Button {
-                        text: "التالي >"
+                        text: "Next >"
                         width: 100
                         height: 40
                         radius: 20
@@ -675,7 +844,7 @@ ApplicationWindow {
 
                         onClicked: {
                             featureIndex += 1
-                            featurePages.push(FeaturePage { featureIndex: featureIndex })
+                            featurePages.push(FeaturePage {featureIndex: featureIndex})
                         }
                     }
                 }
@@ -683,14 +852,14 @@ ApplicationWindow {
         }
     }
 
-    
+    // Change the theme
     Row {
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-        spacing: 10
+        Spacing: 10
 
         Text {
-            text: isDarkTheme ? "Light mode" : "Dark mode"
+            text: isDarkTheme ? "light mode": "dark mode"
             font.family: "IBM Plex Sans Thin"
             font.pixelSize: 16
             color: pywalColors.special.foreground
@@ -705,7 +874,7 @@ ApplicationWindow {
         }
     }
 
-    
+    // Manage keyboard layout
     Rectangle {
         id: keyboardSettings
         anchors.bottom: parent.bottom
@@ -716,14 +885,14 @@ ApplicationWindow {
         color: Qt.rgba(pywalColors.colors[6].r, pywalColors.colors[6].g, pywalColors.colors[6].b, 0.2)
         border.color: pywalColors.colors[6]
         border.width: 1
-        visible: currentPage === 3
+        visible: currentPage===3
 
         Column {
             anchors.fill: parent
-            spacing: 10
+            Spacing: 10
 
             Text {
-                text: "Manage keyboard layouts"
+                text: "Keyboard Layout Management"
                 font.family: "IBM Plex Sans Bold"
                 font.pixelSize: 20
                 color: pywalColors.special.foreground
@@ -734,14 +903,14 @@ ApplicationWindow {
             ListView {
                 width: parent.width
                 height: 100
-                model: keyboardLayouts
+                model: keyboardLayout
                 delegate: Item {
                     width: parent.width
                     height: 30
 
                     Row {
                         anchors.fill: parent
-                        spacing: 10
+                        Spacing: 10
 
                         Text {
                             text: modelData
@@ -751,14 +920,14 @@ ApplicationWindow {
                         }
 
                         Button {
-                            text: "حذف"
+                            text: "Delete"
                             width: 60
                             height: 25
                             radius: 10
-                            visible: model.index !== 0
+                            visible: model.index!== 0
 
                             onClicked: {
-                                keyboardLayouts.splice(model.index, 1)
+                                keyboardLayout.splice(model.index, 1)
                             }
                         }
                     }
@@ -775,27 +944,27 @@ ApplicationWindow {
                 border.width: 1
 
                 onClicked: {
-                    keyboardLayouts.push("New Layout")
+                    keyboardLayout.push("New Layout")
                 }
             }
         }
     }
 
-    
+    //Help functions
     function getFeatureTitle(index) {
         switch (index) {
-        case 0: return "Drile: Lightweight file manager"
-        case 1: return "Crosire: AI engine"
-        case 2: return "ArchStart: App launcher"
+        case 0: return "Drile: Lightweight File Manager"
+        case 1: return "Crosire: AI Engine"
+        case 2: return "ArchStart: Application Manager"
         default: return ""
         }
     }
 
     function getFeatureDescription(index) {
         switch (index) {
-        case 0: return "Drile اخف مدير ملفات على الاطلاق!"
-        case 1: return "Crosire هو محرك الذكاء الاصطناعي الذي يتعلم منك ويتكيف."
-        case 2: return "ArchStart هو مدير التطبيقات المدمج الذي يوفر السرعة والمرونة."
+        case 0: return "Drile is the lightest file manager ever!"
+        case 1: return "Crosire is an AI engine that learns from you and adapts."
+        case 2: return "ArchStart is a built-in application manager that provides speed and flexibility."
         default: return ""
         }
     }
@@ -812,13 +981,16 @@ ApplicationWindow {
 }
 EOL
 
-echo "تكوين QuickShell..."
-echo "========================="
-echo "(1/5) تكوين النظام..."
+# =========================
+# QuickShell Configuration
+# =========================
+echo "QuickShell configuration..."
+echo "=========================
+echo "(1/5) System configuration..."
 cat <<EOL > ~/.config/quickshell/shell.qml
-
-
-
+//===========
+// Imports
+//===========
 import QtQuick 6.8
 import QtQuick.Controls 6.8
 import QtQuick.Layouts 6.8
@@ -845,9 +1017,9 @@ import QuickShell.Effects 6.8
 import QuickShell.System 6.8
 import org.freedesktop.UPower 6.8
 
-
-
-
+//========================
+// Basic application configuration
+//========================
 ApplicationWindow {
     id: root
     visible: true
@@ -860,13 +1032,13 @@ ApplicationWindow {
     LayoutMirroring.enabled: true
     LayoutMirroring.childrenInherit: true
 
-    
-    
-    
+    //==============
+    // System objects
+    //==============
     QuickShellAnimation {
         id: animationEngine
         animationduration: 50
-        animationEasing: 8 
+        animationEasing: 8 // Easing.OutQuart
         enabled: true
     }
 
@@ -903,12 +1075,12 @@ ApplicationWindow {
         }
     }
 
-    
-    
-    
+    //=============================================
+    // Improve pods using new integrations
+    //=============================================
     Capsule {
         id: settingsCapsule
-        icon: "\uf013" 
+        icon: "\uf013" // Settings icon
         colorIndex: 4
         capsuleId: "settings"
         width: 50
@@ -916,15 +1088,15 @@ ApplicationWindow {
         property bool isExpanded: false
         property bool isRightClicked: false
         
-        
+        // Base capsule (circular)
         Rectangle {
             id: capsuleBase
             anchors.fill: parent
-            radius: width / 2
+            radius: width/2
             color: "#000000"
             border.width: 0
             
-            
+            // Icon
             Text {
                 anchors.centerIn: parent
                 text: settingsCapsule.icon
@@ -934,7 +1106,7 @@ ApplicationWindow {
             }
         }
         
-        
+        // Mouse interaction
         MouseArea {
             id: settingsMouseArea
             anchors.fill: parent
@@ -942,36 +1114,36 @@ ApplicationWindow {
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             
             onEntered: {
-                
+                //Light zoom effect
                 animationEngine.startAnimation(capsuleBase, "scale", 1.0, 1.05, 80);
             }
             
             onExited: {
-                
+                // Return to normal scale
                 animationEngine.startAnimation(capsuleBase, "scale", 1.05, 1.0, 80);
             }
             
-            
+            // Left-click processing
             onClicked: {
                 if (mouse.button === Qt.LeftButton) {
-                    
+                    // Close all other capsules
                     for (let i = 0; i < capsuleLayout.children.length; i++) {
                         let child = capsuleLayout.children[i];
-                        if (child.isExpanded && child.capsuleId !== "settings") {
+                        if (child.isExpanded && child.capsuleId!== "settings") {
                             animationEngine.startAnimation(child, "width", child.width, 100, 100);
                             child.isExpanded = false;
                         }
                     }
                     
-                    
+                    // Temporarily expand this capsule
                     animationEngine.startAnimation(settingsCapsule, "width", 50, 100, 100);
                     isExpanded = true;
                     activeCapsule = capsuleId;
                     
-                    
+                    // Open the Settings app as a separate app
                     openSettingsApp();
                     
-                    
+                    // Close the capsule after opening the settings
                     setTimeout(function() {
                         animationEngine.startAnimation(settingsCapsule, "width", 100, 50, 100);
                         isExpanded = false;
@@ -980,38 +1152,38 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Right click processing
             onPressAndHold: {
-                if (!isExpanded) {
-                    
+                if(!isExpanded) {
+                    // Close all other capsules
                     for (let i = 0; i < capsuleLayout.children.length; i++) {
                         let child = capsuleLayout.children[i];
-                        if (child.isExpanded && child.capsuleId !== "settings") {
+                        if (child.isExpanded && child.capsuleId!== "settings") {
                             animationEngine.startAnimation(child, "width", child.width, 100, 100);
                             child.isExpanded = false;
                         }
                     }
                     
-                    
+                    // Expand this capsule
                     animationEngine.startAnimation(settingsCapsule, "width", 50, 200, 100);
                     isExpanded = true;
                     isRightClicked = true;
                     activeCapsule = capsuleId;
                     
-                    
+                    //apply a slight blur effect to editing options
                     visualEffects.applySmoothBlur(editOptions, 16, 0.7);
                     
-                    
+                    // Show editing options
                     editOptions.visible = true;
                     animationEngine.startAnimation(editOptions, "opacity", 0, 1, 50);
                 } else if (isRightClicked) {
-                    
+                    // Close the capsule
                     animationEngine.startAnimation(settingsCapsule, "width", 200, 50, 100);
                     isExpanded = false;
                     isRightClicked = false;
                     activeCapsule = "";
                     
-                    
+                    // Hide editing options
                     animationEngine.startAnimation(editOptions, "opacity", 1, 0, 50);
                     setTimeout(function() {
                         editOptions.visible = false;
@@ -1020,14 +1192,14 @@ ApplicationWindow {
             }
         }
         
-        
+        // Modification options (shown when right-clicked)
         Item {
             id: editOptions
             anchors.fill: parent
             visible: false
             opacity: 0
             
-            
+            // Option to modify Hyprland file
             Rectangle {
                 id: hyprlandOption
                 anchors.left: parent.left
@@ -1042,7 +1214,7 @@ ApplicationWindow {
                 
                 Text {
                     anchors.centerIn: parent
-                    text: "Hyprland file"
+                    text: "Hyprland File"
                     font.family: "IBM Plex Sans Thin"
                     font.pixelSize: 14
                     color: pywalColors.colors[2]
@@ -1052,12 +1224,12 @@ ApplicationWindow {
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
-                        
+                        //Pulse effect when clicking
                         visualEffects.startPulseAnimation(hyprlandOption, pywalColors.colors[2], 300, 600);
                         openHyprlandConfig();
                     }
                     onEntered: {
-                        
+                        // Zoom effect when passing
                         animationEngine.startAnimation(parent, "scale", 1.0, 1.05, 50);
                     }
                     onExited: {
@@ -1066,7 +1238,7 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Option to modify QuickShell file
             Rectangle {
                 id: quickshellOption
                 anchors.left: hyprlandOption.right
@@ -1091,12 +1263,12 @@ ApplicationWindow {
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
-                        
+                        //Pulse effect when clicking
                         visualEffects.startPulseAnimation(quickshellOption, pywalColors.colors[5], 300, 600);
                         openQuickShellConfig();
                     }
                     onEntered: {
-                        
+                        // Zoom effect when passing
                         animationEngine.startAnimation(parent, "scale", 1.0, 1.05, 50);
                     }
                     onExited: {
@@ -1106,147 +1278,147 @@ ApplicationWindow {
             }
         }
         
-        
-        
-        
-        
+        //====================
+        // System functions
+        //====================
+        // Open the Settings app as a separate app
         function openSettingsApp() {
             try {
-                
+                // Use System to open the Settings app
                 systemInfo.executeTerminalCommand("qmlscene qrc:/SettingsApp/SettingsApp.qml");
-            } catch (e) {
-                console.error("فشل فتح تطبيق الإعدادات:", e);
+            } catch(e) {
+                console.error("Failed to open Settings app:", e);
             }
         }
         
-        
+        //Open Hyprland file for editing
         function openHyprlandConfig() {
             try {
-                
+                // Specify the configuration file path using System
                 const homeDir = systemInfo.executeCommand("echo", ["$HOME"]).trim();
                 const configPath = homeDir + "/.config/hypr/hyprland.conf";
                 
+                //Open file in Neovim
+                systemInfo.executeTerminalCommand("nvim" + configPath);
                 
-                systemInfo.executeTerminalCommand("nvim " + configPath);
-                
-                
+                //Breathing effect on the capsule
                 visualEffects.startBreathingAnimation(settingsCapsule, 0.95, 1.05, 3000);
-            } catch (e) {
-                console.error("فشل فتح ملف Hyprland:", e);
+            } catch(e) {
+                console.error("Failed to open Hyprland file:", e);
             }
         }
         
-        
+        //Open QuickShell file for editing
         function openQuickShellConfig() {
             try {
-                
+                // Specify the configuration file path using System
                 const homeDir = systemInfo.executeCommand("echo", ["$HOME"]).trim();
                 const configPath = homeDir + "/.config/quickshell/config.json";
                 
+                //Open file in Neovim
+                systemInfo.executeTerminalCommand("nvim" + configPath);
                 
-                systemInfo.executeTerminalCommand("nvim " + configPath);
-                
-                
+                //Breathing effect on the capsule
                 visualEffects.startBreathingAnimation(settingsCapsule, 0.95, 1.05, 3000);
-            } catch (e) {
-                console.error("فشل فتح ملف QuickShell:", e);
+            } catch(e) {
+                console.error("Failed to open QuickShell file:", e);
             }
         }
     }
 
-    
-    
-    
-    property var productivityData: {
+    //================
+    // Productivity analysis
+    //===============
+    property var productData: {
         daily: [],
         weekly: [],
-        monthly: []
+        Monthly: []
     }
 
-    
-    
-    
+    //==============
+    // Smart devices
+    //==============
     SmartDeviceManager {
         id: smartDeviceManager
         enabled: true
         
         onDeviceDetected: {
+            // Discover a new smart device
+            notificationSystem.notificationReceived("Smart Devices", "New Device", 
+                "Device detected" + deviceName, "\uf108");
             
-            notificationSystem.notificationReceived("Smart devices", "جهاز جديد", 
-                "تم اكتشاف جهاز " + deviceName, "\uf108");
-            
-            
+            // Integration proposal
             crosireChatMessages.push({
-                message: "تم اكتشاف جهاز " + deviceName + 
-                        ". هل تريد دمجه مع نظام QuickShell؟",
+                message: "Device detected" + deviceName + 
+                        ". Want to integrate it with QuickShell?
                 isUser: false
             });
         }
         
         onDeviceInteractionRequested: {
-            
+            // Interact with a smart device
             interactWithSmartDevice(deviceId, interactionType);
         }
         
         onDeviceStatusChanged: {
-            
+            // Update device status
             updateDeviceStatus(deviceId, status);
         }
     }
 
-    
+    // Function to interact with a smart device
     function interactWithSmartDevice(deviceId, interactionType) {
         try {
             smartDeviceManager.interact(deviceId, interactionType);
-        } catch (e) {
-            console.error("Failed to interact with smart device:", e);
-            showToast("فشل التفاعل مع الجهاز", "\uf071");
+        } catch(e) {
+            console.error("Failed to interact with the smart device:", e);
+            showToast("Device Interaction Failed", "\uf071");
         }
     }
 
-    
+    // Function to integrate a smart device with the system
     function integrateSmartDevice(deviceId) {
         try {
             smartDeviceManager.integrate(deviceId);
-            showToast("Device integrated with the system", "\uf108");
-        } catch (e) {
-            console.error("Failed to integrate smart device:", e);
-            showToast("فشل دمج الجهاز", "\uf071");
+            showToast("Device integrated with system", "\uf108");
+        } catch(e) {
+            console.error("Smart device integration failed:", e);
+            showToast("Device merge failed", "\uf071");
         }
     }
 
-    
+    // Function to update device state
     function updateDeviceStatus(deviceId, status) {
-        
-        console.log(`حالة الجهاز ${deviceId} تم تحديثها إلى: ${status}`);
+        // Here you can add logic to update the UI
+        console.log(`Device status ${deviceId} updated to: ${status}`);
     }
 
-    
+    // Function to search for smart devices
     function discoverSmartDevices() {
         try {
             smartDeviceManager.discover();
-            showToast("Started searching for smart devices", "\uf108");
-        } catch (e) {
-            console.error("Failed to search for devices الذكية:", e);
-            showToast("Failed to search for devices", "\uf071");
+            showToast("Search for smart devices started", "\uf108");
+        } catch(e) {
+            console.error("Smart device search failed:", e);
+            showToast("Hardware Search Failed", "\uf071");
         }
     }
 
-    
+    // Timer for detecting smart devices
     Timer {
         id: deviceDiscoveryTimer
-        interval: 300000 
+        interval: 300,000 // every 5 minutes
         repeat: true
         running: true
         onTriggered: discoverSmartDevices()
     }
 
-    
+    // Function to collect usage data
     function collectUsageData() {
         const now = new Date();
-        const hour = now.getHours();
+        const hour = now. getHours();
         
-        productivityData.daily.push({
+        productData.daily.push({
             timestamp: now.toISOString(),
             activeApps: getActiveApplications(),
             cpuUsage: systemMonitor.cpuUsage,
@@ -1254,48 +1426,48 @@ ApplicationWindow {
             focused: isUserFocused()
         });
         
-        
+        // Save data
         saveProductivityData();
     }
 
-    
+    // Function to analyze productivity data
     function analyzeProductivity() {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         
-        
-        const todayData = productivityData.daily.filter(entry => 
+        // Current day analysis
+        const todayData = productData.daily.filter(entry => 
             new Date(entry.timestamp).toDateString() === today.toDateString());
         
         if (todayData.length === 0) return null;
         
-        
+        // Calculate average resource usage
         const avgCpu = todayData.reduce((sum, entry) => sum + entry.cpuUsage, 0) / todayData.length;
         const avgMemory = todayData.reduce((sum, entry) => sum + entry.memoryUsage, 0) / todayData.length;
         
-        
+        // Specify focus periods
         const focusPeriods = detectFocusPeriods(todayData);
-        const distractionPeriods = detectDistractionPeriods(todayData);
+        const divisionPeriods = detectDistractionPeriods(todayData);
         
         return {
             productiveHours: focusPeriods.length,
-            distractionHours: distractionPeriods.length,
+            distributionHours: distributionPeriods.length,
             avgCpu: avgCpu,
             avgMemory: avgMemory,
             focusPeriods: focusPeriods,
-            distractionPeriods: distractionPeriods,
-            productivityScore: calculateProductivityScore(focusPeriods, distractionPeriods)
+            distributionPeriods: distributionPeriods,
+            productScore: calculateProductivityScore(focusPeriods, distributionPeriods)
         };
     }
 
-    
+    // Function to specify focus periods
     function detectFocusPeriods(data) {
         const focusPeriods = [];
         let currentPeriod = null;
         
         for (let i = 0; i < data.length; i++) {
             if (data[i].focused) {
-                if (!currentPeriod) {
+                if(!currentPeriod) {
                     currentPeriod = {
                         start: data[i].timestamp,
                         end: data[i].timestamp,
@@ -1306,7 +1478,7 @@ ApplicationWindow {
                     currentPeriod.duration++;
                 }
             } else {
-                if (currentPeriod && currentPeriod.duration >= 5) { 
+                if (currentPeriod && currentPeriod.duration >= 5) {//Focus period of more than 5 data points
                     focusPeriods.push(currentPeriod);
                 }
                 currentPeriod = null;
@@ -1320,14 +1492,14 @@ ApplicationWindow {
         return focusPeriods;
     }
 
-    
+    // Function to specify distraction periods
     function detectDistractionPeriods(data) {
-        const distractionPeriods = [];
+        const divisionPeriods = [];
         let currentPeriod = null;
         
         for (let i = 0; i < data.length; i++) {
-            if (!data[i].focused) {
-                if (!currentPeriod) {
+            if(!data[i].focused) {
+                if(!currentPeriod) {
                     currentPeriod = {
                         start: data[i].timestamp,
                         end: data[i].timestamp,
@@ -1341,77 +1513,77 @@ ApplicationWindow {
                 }
             } else {
                 if (currentPeriod && currentPeriod.duration >= 5) {
-                    distractionPeriods.push(currentPeriod);
+                    distributionPeriods.push(currentPeriod);
                 }
                 currentPeriod = null;
             }
         }
         
         if (currentPeriod && currentPeriod.duration >= 5) {
-            distractionPeriods.push(currentPeriod);
+            distributionPeriods.push(currentPeriod);
         }
         
-        return distractionPeriods;
+        return divisionPeriods;
     }
 
-    
-    function calculateProductivityScore(focusPeriods, distractionPeriods) {
-        const totalFocusMinutes = focusPeriods.reduce((sum, period) => sum + period.duration, 0) * 5; 
-        const totalDistractionMinutes = distractionPeriods.reduce((sum, period) => sum + period.duration, 0) * 5;
+    // Function to calculate productivity score
+    function calculateProductivityScore(focusPeriods, divisionPeriods) {
+        const totalFocusMinutes = focusPeriods.reduce((sum, period) => sum + period.duration, 0) * 5; // Each data point is 5 minutes
+        const totalDistractionMinutes = disturbancePeriods.reduce((sum, period) => sum + period.duration, 0) * 5;
         
         if (totalFocusMinutes + totalDistractionMinutes === 0) return 0;
         
         return Math.round((totalFocusMinutes / (totalFocusMinutes + totalDistractionMinutes)) * 100);
     }
 
-    
+    // Function to generate the productivity report
     function generateProductivityReport() {
         const analysis = analyzeProductivity();
-        if (!analysis) return "Not enough data to generate a report.";
+        if(!analysis) return "There is not enough data to generate a report.";
         
-        return `Your productivity report:\n` +
-            `- ساعات التركيز: ${analysis.productiveHours}\n` +
-            `- ساعات التشتيت: ${analysis.distractionHours}\n` +
-            `- متوسط استخدام وحدة المعالجة المركزية: ${analysis.avgCpu.toFixed(1)}%\n` +
-            `- متوسط استخدام الذاكرة: ${analysis.avgMemory.toFixed(1)}%\n` +
-            `- درجة الإنتاجية: ${analysis.productivityScore}%\n\n` +
-            `نصائح لتحسين إنتاجيتك:\n` +
+        return `Your Productivity Report:\n` +
+            `- Focus Hours: ${analysis.productiveHours}\n` +
+            `- Distraction Hours: ${analysis.distractionHours}\n` +
+            Average CPU usage: ${analysis.avgCpu.toFixed(1)}%\n` +
+            Average memory usage: ${analysis.avgMemory.toFixed(1)}%\n` +
+            `- Productivity score: ${analysis.productivityScore}%\n\n` +
+            Tips to improve your productivity:\n` +
             `- ${getProductivityRecommendation(analysis)}`;
     }
 
-    
+    // Function to get recommendations for improving productivity
     function getProductivityRecommendation(analysis) {
         if (analysis.productivityScore < 50) {
-            return "إليك بعض التوصيات لتحسين إنتاجيتك:\n" +
-                "- حاول تقليل استخدام التطبيقات المسببة للتشتت مثل وسائل التواصل الاجتماعي\n" +
-                "- خصص أوقاتًا محددة للتركيز على المهام المهمة\n" +
-                "- استخدم وضع التركيز عند العمل على المهام الحرجة";
+            return "Here are some recommendations to improve your productivity:\n" +
+                "- Try to reduce the use of distracting apps like social media\n" +
+                "- Set aside specific times to focus on important tasks\n" +
+                "- Use focus mode when working on critical tasks";
         } else if (analysis.productivityScore < 75) {
-            return "إليك بعض التوصيات لتحسين إنتاجيتك:\n" +
-                "- حاول تحسين فترات التركيز الخاصة بك\n" +
-                "- قلل من التبديل بين التطبيقات بشكل متكرر\n" +
-                "- خصص وقتًا كافيًا للراحة بين فترات العمل";
+            return "Here are some recommendations to improve your productivity:\n" +
+                "- Try to improve your concentration intervals\n" +
+                "- Reduce frequent switching between applications\n" +
+                "- Allocate enough time for rest between work periods";
         } else {
-            return "أداء إنتاجيتك ممتاز! إليك بعض النصائح للحفاظ على هذا المستوى:\n" +
-                "- استمر في استخدام أوقات التركيز بكفاءة\n" +
-                "- تأكد من أخذ فترات راحة كافية\n" +
-                "- حاول تحسين جودة العمل بدلًا من الكمية";
+            return "Your productivity performance is excellent! Here are some tips to maintain this level:\n"+
+                "- Continue to use focus times efficiently\n" +
+                "- Make sure you take enough breaks\n" +
+                "- Try to improve the quality of work rather than quantity";
         }
     }
 
-    
+    // Temporary to collect usage data
     Timer {
         id: usageDataCollector
-        interval: 300000 
+        interval: 300,000 // every 5 minutes
         repeat: true
         running: true
         onTriggered: collectUsageData()
     }
 
-    
+    // Temporary for productivity analysis
     Timer {
-        id: productivityAnalyzer
-        interval: 3600000 
+        id: productAnalyzer
+        interval: 3,600,000 // every hour
         repeat: true
         running: true
         onTriggered: {
@@ -1423,43 +1595,43 @@ ApplicationWindow {
         }
     }
 
-    
+    // Function to store productivity data
     function saveProductivityData() {
         try {
             const fs = Qt.createQmlObject('import QtQuick 2.0; FileIO', root, "FileIO");
             fs.source = "/home/user/.crosire/productivity.json";
             fs.write(JSON.stringify(productivityData));
-        } catch (e) {
-            console.error("فشل حفظ بيانات الإنتاجية:", e);
+        } catch(e) {
+            console.error("Failed to save throughput data:", e);
         }
     }
 
-    
+    // Function to load productivity data
     function loadProductivityData() {
         try {
             const fs = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             fs.source = "/home/user/.crosire/productivity.json";
             const data = fs.read();
-            if (data) {
-                productivityData = JSON.parse(data);
+            if(data) {
+                productData = JSON.parse(data);
             }
-        } catch (e) {
-            console.error("فشل تحميل بيانات الإنتاجية:", e);
+        } catch(e) {
+            console.error("Failed to load throughput data:", e);
         }
     }
 
-    
+    // Load productivity data on startup
     Component.onCompleted: {
         loadProductivityData();
     }
 
-    
-    
-    
+    //=============
+    // Task Management
+    //=============
     property var tasks: []
-    property var taskCategories: ["عامة", "عمل", "دراسة", "شخصية"]
+    property var taskCategories: ["General", "Work", "Study", "Personal"]
 
-    
+    // Function to add a new task
     function addTask(description, category, priority, dueDate) {
         const task = {
             id: Date.now(),
@@ -1476,92 +1648,92 @@ ApplicationWindow {
         tasks.push(task);
         saveTasks();
         
-        
+        // Send an automatic reminder
         scheduleTaskReminder(task);
         
         return task;
     }
 
-    
+    // Function to delete a task
     function deleteTask(taskId) {
-        tasks = tasks.filter(task => task.id !== taskId);
+        tasks = tasks.filter(task => task.id!== taskId);
         saveTasks();
     }
 
-    
+    // Function to modify a task
     function updateTask(taskId, updates) {
         const index = tasks.findIndex(task => task.id === taskId);
-        if (index !== -1) {
+        if(index!== -1) {
             tasks[index] = {...tasks[index], ...updates};
             saveTasks();
             
-            
+            //if the expiration date is updated, reschedule the reminder
             if (updates.dueDate) {
                 scheduleTaskReminder(tasks[index]);
             }
         }
     }
 
-    
+    // Function to mark a task as finished
     function completeTask(taskId, completed = true) {
         const index = tasks.findIndex(task => task.id === taskId);
-        if (index !== -1) {
+        if(index!== -1) {
             tasks[index].completed = completed;
-            tasks[index].completedAt = completed ? new Date().toISOString() : null;
+            tasks[index].completedAt = completed ? new Date().toISOString(): null;
             saveTasks();
         }
     }
 
-    
+    // Function to schedule task reminders
     function scheduleTaskReminder(task) {
         const timeUntilDue = new Date(task.dueDate) - new Date();
         if (timeUntilDue > 0) {
             setTimeout(() => {
-                notificationSystem.notificationReceived("Tasks", "تذكير بمهمة", 
-                    "موعد انتهاء المهمة: " + task.description, "\uf021");
+                notificationSystem.notificationReceived("Tasks", "Task Reminder", 
+                    "Task completion date:" + task.description, "\uf021");
                 
-                
+                // Send a reminder to Crosire
                 crosireChatMessages.push({
-                    message: "تذكير: موعد انتهاء المهمة '" + task.description + "' هو الآن!",
+                    message: "Reminder: Task end date '" + task.description + "' is now!",
                     isUser: false
                 });
-            }, timeUntilDue - 3600000); 
+            }, timeUntilDue - 3600000); // Reminder an hour before the appointment
         }
     }
 
-    
+    // Function to save tasks
     function saveTasks() {
         try {
             const fs = Qt.createQmlObject('import QtQuick 2.0; FileIO', root, "FileIO");
             fs.source = "/home/user/.crosire/tasks.json";
             fs.write(JSON.stringify(tasks));
-        } catch (e) {
-            console.error("فشل حفظ المهام:", e);
+        } catch(e) {
+            console.error("Failed to save tasks:", e);
         }
     }
 
-    
+    // Function to load tasks
     function loadTasks() {
         try {
             const fs = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             fs.source = "/home/user/.crosire/tasks.json";
             const data = fs.read();
-            if (data) {
+            if(data) {
                 tasks = JSON.parse(data);
                 
-                
+                // Reschedule reminders
                 tasks.forEach(task => {
-                    if (!task.completed) {
+                    if(!task.completed) {
                         scheduleTaskReminder(task);
                     }
                 });
             }
-        } catch (e) {
-            console.error("فشل تحميل المهام:", e);
+        } catch(e) {
+            console.error("Failed to load tasks:", e);
         }
     }
 
-    
+    // Function to analyze tasks
     function analyzeTasks() {
         const today = new Date();
         const tomorrow = new Date();
@@ -1587,22 +1759,22 @@ ApplicationWindow {
         };
     }
 
-    
+    // Function to generate the task report
     function generateTaskReport() {
         const analysis = analyzeTasks();
         
-        return `Task report:\n` +
-            `- المهام المتأخرة: ${analysis.overdue}\n` +
-            `- المهام اليوم: ${analysis.today}\n` +
-            `- المهام غدًا: ${analysis.tomorrow}\n` +
-            `- المهام الإجمالية: ${analysis.total}\n` +
-            `- المهام المكتملة: ${analysis.completed}`;
+        return `Task Report:\n` +
+            `- Late tasks: ${analysis.overdue}\n` +
+            `- Today's tasks: ${analysis.today}\n` +
+            `- Tasks tomorrow: ${analysis.tomorrow}\n` +
+            `- Total tasks: ${analysis.total}\n` +
+            `- Completed tasks: ${analysis.completed}`;
     }
 
-    
+    // Temporary for task analysis
     Timer {
         id: taskAnalysisTimer
-        interval: 3600000 
+        interval: 3,600,000 // every hour
         repeat: true
         running: true
         onTriggered: {
@@ -1614,17 +1786,17 @@ ApplicationWindow {
         }
     }
 
-    
+    // Load tasks on startup
     Component.onCompleted: {
         loadTasks();
     }
 
-    
-    
-    
+    //====================
+    // Dynamic themes
+    //===================
     property var lightThemeColors: {
         "colors": [
-            "#FFFFFF", "#C50F1F", "#00C214", "#C19C00", "#00A1F1", "#BB0099", "#00C2C2", "#333333",
+            "#FFFFFF", "#C50F1F", "#00C214", "#C19C00", "#00A1F1", "#BB0099", "#00C2C2", "#333333"
             "#CCCCCC", "#E74856", "#16C60C", "#F9F12D", "#3B96D1", "#C218D1", "#1BA1E2", "#000000"
         ],
         "special": {
@@ -1666,7 +1838,7 @@ ApplicationWindow {
         }
     }
 
-    
+    // Function to apply the theme
     function applyTheme(themeName) {
         switch(themeName) {
             case "light":
@@ -1685,62 +1857,62 @@ ApplicationWindow {
                 pywalColors = darkThemeColors;
         }
         
-        
-        notificationSystem.notificationReceived("System", "تم تغيير الثيم", 
-            "تم تطبيق ثيم " + themeName, "\uf042");
+        // Send a notification to change the theme
+        notificationSystem.notificationReceived("System", "Theme changed" 
+            "Theme applied " + themeName, "\uf042");
     }
 
-    
+    // Function to specify the contextual theme
     function applyContextualTheme() {
-        const hour = new Date().getHours();
+        const hour = new Date(). getHours();
         
-        
+        // Change theme based on time
         if (hour >= 6 && hour < 18) {
             applyTheme("light");
         } else {
             applyTheme("dark");
         }
         
-        
+        // Change theme based on activity
         if (systemMonitor.cpuUsage > 70) {
             applyTheme("performance");
         }
         
-        
+        // Change theme based on open apps
         const activeApps = getActiveApplications();
         if (activeApps.includes("video-editor")) {
             applyTheme("creative");
         }
     }
 
-    
+    // Temporary to apply the contextual theme
     Timer {
         id: contextualThemeTimer
-        interval: 300000 
+        interval: 300,000 // every 5 minutes
         repeat: true
         running: true
         onTriggered: applyContextualTheme()
     }
 
-    
+    // AI token
     property string openRouterApiKey: "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"
 
-    
+    // Download Font Awesome 7 fonts
     FontLoader { id: faSolid; source: "qrc:/fonts/fa-solid-900.otf" }
     FontLoader { id: faRegular; source: "qrc:/fonts/fa-regular-400.otf" }
     FontLoader { id: faBrands; source: "qrc:/fonts/fa-brands-400.0tf" }
     
-    
+    // Download the basic system fonts
     FontLoader { id: ibmPlex; source: "qrc:/fonts/IBM-Plex-Sans-Thin.ttf" }
     
-    
+    // Load Pywal colors dynamically
     property var pywalColors: {
         try {
             const fs = Qt.createQmlObject('import QtQuick 6.8; FileIO', root, "FileIO")
             fs.source = "qrc:/data/pywal.js"
             return JSON.parse(fs.read())
-        } catch (e) {
-            console.warn("لم يتم العثور على ألوان Pywal، يتم استخدام القيم الافتراضية")
+        } catch(e) {
+            console.warn("Pywal colors not found, default values are used")
             return {
                 "colors": [
                     "#000000", "#C50F1F", "#00C214", "#C19C00", "#00A1F1", "#BB0099", "#00C2C2", "#CCCCCC",
@@ -1754,36 +1926,36 @@ ApplicationWindow {
         }
     }
     
-    
-    
-    
-    
-    property bool isLocked: true                  
-    property bool isAppLauncherOpen: false        
-    property bool isPowerMenuOpen: false          
-    property bool isNotificationCenterOpen: false 
-    property bool isWakingUp: false               
-    property string activeCapsule: ""             
-    property int activeWorkspace: 1               
-    property int totalWorkspaces: 10              
-    property int visibleStart: 1                  
-    property int maxVisible: 5                    
-    property bool isDarkTheme: true               
-    property int maxResults: 8                    
-    property int debounceTime: 50                 
+    //===================
+    // System state management
+    //===================
+    // Basic system state properties
+    property bool isLocked: true                  // Screen lock status
+    property bool isAppLauncherOpen: false        // Application list opening status
+    property bool isPowerMenuOpen: false          // Power menu opening status
+    property bool isNotificationCenterOpen: false // Notification Center open status
+    property bool isWakingUp: false               //the state of waking the device from sleep mode
+    property string activeCapsule: ""             //Currently active capsule
+    property int activeWorkspace: 1               // Active workspace
+    property int totalWorkspaces: 10              // Total workspaces
+    property int visibleStart: 1                  //Visual start of workspaces
+    property int maxVisible: 5                    // Maximum number of visible workspaces
+    property bool isDarkTheme: true               // Dark Theme Status
+    property int maxResults: 8                    // Reduce the number of visible elements
+    property int debounceTime: 50                 //50ms to update (ensure response < 5ms)
 
-    
-    
-    
+    //=============
+    // Context memory
+    //=============
     property var conversationHistory: []
     property var userBehaviorPatterns: {}
 
-    
+    // Function to save the conversation
     function saveConversation() {
         const db = LocalStorage.openDatabaseSync("Crosire", "1.0", "Conversation History", 100000);
         db.transaction(function(tx) {
             tx.executeSql('CREATE TABLE IF NOT EXISTS conversations (id INTEGER PRIMARY KEY, timestamp TEXT, message TEXT, isUser BOOLEAN)');
-            
+            // Save the current conversation
             for (let i = 0; i < crosireChatMessages.length; i++) {
                 tx.executeSql('INSERT INTO conversations (timestamp, message, isUser) VALUES (?, ?, ?)', 
                 [new Date().toISOString(), crosireChatMessages[i].message, crosireChatMessages[i].isUser]);
@@ -1791,71 +1963,71 @@ ApplicationWindow {
         });
     }
 
-    
-    
-    
-    
+    //================
+    // Manage notifications
+    //===============    
+    // Corresponding notification colors
     property var notificationColors: [4, 5, 3, 2, 1, 5, 6, 4, 3, 2]
     
-    
+    // Active notifications list
     property list<var> activeNotifications: []
     property int maxVisibleNotifications: 3
     property int notificationHeight: 70
     property int notificationSpacing: 10
     
-    
+    // Address list
     property var notificationTitles: [
-        "System",
-        "الرسائل",
-        "البريد الإلكتروني",
-        "التحديثات",
-        "التقويم",
-        "المنبه",
-        "التنبيهات",
-        "الرسائل",
-        "البطارية"
+        "The System"
+        "Messages",
+        "Email",
+        "Updates",
+        "Calendar",
+        "Alarm clock"
+        "Alerts",
+        "Messages",
+        "Battery"
     ]
     
-    
-    
-    
-    
+    //=====================
+    //Basic controls
+    //=====================
+    // System controls (Wi-Fi, Bluetooth, etc.)
     property var controlItems: [
-        {icon: "\uf1eb", label: "الواي فاي", colorIndex: 5, active: true},
-        {icon: "\uf293", label: "البلوتوث", colorIndex: 4, active: false},
-        {icon: "\uf185", label: "الوضع المظلم", colorIndex: 6, active: true}
+        {icon: "\uf1eb", label: "Wi-Fi", colorIndex: 5, active: true},
+        {icon: "\uf293", label: "Bluetooth", colorIndex: 4, active: false},
+        {icon: "\uf185", label: "Dark Mode", colorIndex: 6, active: true}
     ]
     
-    
+    // Application List
     property var appList: [
-        {name: "Files", icon: "\uf15b", colorIndex: 4},
+        {name: "File", icon: "\uf15b", colorIndex: 4},
         {name: "Editor", icon: "\uf58d", colorIndex: 5},
         {name: "Browser", icon: "\uf268", colorIndex: 3},
-        {name: "البريد", icon: "\uf0e0", colorIndex: 2},
+        {name: "mail", icon: "\uf0e0", colorIndex: 2},
         {name: "Music", icon: "\uf001", colorIndex: 1},
-        {name: "الصور", icon: "\uf03e", colorIndex: 6},
-        {name: "الفيديو", icon: "\uf03d", colorIndex: 4},
+        {name: "Images", icon: "\uf03e", colorIndex: 6},
+        {name: "Video", icon: "\uf03d", colorIndex: 4},
         {name: "Notes", icon: "\uf0f6", colorIndex: 5},
-        {name: "الرسوم", icon: "\uf58d", colorIndex: 3},
+        {name: "Fees", icon: "\uf58d", colorIndex: 3},
         {name: "Projects", icon: "\uf187", colorIndex: 2}
     ]
     
+    //=====================
+    // Basic system components
+    //=====================
     
-    
-    
-    
-    
+    // Timer to display the time
     Timer {
         interval: 1000
         repeat: true
         running: true
         onTriggered: {
-            
+            // Update the time in the clock capsule
             if (clockCapsule) clockCapsule.label = Qt.formatTime(new Date(), "hh:mm")
         }
     }
     
-    
+    // Temporary to update workspaces
     Timer {
         interval: 500
         repeat: true
@@ -1865,14 +2037,14 @@ ApplicationWindow {
         }
     }
     
-    
+    // Animation to pass workspaces
     NumberAnimation on x {
-        id: workspaceScrollAnimation
+        id:workspaceScrollAnimation
         duration: 50
         easing.type: Easing.OutQuart
     }
     
-    
+    // Animation for gradual appearance
     OpacityAnimation on opacity {
         id: fadeIn
         from: 0
@@ -1881,7 +2053,7 @@ ApplicationWindow {
         easing.type: Easing.OutQuart
     }
     
-    
+    // Slide-up animation
     PropertyAction {
         target: statusBar
         property: "y"
@@ -1893,7 +2065,7 @@ ApplicationWindow {
         easing.type: Easing.OutQuart
     }
     
-    
+    // Animation for the appearance of the expanded music player
     ParallelAnimation {
         id: musicPlayerExpandAnimation
         OpacityAnimation {
@@ -1912,7 +2084,7 @@ ApplicationWindow {
         }
     }
     
-    
+    // Animation to hide the extended music player
     ParallelAnimation {
         id: musicPlayerCollapseAnimation
         OpacityAnimation {
@@ -1931,9 +2103,9 @@ ApplicationWindow {
         }
     }
 
-    
-    
-    
+    //====================
+    //Basic island component
+    //====================
     Component {
         id: islandComponent
         
@@ -1945,7 +2117,7 @@ ApplicationWindow {
             property real blurRadius: 32
             property real blurOpacity: 0.8
             
-            
+            //Full oval background
             Rectangle {
                 id: islandBackground
                 anchors.fill: parent
@@ -1953,7 +2125,7 @@ ApplicationWindow {
                 color: islandColor
                 border.width: 0
                 
-                
+                // Improve blur (without using FastBlur)
                 layer.enabled: true
                 layer.effect: OpacityMask {
                     maskSource: Rectangle {
@@ -1965,10 +2137,10 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Additional transparency improvements
             property real dynamicOpacity: 0.8
             
-            
+            //Interactive effect
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -1980,7 +2152,7 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
-        
+        // Animation Start
         fadeIn.target = root
         fadeIn.restart()
         statusBar.y = Screen.height
@@ -1988,24 +2160,24 @@ ApplicationWindow {
 
     Item {
         Component.onCompleted: {
-            
+            // Read the Alacritty file
             var alacrittyConfig = fileIO.readFile("qrc:/config/alacritty.toml");
             console.log("Alacritty Config:", alacrittyConfig);
 
-            
+            // Read the FastFetch file
             var fastfetchConfig = fileIO.readFile("qrc:/config/config.jsonc");
             console.log("FastFetch Config:", fastfetchConfig);
 
-            
+            // Read Hyprland file
             var hyprlandConfig = fileIO.readFile("qrc:/config/hyprland.conf");
             console.log("Hyprland Config:", hyprlandConfig);
         }
     }
 
-    
-    
-    
-    
+    //=====================
+    // Basic system functions
+    //=====================
+    // Function to extract the active workspace
     function getActiveWorkspace() {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -2013,35 +2185,35 @@ ApplicationWindow {
             process.waitForFinished();
             const output = process.readAllStandardOutput().trim();
             
-            if (output && output.includes("workspace ID")) {
+            if(output && output.includes("workspace ID")) {
                 const workspaceId = output.split("workspace ID")[1].split(":")[0].trim();
                 activeWorkspace = parseInt(workspaceId);
             }
-        } catch (e) {
-            console.error("فشل جلب مساحة العمل النشطة:", e);
+        } catch(e) {
+            console.error("Failed to fetch active workspace:", e);
         }
     }
     
-    
+    // Function to change the workspace
     function switchWorkspace(workspaceId) {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("hyprctl", ["dispatch", "workspace", workspaceId.toString()]);
-        } catch (e) {
-            console.error("فشل تغيير مساحة العمل:", e);
+        } catch(e) {
+            console.error("Workspace change failed:", e);
         }
     }
     
-    
-    
-    
+    //======================
+    //Customize UI
+    //======================
     property var currentUIContext: "default"
 
-    
+    // Function to modify the user interface according to context
     function adaptUIContext() {
         const activeApp = getActiveApplication();
         
-        
+        // Change the user interface based on the active application
         switch(activeApp) {
             case "video-editor":
                 adaptVideoEditingUI();
@@ -2060,98 +2232,98 @@ ApplicationWindow {
                 currentUIContext = "default";
         }
         
-        
-        const hour = new Date().getHours();
+        // Change the user interface based on the time of day
+        const hour = new Date(). getHours();
         if (hour >= 22 || hour < 6) {
             enableNightMode();
         }
     }
 
-    
+    // Function to modify the video editing interface
     function adaptVideoEditingUI() {
-        
+        // Simplify the user interface
         statusBar.visible = false;
-        
+        // Add custom video editing tools
         videoEditingTools.visible = true;
-        
+        // Enlarge the work area
         workspaceArea.scale = 1.1;
-        
+        // Change the theme
         applyTheme("creative");
         
-        showToast("تم تفعيل وضع تحرير الفيديو", "\uf03d");
+        showToast("Video Editing Mode Activated", "\uf03d");
     }
 
-    
+    // Function to modify the programming interface
     function adaptCodingUI() {
-        
+        // Change the font to a suitable font for programming
         ibmPlex.source = "qrc:/fonts/IBM-Plex-Mono-Thin.ttf";
-        
+        //Enlarge font size slightly
         statusBar.height = 55;
-        
+        // Change the theme
         applyTheme("dark");
         
-        showToast("تم تفعيل وضع البرمجة", "\uf121");
+        showToast("Programming Mode Activated", "\uf121");
     }
 
-    
+    // Function to modify the browsing interface
     function adaptBrowsingUI() {
-        
+        //Enlarge address bar
         statusBar.height = 65;
-        
+        // Change the theme
         applyTheme("light");
         
-        showToast("تم تفعيل وضع التصفح", "\uf268");
+        showToast("Browsing mode enabled", "\uf268");
     }
 
-    
+    // Function to return the interface to the default
     function resetToDefaultUI() {
-        
+        // Resize to default
         statusBar.height = 50;
-        
+        // Restore default font
         ibmPlex.source = "qrc:/fonts/IBM-Plex-Sans-Thin.ttf";
-        
+        // Restore the default theme
         applyContextualTheme();
         
         statusBar.visible = true;
         videoEditingTools.visible = false;
     }
 
-    
+    // Temporary to modify the UI according to context
     Timer {
         id: uiContextTimer
-        interval: 10000 
+        interval: 10000 // every 10 seconds
         repeat: true
         running: true
         onTriggered: adaptUIContext()
     }
 
-    
-    
-    
+    //=============
+    // Security monitoring
+    //=============
     SecurityMonitor {
         id: securityMonitor
-        updateInterval: 30000 
+        updateInterval: 30000 // every 30 seconds
         
         onSuspiciousActivityDetected: {
+            // Send an alert to Crosire
+            crosireSecurityAlert("Suspicious activity detected: " + activityDescription);
             
-            crosireSecurityAlert("نشاط مشبوه تم اكتشافه: " + activityDescription);
-            
-            
+            // Propose security measures
             crosireChatMessages.push({
-                message: "تم اكتشاف نشاط مشبوه: " + activityDescription + 
-                        ". هل تريد اتخاذ الإجراءات الأمنية التالية: " + recommendedActions.join(", "),
+                message: "Suspicious activity detected: " + activityDescription + 
+                        ". Do you want to take the following security measures: " + recommendedActions.join(","),
                 isUser: false
             });
         }
     }
 
-    
+    // Function to send a security alert
     function crosireSecurityAlert(message) {
-        notificationSystem.notificationReceived("الأمان", "تنبيه أمني", message, "\uf023");
+        notificationSystem.notificationReceived("Security", "Security Alert", message, "\uf023");
         logSecurityEvent(message);
     }
 
-    
+    // Function to record the security event
     function logSecurityEvent(message) {
         const timestamp = new Date().toISOString();
         const logEntry = `[${timestamp}] ${message}`;
@@ -2160,16 +2332,16 @@ ApplicationWindow {
             const fs = Qt.createQmlObject('import QtQuick 2.0; FileIO', root, "FileIO");
             fs.source = "/var/log/crosire-security.log";
             fs.append(logEntry + "\n");
-        } catch (e) {
-            console.error("فشل تسجيل الحدث الأمني:", e);
+        } catch(e) {
+            console.error("Security event registration failed:", e);
         }
     }
 
-    
+    // Function to check suspicious activities
     function checkForSuspiciousActivities() {
         try {
-            
-            const suspiciousPatterns = [
+            // Check system logs
+            const suspendedPatterns = [
                 /failed login/i,
                 /unauthorized access/i,
                 /suspicious port scan/i
@@ -2179,82 +2351,82 @@ ApplicationWindow {
             fs.source = "/var/log/auth.log";
             const logContent = fs.read();
         
-            for (const pattern of suspiciousPatterns) {
+            for (const pattern of suspendedPatterns) {
                 if (pattern.test(logContent)) {
-                    securityMonitor.suspiciousActivityDetected("تم اكتشاف نمط مشبوه في سجلات النظام");
+                    securityMonitor.suspiciousActivityDetected("A suspicious pattern was detected in the system logs");
                     break;
                 }
             }
             
-            
+            // Check active processes
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("ps", ["aux"]);
             process.waitForFinished();
             const processOutput = process.readAllStandardOutput().trim();
             
-            if (processOutput.includes("suspicious-process")) {
-                securityMonitor.suspiciousActivityDetected("تم اكتشاف عملية مشبوهة");
+            if(processOutput.includes("suspicious-process")) {
+                securityMonitor.suspiciousActivityDetected("Suspicious operation detected");
             }
-        } catch (e) {
-            console.error("فشل فحص الأنشطة المشبوهة:", e);
+        } catch(e) {
+            console.error("Suspicious activity scan failed:", e);
         }
     }
 
-    
+    // Temporary to check for suspicious activities
     Timer {
         id: securityCheckTimer
-        interval: 300000 
+        interval: 300,000 // every 5 minutes
         repeat: true
         running: true
         onTriggered: checkForSuspiciousActivities()
     }
 
-    
-    
-    
+    //===========
+    // Lock screen
+    //===========
     Item {
         id: lockScreen
         anchors.fill: parent
         visible: isLocked
         color: "#000000"
 
-        
+        //Basic variables
         property bool isAODActive: false
         property bool isWakingUp: false
-        property int aodDelay: 5000 
+        property int aodDelay: 5000 // 5 seconds
         property int largeClockSize: parent.height * 0.28
         property int smallClockSize: parent.height * 0.08
 
-        
+        // AOD mode activation timer
         Timer {
             id: aodTimer
             interval: aodDelay
             onTriggered: {
-                if (isLocked && !isAODActive && !isWakingUp) {
+                if (isLocked &&!isAODActive && !isWakingUp) {
                     enterAODMode()
                 }
             }
         }
 
-        
+        //Time update timer
         Timer {
             interval: 1000
             repeat: true
             running: true
             onTriggered: {
                 clockDisplay.text = Qt.formatTime(new Date(), "hh:mm")
-                if (!isAODActive && !isWakingUp) {
+                if(!isAODActive && !isWakingUp) {
                     clockAnimation.to = largeClockSize
                     clockAnimation.restart()
                 }
             }
         }
 
-        
-        
-        
+        //===============================
+        // Lock screen elements
+        //===============================
 
-        
+        // AOD mode status indicator
         Rectangle {
             id: aodIndicator
             anchors.top: parent.top
@@ -2263,12 +2435,12 @@ ApplicationWindow {
             width: 10
             height: 10
             radius: 5
-            color: isAODActive ? pywalColors.colors[6] : "#333333"
+            color: isAODActive? pywalColors.colors[6] : "#333333"
             opacity: isAODActive ? 1.0 : 0.3
             visible: isLocked
         }
 
-        
+        // Display the large clock (3/4 of the screen)
         Text {
             id: clockDisplay
             anchors.top: parent.top
@@ -2279,9 +2451,9 @@ ApplicationWindow {
             color: pywalColors.colors[7]
             text: Qt.formatTime(new Date(), "hh:mm")
             horizontalAlignment: Text.AlignHCenter
-            opacity: 0 
+            opacity: 0 // Start invisible
 
-            
+            // Animation of a big clock
             NumberAnimation on font.pixelSize {
                 id: clockAnimation
                 duration: animationDuration
@@ -2295,7 +2467,7 @@ ApplicationWindow {
             }
         }
 
-        
+        // Display user information
         Item {
             id: userInfo
             anchors.top: clockDisplay.bottom
@@ -2312,7 +2484,7 @@ ApplicationWindow {
             }
 
             Text {
-                text: "مرحباً، " + userName
+                text: "Hello, " + userName
                 font.family: "IBM Plex Sans Thin"
                 font.pixelSize: 16
                 color: pywalColors.colors[5]
@@ -2321,11 +2493,11 @@ ApplicationWindow {
             }
         }
 
-        
+        // Unlock status indicator
         property bool isUnlocking: false
         property real unlockProgress: 0.0
 
-        
+        // Unlock animation
         NumberAnimation {
             id: unlockAnimation
             target: lockScreen
@@ -2335,13 +2507,13 @@ ApplicationWindow {
             duration: 450
             easing.type: Easing.OutCubic
             onRunningChanged: {
-                if (!running && to == 0.0) {
-                    
+                if(!running && to == 0.0) {
+                    //start status bar animation after unlock animation is complete                statusBarAnimation.restart()
                 }
             }
         }
 
-        
+        // Status bar animation
         NumberAnimation {
             id: statusBarAnimation
             target: statusBar
@@ -2351,17 +2523,17 @@ ApplicationWindow {
             duration: 350
             easing.type: Easing.OutBack
             onRunningChanged: {
-                if (!running && to == Screen.height - statusBar.height - 20) {
-                    
+                if(!running && to == Screen.height - statusBar.height - 20) {
+                    // Unlock complete, hide lock screen                isLocked = false
                 }
             }
         }
 
-        
+        // Effect of light wave when unlocking    Rectangle {
             id: unlockEffect
             width: 0
             height: 0
-            radius: width / 2
+            radius: width/2
             color: Qt.rgba(pywalColors.colors[6].r, pywalColors.colors[6].g, pywalColors.colors[6].b, 0.5)
             anchors.centerIn: parent
 
@@ -2375,23 +2547,23 @@ ApplicationWindow {
             NumberAnimation on width {
                 duration: 500
                 from: 0
-                to: Math.max(Screen.width, Screen.height) * 2
+                to: Math.max(Screen.width, Screen.height)*2
                 easing.type: Easing.OutCubic
             }
 
             NumberAnimation on height {
                 duration: 500
                 from: 0
-                to: Math.max(Screen.width, Screen.height) * 2
+                to: Math.max(Screen.width, Screen.height)*2
                 easing.type: Easing.OutCubic
             }
         }
 
-        
-        
-        
+        //===============================
+        // AOD (Always On Display) feature
+        //===============================
 
-        
+        // Small clock display (for AOD mode)
         Text {
             id: smallClockDisplay
             anchors.top: parent.top
@@ -2402,7 +2574,7 @@ ApplicationWindow {
             color: pywalColors.colors[7]
             text: Qt.formatTime(new Date(), "hh:mm")
             horizontalAlignment: Text.AlignHCenter
-            opacity: 0 
+            opacity: 0 // Start invisible
 
             OpacityAnimation on opacity {
                 id: smallClockFade
@@ -2420,7 +2592,7 @@ ApplicationWindow {
             }
         }
 
-        
+        // Light effect for AOD mode
         Rectangle {
             anchors.fill: parent
             radius: parent.height * 0.04
@@ -2430,7 +2602,7 @@ ApplicationWindow {
             visible: lockScreen.isAODActive
         }
 
-        
+        // Awakening animation from AOD mode
         Text {
             id: wakeUpClock
             anchors.centerIn: parent
@@ -2457,18 +2629,18 @@ ApplicationWindow {
             }
         }
 
-        
-        
-        
-        
+        //===============================
+        // AOD mode control functions
+        //===============================
+        // Function to enter AOD mode
         function enterAODModeMCX() {
-            if (isLocked && !isWakingUp) {
+            if (isLocked &&!isWakingUp) {
                 isAODActive = true;
                 aodTimer.stop();
 
-                
+                //Hide large items very quickly (less than 5ms)
                 largeClockFade.to = 0;
-                largeClockFade.duration = 4; 
+                largeClockFade.duration = 4; // Instant response
                 largeClockFade.restart();
 
                 userInfo.visible = false;
@@ -2476,13 +2648,13 @@ ApplicationWindow {
                 userInfoFade.duration = 4;
                 userInfoFade.restart();
 
-                
+                // Small clock display
                 smallClockDisplay.visible = true;
                 smallClockFade.to = 1;
                 smallClockFade.duration = 4;
                 smallClockFade.restart();
 
-                
+                // Fast light effect for AOD mode
                 aodLightEffect.start();
             }
         }
@@ -2492,11 +2664,11 @@ ApplicationWindow {
                 isWakingUp = true;
                 isAODActive = false;
 
-                
+                // Hide the small clock
                 smallClockFade.to = 0;
                 smallClockFade.restart();
 
-                
+                // Large clock display with smooth animation
                 clockDisplay.visible = true;
                 clockAnimation.to = largeClockSize;
                 clockAnimation.restart();
@@ -2505,16 +2677,16 @@ ApplicationWindow {
                 userInfoFade.to = 1;
                 userInfoFade.restart();
 
-                
+                // Restart AOD timer
                 aodTimer.start();
                 isWakingUp = false;
             }
         }
 
-        
-        
-        
-        
+        //===============
+        // Event handling
+        //===============
+        //process mouse events to wake up the device
         MouseArea {
             anchors.fill: parent
             enabled: isAODActive
@@ -2523,39 +2695,39 @@ ApplicationWindow {
             }
         }
 
-        
+        // Process keyboard events to wake the device from AOD
         Keys.onPressed: {
             if (isAODActive) {
                 wakeUpFromAOD()
             }
         }
 
-        
+        // Turn on the AOD timer when the screen is locked
         Component.onCompleted: {
             if (isLocked) {
                 aodTimer.start()
             }
         }
 
-        
+        //Lock screen background effect    Rectangle {
             anchors.fill: parent
             color: "#000000"
         }
 
-        
-        
-        
-        
+        //==================
+        // Unlock processing
+        //==================
+        // Close when background is clicked
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                if (isLocked && !isAODActive) {
+                if (isLocked &&!isAODActive) {
                     launcherCloseAnimation.onCompleted = function() {
                         isAppLauncherOpen = false
                     }
                     launcherCloseAnimation.restart()
 
-                    
+                    // Effect of a click on the application 
                     parent.children[0].scale = 0.95
                     setTimeout(function() {
                         parent.children[0].scale = 1.0
@@ -2564,7 +2736,7 @@ ApplicationWindow {
             }
         }
 
-        
+        // Password input field
         Rectangle {
             id: passwordInput
             width: 300
@@ -2595,12 +2767,12 @@ ApplicationWindow {
                 focus: true
                 horizontalAlignment: TextInput.AlignHCenter
                 onAccepted: {
-                    
+                    // Start animation Close lock screen                isUnlocking = true
                     unlockAnimation.restart()
                 }
             }
 
-            
+            // Animation of interaction with the mouse        ScaleAnimation on scale {
                 target: parent
                 from: 1
                 to: 1.05
@@ -2617,45 +2789,45 @@ ApplicationWindow {
         }
     }
 
-    
-    
-    
+    //=================
+    //Automatic optimization
+    //=================
     Timer {
         id: autoOptimizeTimer
-        interval: 600000 
+        interval: 600,000 // every 10 minutes
         repeat: true
         running: true
         onTriggered: autoOptimizeSystem()
     }
 
-    
+    // Function to clean cache
     function cleanTemporaryFiles() {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("rm", ["-rf", "/tmp/*"]);
             process.start("journalctl", ["--vacuum-size=100M"]);
-            showToast("تم تنظيف الملفات المؤقتة", "\uf014");
-        } catch (e) {
-            console.error("فشل تنظيف الملفات المؤقتة:", e);
+            showToast("Temporary files cleaned", "\uf014");
+        } catch(e) {
+            console.error("Failed to clean temporary files:", e);
         }
     }
 
-    
+    // Function to improve system performance
     function optimizeSystemPerformance() {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("sysctl", ["vm.swappiness=10"]);
             process.start("sysctl", ["vm.vfs_cache_pressure=50"]);
-            showToast("تم تحسين أداء النظام", "\uf085");
-        } catch (e) {
-            console.error("فشل تحسين أداء النظام:", e);
+            showToast("System performance improved", "\uf085");
+        } catch(e) {
+            console.error("System performance optimization failed:", e);
         }
     }
 
-    
-    
-    
-    
+    //============
+    // Status bar
+    //============
+    // Status bar area
     Item {
         id: statusBar
         width: parent.width
@@ -2663,14 +2835,14 @@ ApplicationWindow {
         anchors.top: parent.top
         z: 999
         
-        
+        // Background
         Rectangle {
             id: statusBarBackground
             anchors.fill: parent
             color: "#000000"
             opacity: 0.7
             
-            
+            // Glass effect
             GlassMorphismEffect {
                 radius: 20
                 intensity: 0.7
@@ -2678,12 +2850,12 @@ ApplicationWindow {
             }
         }
         
-        
+        // Capsule layout
         RowLayout {
             id: capsuleLayout
             anchors.fill: parent
             anchors.margins: 5
-            spacing: 10
+            Spacing: 10
 
         Item {
             id: capsuleLayout
@@ -2691,22 +2863,22 @@ ApplicationWindow {
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width * 0.7
             height: 60
-            spacing: 10 
+            spacing: 10 // Distance between capsules
 
-            
+            // List of capsules
             Repeater {
                 model: ["arch", "activeWindow", "workspaces", "music", "keyboard", "network", "volume", "battery", "clock", "crosire", "notifire", "settings", "power"]
                 delegate: Capsule {
                     id: capsule
-                    icon: "\uf017" 
-                    label: modelData === "clock" ? "الساعة" : ""
-                    colorIndex: index % 6
+                    icon: "\uf017" // Capsule icon
+                    label: modelData === "clock" ? "The clock": ""
+                    colorIndex: index %6
                     capsuleId: modelData
                     width: 100
                     height: 50
-                    x: index * (100 + 10) 
+                    x: index * (100 + 10) // Specify the original location of the capsule
 
-                    
+                    // Expansion Animation
                     ParallelAnimation {
                         id: expandAnimation
                         NumberAnimation {
@@ -2724,12 +2896,12 @@ ApplicationWindow {
                             easing.type: Easing.OutQuart
                         }
 
-                        
+                        // Move other capsules
                         ScriptAction {
                             script: {
                                 for (let i = 0; i < capsuleLayout.children.length; i++) {
                                     let child = capsuleLayout.children[i];
-                                    if (child !== capsule && child.x > capsule.x) {
+                                    if (child!== capsule && child.x > capsule.x) {
                                         moveCapsule(child, child.x, child.x + 350);
                                     }
                                 }
@@ -2737,7 +2909,7 @@ ApplicationWindow {
                         }
                     }
 
-                    
+                    // Shrinkage animation
                     ParallelAnimation {
                         id: collapseAnimation
                         NumberAnimation {
@@ -2755,12 +2927,12 @@ ApplicationWindow {
                             easing.type: Easing.OutQuart
                         }
 
-                        
+                        // Return the capsules to their original locations
                         ScriptAction {
                             script: {
                                 for (let i = 0; i < capsuleLayout.children.length; i++) {
                                     let child = capsuleLayout.children[i];
-                                    if (child !== capsule && child.x > capsule.x) {
+                                    if (child!== capsule && child.x > capsule.x) {
                                         moveCapsule(child, child.x, child.x - 350);
                                     }
                                 }
@@ -2768,23 +2940,23 @@ ApplicationWindow {
                         }
                     }
 
-                    
+                    //Click interaction
                     onClicked: {
-                        if (!isExpanded) {
-                            
+                        if(!isExpanded) {
+                            // Close all other capsules quickly
                             for (let i = 0; i < capsuleLayout.children.length; i++) {
                                 let child = capsuleLayout.children[i];
-                                if (child.isExpanded && child.capsuleId !== capsule.capsuleId) {
+                                if (child.isExpanded && child.capsuleId!== capsule.capsuleId) {
                                     child.collapseAnimation.restart();
                                     child.isExpanded = false;
                                 }
                             }
 
-                            
+                            // Expand this capsule
                             expandAnimation.restart();
                             isExpanded = true;
                         } else {
-                            
+                            // Close this capsule
                             collapseAnimation.restart();
                             isExpanded = false;
                         }
@@ -2792,7 +2964,7 @@ ApplicationWindow {
                 }
             }
 
-            
+            // Function to move capsules
             function moveCapsule(capsule, fromX, toX) {
                 NumberAnimation {
                     target: capsule
@@ -2805,9 +2977,9 @@ ApplicationWindow {
             }
         }
             
-        
-        
-        
+        //=================
+        // ArchStart Capsule
+        //=================
         Capsule {
             id: archCapsule
             icon: "\f669"
@@ -2822,13 +2994,13 @@ ApplicationWindow {
             property int activeResultIndex: -1
             property bool showResults: false
             
-            
-            property int debounceTime: 50 
+            // Performance characteristics
+            property int debounceTime: 50 // 50ms to update (ensure < 5ms response)
             property int maxResults: 8
             property var searchTimer: null
             property bool isProcessing: false
             
-            
+            // Expansion Animation 
             ParallelAnimation {
                 id: archExpandAnimation
                 NumberAnimation {
@@ -2847,7 +3019,7 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Shrinkage animation 
             ParallelAnimation {
                 id: archCollapseAnimation
                 NumberAnimation {
@@ -2866,15 +3038,15 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Base capsule (circular)
             Rectangle {
                 id: capsuleBase
                 anchors.fill: parent
-                radius: width / 2
+                radius: width/2
                 color: "#000000"
                 border.width: 0
                 
-                
+                // Icon
                 Text {
                     anchors.centerIn: parent
                     text: archCapsule.icon
@@ -2884,7 +3056,7 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Hover animation 
             ScaleAnimation {
                 id: hoverAnimation
                 target: capsuleBase
@@ -2896,13 +3068,13 @@ ApplicationWindow {
                 running: false
             }
             
-            
+            // Mouse interaction
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
                 
                 onEntered: {
-                    if (!isExpanded) {
+                    if(!isExpanded) {
                         hoverAnimation.running = true;
                     }
                 }
@@ -2910,40 +3082,40 @@ ApplicationWindow {
                 onExited: {
                     hoverAnimation.to = 1.0;
                     hoverAnimation.running = true;
-                    if (!isExpanded) capsuleBase.scale = 1.0;
+                    if(!isExpanded) capsuleBase.scale = 1.0;
                 }
                 
                 onClicked: {
-                    if (!isExpanded) {
-                        
+                    if(!isExpanded) {
+                        // Close all other capsules quickly
                         for (let i = 0; i < capsuleLayout.children.length; i++) {
                             let child = capsuleLayout.children[i];
-                            if (child.isExpanded && child.capsuleId !== capsule.capsuleId) {
+                            if (child.isExpanded && child.capsuleId!== capsule.capsuleId) {
                                 child.collapseAnimation.restart();
                                 child.isExpanded = false;
                             }
                         }
                         
-                        
+                        // Expand this capsule
                         expandAnimation.restart();
                         isExpanded = true;
                         activeCapsule = capsuleId;
                         
-                        
+                        // View ArchStart Capsule
                         archContent.visible = true;
                         archContent.opacity = 0;
                         fadeInAnimation.target = archContent;
                         fadeInAnimation.restart();
                         
-                        
+                        // Focus on the search bar
                         searchInput.forceActiveFocus();
                     } else {
-                        
+                        // Close this capsule
                         archCollapseAnimation.restart();
                         isExpanded = false;
                         activeCapsule = "";
                         
-                        
+                        // Hide ArchStart Capsule
                         fadeOutAnimation.target = archContent;
                         fadeOutAnimation.onCompleted = function() {
                             archContent.visible = false;
@@ -2953,16 +3125,16 @@ ApplicationWindow {
                 }
             }
             
-            
-            
-            
+            //====================
+            // ArchStart interface
+            //====================
             Item {
                 id: archContent
                 anchors.fill: parent
                 visible: false
                 opacity: 0
                 
-                
+                //Search Island 
                 Item {
                     id: islandContainer
                     width: parent.width * 0.9
@@ -2970,7 +3142,7 @@ ApplicationWindow {
                     anchors.bottom: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
                     
-                    
+                    //Full oval background
                     Rectangle {
                         id: islandBackground
                         anchors.fill: parent
@@ -2978,7 +3150,7 @@ ApplicationWindow {
                         color: Qt.rgba(0, 0, 0, 0.85)
                         border.width: 0
                         
-                        
+                        // Improve blur
                         layer.enabled: true
                         layer.effect: OpacityMask {
                             maskSource: Rectangle {
@@ -2990,7 +3162,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Search bar
                     Rectangle {
                         id: searchInputContainer
                         anchors.fill: parent
@@ -3006,13 +3178,13 @@ ApplicationWindow {
                             font.family: "IBM Plex Sans Thin"
                             font.pixelSize: 16
                             color: pywalColors.colors[5]
-                            placeholderText: "البحث عن التطبيقات، الملفات، الإعدادات..."
+                            placeholderText: "Find apps, files, settings..."
                             placeholderColor: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.5)
                             selectByMouse: true
                             focus: false
                             maximumLength: 100
                             
-                            
+                            // Update event
                             onTextChanged: {
                                 if (isProcessing) return;
                                 
@@ -3023,7 +3195,7 @@ ApplicationWindow {
                                     clearTimeout(searchTimer);
                                 }
                                 
-                                if (text.length > 0) {
+                                if(text.length > 0) {
                                     isProcessing = true;
                                     searchTimer = setTimeout(function() {
                                         performSearch(text);
@@ -3035,7 +3207,7 @@ ApplicationWindow {
                                 }
                             }
                             
-                            
+                            //Stock key processing
                             Keys.onUpPressed: {
                                 event.accepted = true;
                                 if (activeResultIndex > 0) {
@@ -3050,7 +3222,7 @@ ApplicationWindow {
                                 }
                             }
                             
-                            
+                            // Execute the selection
                             Keys.onReturnPressed: {
                                 event.accepted = true;
                                 if (activeResultIndex >= 0 && activeResultIndex < searchResults.length) {
@@ -3058,7 +3230,7 @@ ApplicationWindow {
                                 }
                             }
                             
-                            
+                            // Close results
                             Keys.onEscapePressed: {
                                 event.accepted = true;
                                 archCollapseAnimation.restart();
@@ -3069,7 +3241,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Search results
                 ListView {
                     id: resultsList
                     anchors.top: parent.top
@@ -3077,7 +3249,7 @@ ApplicationWindow {
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: parent.width * 0.85
                     height: Math.min(maxResults * 50, searchResults.length * 50)
-                    model: searchResults.length > 0 && showResults ? searchResults : null
+                    model: searchResults.length > 0 && showResults ? searchResults: null
                     clip: true
                     interactive: false
                     visible: searchResults.length > 0 && showResults
@@ -3092,7 +3264,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Appearance animation
                     OpacityAnimation on opacity {
                         duration: 50
                         easing.type: Easing.OutQuart
@@ -3102,7 +3274,7 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Appearance animation
             OpacityAnimation {
                 id: fadeInAnimation
                 from: 0
@@ -3111,7 +3283,7 @@ ApplicationWindow {
                 easing.type: Easing.OutQuart
             }
             
-            
+            //Disappearance Animation
             OpacityAnimation {
                 id: fadeOutAnimation
                 from: 1
@@ -3120,11 +3292,11 @@ ApplicationWindow {
                 easing.type: Easing.OutQuart
             }
             
+            //=======================
+            // Search and processing functions
+            //=======================
             
-            
-            
-            
-            
+            //Main search function
             function performSearch(query) {
                 if (query.length === 0) {
                     searchResults = [];
@@ -3134,29 +3306,29 @@ ApplicationWindow {
                 
                 const startTime = performance.now();
                 
-                
+                // Clear old results
                 searchResults = [];
                 showResults = true;
                 
-                
+                // 1. Search for applications
                 const apps = searchApplications(query);
                 searchResults = searchResults.concat(apps.map(app => ({
                     type: "app",
                     title: app.name,
-                    subtitle: "تطبيق",
+                    subtitle: "Application",
                     icon: app.icon,
                     action: function() {
-                        
+                        // Run the application
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                             process.start("exec", [app.exec]);
-                        } catch (e) {
-                            console.error("فشل تشغيل التطبيق:", e);
+                        } catch(e) {
+                            console.error("Application failed to launch:", e);
                         }
                     }
                 })));
                 
-                
+                // Load applications from .desktop files
                 property var apps: loadDesktopApps("/usr/share/applications");
 
                 function loadDesktopApps(path) {
@@ -3167,7 +3339,7 @@ ApplicationWindow {
                     
                     const appList = [];
                     for (const file of files) {
-                        if (file.endsWith(".desktop")) {
+                        if(file.endsWith(".desktop")) {
                             const desktopFile = readDesktopFile(path + "/" + file);
                             if (desktopFile) {
                                 appList.push(desktopFile);
@@ -3197,7 +3369,7 @@ ApplicationWindow {
                     return app;
                 }
 
-                
+                // Download apps using Depender
                 function loadDesktopApps() {
                     const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                     process.start("depender", ["list", "-j"]);
@@ -3207,20 +3379,20 @@ ApplicationWindow {
                         const output = process.readAllStandardOutput().trim();
                         try {
                             return JSON.parse(output);
-                        } catch (e) {
-                            console.error("فشل تحليل مخرجات Depender:", e);
+                        } catch(e) {
+                            console.error("Depender output analysis failed:", e);
                         }
                     }
                     return [];
                 }
 
-                
+                // Run an application using Depender
                 function runApp(appName) {
                     const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                     process.start("depender", ["run", appName]);
                 }
 
-                
+                // 2. Search for files
                 const files = searchFiles(query);
                 searchResults = searchResults.concat(files.map(file => ({
                     type: "file",
@@ -3228,17 +3400,17 @@ ApplicationWindow {
                     subtitle: file.path,
                     icon: "\uf15b",
                     action: function() {
-                        
+                        // Open file
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                             process.start("xdg-open", [file.path]);
-                        } catch (e) {
-                            console.error("فشل فتح الملف:", e);
+                        } catch(e) {
+                            console.error("Failed to open file:", e);
                         }
                     }
                 })));
                 
-                
+                // 3. Find settings
                 const settings = searchSettings(query);
                 searchResults = searchResults.concat(settings.map(setting => ({
                     type: "setting",
@@ -3246,7 +3418,7 @@ ApplicationWindow {
                     subtitle: setting.section,
                     icon: "\uf013",
                     action: function() {
-                        
+                        // Open certain settings
                         try {
                             loader.source = "qrc:/SettingsApp/SettingsApp.qml";
                             settingsApp.activeTab = setting.tab;
@@ -3254,20 +3426,20 @@ ApplicationWindow {
                             archCollapseAnimation.restart();
                             isExpanded = false;
                             activeCapsule = "";
-                        } catch (e) {
-                            console.error("فشل فتح الإعدادات:", e);
+                        } catch(e) {
+                            console.error("Failed to open settings:", e);
                         }
                     }
                 })));
                 
-                
-                if (query.length >= 3) { 
+                // 4. Package Search (Pacman and AUR)
+                if(query.length >= 3) { // Only search at least 3 characters
                     searchPackages(query);
                 }
                 
-                
+                // 5. Simple command processing
                 const commands = processCommands(query);
-                if (commands) {
+                if(commands) {
                     searchResults.unshift({
                         type: "command",
                         title: commands.title,
@@ -3277,36 +3449,36 @@ ApplicationWindow {
                     });
                 }
                 
-                
+                // Restrict the number of results
                 searchResults = searchResults.slice(0, maxResults);
                 
-                
+                // Performance measurement
                 const endTime = performance.now();
                 const duration = endTime - startTime;
-                console.log(`البحث استغرق ${duration.toFixed(2)}ms`);
+                console.log(`The search took ${duration.toFixed(2)}ms`);
                 
-                
+                // Ensure a response of less than 5ms
                 if (duration > 5) {
-                    console.warn(`تحذير: وقت البحث تجاوز 5ms (${duration.toFixed(2)}ms)`);
+                    console.warn(`Warning: Search time exceeded 5ms (${duration.toFixed(2)}ms)`);
                 }
             }
             
-            
+            // Application search function
             function searchApplications(query) {
                 try {
                     const apps = [];
                     const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                     
-                    
+                    // Use xdg-desktop-menu to get applications
                     process.start("find", ["/usr/share/applications", "-name", "*.desktop"]);
                     process.waitForFinished();
                     const output = process.readAllStandardOutput().trim();
                     
                     const desktopFiles = output.split('\n');
                     for (const file of desktopFiles) {
-                        if (!file) continue;
+                        if(!file) continue;
                         
-                        
+                        // Read the .desktop file
                         const appProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         appProcess.start("grep", ["-E", "^(Name|Exec|Icon)=", file]);
                         appProcess.waitForFinished();
@@ -3326,24 +3498,24 @@ ApplicationWindow {
                         
                         if (name && exec && (name.toLowerCase().includes(query.toLowerCase()) || 
                             exec.toLowerCase().includes(query.toLowerCase()))) {
-                            apps.push({ name, exec, icon });
+                            apps.push({ name, exec, icon});
                         }
                     }
                     
                     return apps;
-                } catch (e) {
-                    console.error("فشل البحث عن التطبيقات:", e);
+                } catch(e) {
+                    console.error("App search failed:", e);
                     return [];
                 }
             }
             
-            
+            // File search function
             function searchFiles(query) {
                 try {
                     const files = [];
                     const homeDir = "/home/" + Qt.application.arguments[2];
                     
-                    
+                    // Search main folders
                     const dirs = [
                         homeDir + "/Documents",
                         homeDir + "/Pictures",
@@ -3356,9 +3528,9 @@ ApplicationWindow {
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                             process.start("find", [dir, "-maxdepth", "1", "-iname", `*${query}*`, "-type", "f"]);
-                            process.waitForFinished(500); 
+                            process.waitForFinished(500); // 500ms timeout for search
                             
-                            if (process.running) {
+                            if(process.running) {
                                 process.kill();
                                 continue;
                             }
@@ -3367,7 +3539,7 @@ ApplicationWindow {
                             const foundFiles = output.split('\n');
                             
                             for (const file of foundFiles) {
-                                if (!file) continue;
+                                if(!file) continue;
                                 
                                 const fileName = file.split('/').pop();
                                 files.push({
@@ -3375,77 +3547,77 @@ ApplicationWindow {
                                     path: file
                                 });
                                 
-                                
+                                // Do not exceed the maximum results
                                 if (files.length >= maxResults) break;
                             }
                             
-                            
+                            // Do not exceed the maximum results
                             if (files.length >= maxResults) break;
-                        } catch (e) {
-                            console.error("فشل البحث في المجلد:", dir, e);
+                        } catch(e) {
+                            console.error("Failed to search folder:", dir, e);
                         }
                     }
                     
                     return files;
-                } catch (e) {
-                    console.error("فشل البحث عن الملفات:", e);
+                } catch(e) {
+                    console.error("File search failed:", e);
                     return [];
                 }
             }
             
-            
+            // Settings search function
             function searchSettings(query) {
                 const settings = [];
                 const lowerQuery = query.toLowerCase();
                 
-                
-                if ("شاشة".includes(lowerQuery) || "display".includes(lowerQuery) || 
-                    "سطوع".includes(lowerQuery) || "brightness".includes(lowerQuery) ||
-                    "دقة".includes(lowerQuery) || "resolution".includes(lowerQuery)) {
+                // Screen settings
+                if("screen".includes(lowerQuery) || "display".includes(lowerQuery) || 
+                    "Brightness".includes(lowerQuery) || "brightness".includes(lowerQuery) ||
+                    "Accuracy".includes(lowerQuery) || "resolution".includes(lowerQuery)) {
                     settings.push({
-                        title: "إعدادات الشاشة",
-                        section: "الشاشة والعرض",
+                        title: "Screen Settings",
+                        section: "Screen and Display",
                         tab: "display"
                     });
                 }
                 
-                
-                if ("صوت".includes(lowerQuery) || "volume".includes(lowerQuery) || 
-                    "ميكروفون".includes(lowerQuery) || "microphone".includes(lowerQuery)) {
+                // Sound settings
+                if("voice".includes(lowerQuery) || "volume".includes(lowerQuery) || 
+                    "microphone".includes(lowerQuery) || "microphone".includes(lowerQuery)) {
                     settings.push({
-                        title: "إعدادات الصوت",
-                        section: "الصوت والصورة",
+                        title: "Audio Settings",
+                        section: "Audio and Image"
                         tab: "audio"
                     });
                 }
                 
-                
-                if ("شبكة".includes(lowerQuery) || "network".includes(lowerQuery) || 
-                    "واي فاي".includes(lowerQuery) || "wifi".includes(lowerQuery) ||
-                    "بلوتوث".includes(lowerQuery) || "bluetooth".includes(lowerQuery)) {
+                // Network Settings
+                if("network".includes(lowerQuery) || "network".includes(lowerQuery) || 
+                    "Wi-Fi".includes(lowerQuery) || "wifi".includes(lowerQuery) ||
+                    "Bluetooth".includes(lowerQuery) || "bluetooth".includes(lowerQuery)) {
                     settings.push({
-                        title: "إعدادات الشبكة",
-                        section: "الاتصال",
+                        title: "Network Settings",
+                        section: "Contact",
                         tab: "network"
                     });
                 }
                 
-                
-                if ("بطارية".includes(lowerQuery) || "battery".includes(lowerQuery) || 
-                    "طاقة".includes(lowerQuery) || "power".includes(lowerQuery)) {
+                // Battery settings
+                if("battery".includes(lowerQuery) || "battery".includes(lowerQuery) || 
+                    "Energy".includes(lowerQuery) || "power".includes(lowerQuery)) {
                     settings.push({
-                        title: "إعدادات البطارية",
-                        section: "الطاقة",
+                        title: "Battery Settings",
+                        section: "Energy",
                         tab: "power"
                     });
                 }
                 
-                
-                if ("أنميشن".includes(lowerQuery) || "animation".includes(lowerQuery) || 
-                    "حركة".includes(lowerQuery) || "motion".includes(lowerQuery)) {
+                //Animation settings
+                if("Animation".includes(lowerQuery) || "Animation".includes(lowerQuery) || 
+                    "Movement".includes(lowerQuery) || "motion".includes(lowerQuery)) {
                     settings.push({
-                        title: "إعدادات الأنميشنات",
-                        section: "التجربة البصرية",
+                        title: "Animation Settings",
+                        section: "Visual Experience",
                         tab: "animations"
                     });
                 }
@@ -3453,13 +3625,13 @@ ApplicationWindow {
                 return settings;
             }
             
-            
+            // Packet search function
             function searchPackages(query) {
                 try {
-                    
+                    // Search for Pacman packages
                     const pacmanProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                     pacmanProcess.start("pacman", ["-Ss", query]);
-                    pacmanProcess.waitForFinished(1000); 
+                    pacmanProcess.waitForFinished(1000); // 1 second timeout
                     
                     if (pacmanProcess.exitCode() === 0) {
                         const output = pacmanProcess.readAllStandardOutput().trim();
@@ -3476,35 +3648,35 @@ ApplicationWindow {
                                 searchResults.push({
                                     type: "package",
                                     title: pkgName,
-                                    subtitle: "حزمة Pacman - " + pkgDesc,
+                                    subtitle: "Pacman Package -" + pkgDesc,
                                     icon: "\uf17c",
                                     action: function() {
                                         try {
                                             const termProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                                             termProcess.start("alacritty", ["-e", "sudo", "pacman", "-S", "--noconfirm", pkgName]);
-                                        } catch (e) {
-                                            console.error("فشل فتح الطرفية:", e);
+                                        } catch(e) {
+                                            console.error("Failed to open terminal:", e);
                                         }
                                     }
                                 });
                                 
-                                
+                                // Do not exceed the maximum results
                                 if (searchResults.length >= maxResults) return;
                             }
                         }
                     }
                     
-                    
+                    // Search for AUR packages
                     const aurProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                     aurProcess.start("yay", ["-Ss", query]);
-                    aurProcess.waitForFinished(1000); 
+                    aurProcess.waitForFinished(1000); // 1 second timeout
                     
                     if (aurProcess.exitCode() === 0) {
                         const output = aurProcess.readAllStandardOutput().trim();
                         const lines = output.split('\n');
                         
                         for (const line of lines) {
-                            if (line.startsWith("aur/")) {
+                            if(line.startsWith("aur/")) {
                                 const parts = line.split(' ');
                                 const pkgName = parts[0].replace("aur/", "");
                                 const pkgDesc = parts.slice(1).join(' ');
@@ -3512,63 +3684,63 @@ ApplicationWindow {
                                 searchResults.push({
                                     type: "package",
                                     title: pkgName,
-                                    subtitle: "حزمة AUR - " + pkgDesc,
+                                    subtitle: "AUR package - " + pkgDesc,
                                     icon: "\uf17c",
                                     action: function() {
                                         try {
                                             const termProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                                             termProcess.start("alacritty", ["-e", "yay", "-S", "--noconfirm", pkgName]);
-                                        } catch (e) {
-                                            console.error("فشل فتح الطرفية:", e);
+                                        } catch(e) {
+                                            console.error("Failed to open terminal:", e);
                                         }
                                     }
                                 });
                                 
-                                
+                                // Do not exceed the maximum results
                                 if (searchResults.length >= maxResults) return;
                             }
                         }
                     }
-                } catch (e) {
-                    console.error("فشل البحث عن الحزم:", e);
+                } catch(e) {
+                    console.error("Failed to find packages:", e);
                 }
             }
             
-            
+            // Simple command processing function
             function processCommands(query) {
                 const lowerQuery = query.toLowerCase();
                 
-                
-                const timerMatch = lowerQuery.match(/^(ضبط|اضافة|انشاء|start)\s+(\d+)\s*(ثانية|دقيقة|ساعة|second|minute|hour)/);
-                if (timerMatch) {
+                //Timer order
+                const timerMatch = lowerQuery.match(/^(set|add|create|start)\s+(\d+)\s*(second|minute|hour|second|minute|hour)/);
+                if(timerMatch) {
                     const amount = parseInt(timerMatch[2]);
                     const unit = timerMatch[3];
                     let seconds = 0;
                     
-                    if (unit.includes("ثانية") || unit === "second") {
+                    if (unit.includes("second") || unit === "second") {
                         seconds = amount;
-                    } else if (unit.includes("دقيقة") || unit === "minute") {
+                    } else if (unit.includes("minute") || unit === "minute") {
                         seconds = amount * 60;
-                    } else if (unit.includes("ساعة") || unit === "hour") {
+                    } else if (unit.includes("hour") || unit === "hour") {
                         seconds = amount * 3600;
                     }
                     
                     if (seconds > 0) {
                         return {
-                            title: `مؤقت ${amount} ${unit}`,
-                            description: `سيتم تنبيهك بعد ${amount} ${unit}`,
+                            title: `temporary ${amount} ${unit}`,
+                            description: `You will be alerted after ${amount} ${unit}`,
                             action: function() {
-                                
+                                // Run the timer
                                 clockExpanded.activeTimer = {
                                     id: Date.now(),
-                                    endTime: Date.now() + (seconds * 1000),
+                                    endTime: Date.now() + (seconds*1000),
                                     isActive: true,
                                     paused: false,
                                     soundPath: "/usr/share/sounds/classic-alarm.wav"
                                 };
                                 clockExpanded.checkDynamicIsland();
                                 
-                                
+                                // Close the search capsule
                                 archCollapseAnimation.restart();
                                 isExpanded = false;
                                 activeCapsule = "";
@@ -3577,28 +3749,28 @@ ApplicationWindow {
                     }
                 }
                 
-                
-                const alarmMatch = lowerQuery.match(/^(ضبط|اضافة|انشاء|set)\s+المنبه\s+ل\s+(\d{1,2}):(\d{2})/);
+                // Alarm command
+                const alarmMatch = lowerQuery.match(/^(set|add|create|set)\s+alarm\s+l\s+(\d{1,2}):(\d{2})/);
                 if (alarmMatch) {
                     const hour = parseInt(alarmMatch[2]);
                     const minute = parseInt(alarmMatch[3]);
                     
                     if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) {
                         return {
-                            title: `منبه ${hour}:${minute}`,
-                            description: `سيتم تنبيهك عند الساعة ${hour}:${minute}`,
+                            title: `alarm ${hour}:${minute}`,
+                            description: `You will be alerted at ${hour}:${minute}`,
                             action: function() {
-                                
+                                // Add alarm
                                 clockExpanded.alarms.push({
                                     id: Date.now(),
-                                    time: `${hour < 10 ? '0' : ''}${hour}:${minute < 10 ? '0' : ''}${minute}`,
-                                    label: "منبه مخصص",
+                                    time: `${hour < 10 ? '0' : ''}${hour}:${minute < 10 ? '0': ''}${minute}`,
+                                    label: "Custom Alarm Clock",
                                     days: [true, true, true, true, true, true, true],
                                     isActive: true,
                                     soundPath: "/usr/share/sounds/classic-alarm.wav"
                                 });
                                 
-                                
+                                // Close the search capsule
                                 archCollapseAnimation.restart();
                                 isExpanded = false;
                                 activeCapsule = "";
@@ -3607,20 +3779,20 @@ ApplicationWindow {
                     }
                 }
                 
-                
-                if (lowerQuery.includes("Pause التشغيل") || lowerQuery.includes("shutdown")) {
+                // System shutdown command
+                if (lowerQuery.includes("Shutdown") || lowerQuery.includes("shutdown")) {
                     return {
-                        title: "Pause التشغيل",
-                        description: "Pause تشغيل الجهاز",
+                        title: "Shutdown",
+                        description: "Turn off the device",
                         action: function() {
                             try {
                                 const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                                 process.start("systemctl", ["poweroff"]);
-                            } catch (e) {
-                                console.error("فشل إيقاف التشغيل:", e);
+                            } catch(e) {
+                                console.error("Shutdown Failed:", e);
                             }
                             
-                            
+                            // Close the search capsule
                             archCollapseAnimation.restart();
                             isExpanded = false;
                             activeCapsule = "";
@@ -3628,20 +3800,20 @@ ApplicationWindow {
                     };
                 }
                 
-                
-                if (lowerQuery.includes("إعادة التشغيل") || lowerQuery.includes("reboot")) {
+                // Restart command
+                if(lowerQuery.includes("reboot") || lowerQuery.includes("reboot")) {
                     return {
-                        title: "إعادة التشغيل",
-                        description: "إعادة تشغيل الجهاز",
+                        title: "Restart",
+                        description: "Restart the device",
                         action: function() {
                             try {
                                 const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                                 process.start("systemctl", ["reboot"]);
-                            } catch (e) {
-                                console.error("فشل إعادة التشغيل:", e);
+                            } catch(e) {
+                                console.error("Restart Failed:", e);
                             }
                             
-                            
+                            // Close the search capsule
                             archCollapseAnimation.restart();
                             isExpanded = false;
                             activeCapsule = "";
@@ -3652,18 +3824,18 @@ ApplicationWindow {
                 return null;
             }
             
-            
+            // Result execution function
             function executeResult(result) {
                 if (result && result.action) {
                     result.action();
                 }
             }
             
+            //=======================
+            // User interface components
+            //=======================
             
-            
-            
-            
-            
+            // Search result component
             Component {
                 id: searchResultComponent
                 
@@ -3674,17 +3846,17 @@ ApplicationWindow {
                     width: parent.width
                     height: 50
                     
-                    
+                    // Background
                     Rectangle {
                         anchors.fill: parent
                         radius: 15
                         color: searchResult.isActive ? 
-                            Qt.rgba(pywalColors.colors[5].r, pywalColors.colors[5].g, pywalColors.colors[5].b, 0.1) : 
+                            Qt.rgba(pywalColors.colors[5].r, pywalColors.colors[5].g, pywalColors.colors[5].b, 0.1): 
                             "#000000"
                         border.width: 0
                     }
                     
-                    
+                    // Icon
                     Text {
                         anchors.left: parent.left
                         anchors.leftMargin: 15
@@ -3695,7 +3867,7 @@ ApplicationWindow {
                         color: pywalColors.colors[5]
                     }
                     
-                    
+                    // Address
                     Text {
                         anchors.left: iconText.right
                         anchors.leftMargin: 10
@@ -3708,7 +3880,7 @@ ApplicationWindow {
                         width: parent.width * 0.6
                     }
                     
-                    
+                    // Description
                     Text {
                         anchors.right: parent.right
                         anchors.rightMargin: 15
@@ -3721,7 +3893,7 @@ ApplicationWindow {
                         width: parent.width * 0.3
                     }
                     
-                    
+                    // Interaction area
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
@@ -3741,17 +3913,17 @@ ApplicationWindow {
             }
         }
 
-        
-        
-        
+        //================================
+        // Process keyboard shortcuts
+        //================================
         Keys.onPressed: {
-            
+            // Meta shortcut to open the ArchStart capsule
             if (event.key === Qt.Key_Meta && !isExpanded && activeCapsule === "") {
                 archCapsule.onClicked();
                 event.accepted = true;
             }
             
-            
+            //Esc shortcut to close the ArchStart capsule
             if (event.key === Qt.Key_Escape && isExpanded) {
                 archCollapseAnimation.restart();
                 isExpanded = false;
@@ -3760,21 +3932,21 @@ ApplicationWindow {
             }
         }
             
-        
-        
-        
+        //==========================
+        // Capsule name of the active application
+        //=========================
         Capsule {
             id: activeWindowCapsule
-            icon: "\uf2d2" 
-            label: activeWindowName || "سطح المكتب"
+            icon: "\uf2d2" // Window icon from Font Awesome 7
+            label: activeWindowName || "Desktop"
             colorIndex: 3
             capsuleId: "activeWindow"
             width: activeWindowCapsule.implicitWidth + 20
             
-            property string activeWindowName: "سطح المكتب"
-            property string activeWindowIcon: "\uf10c" 
+            property string activeWindowName: "Desktop"
+            property string activeWindowIcon: "\uf10c" // Default icon
             
-            
+            // Function to extract active window information
             function getActiveWindowInfo() {
                 try {
                     const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -3782,19 +3954,19 @@ ApplicationWindow {
                     process.waitForFinished();
                     const output = process.readAllStandardOutput().trim();
                     
-                    if (output && output.includes("class:")) {
+                    if(output && output.includes("class:")) {
                         const className = output.split("class:")[1].split("\n")[0].trim();
                         activeWindowName = className;
                         
-                        
-                        console.log("تفاصيل النافذة النشطة:", activeWindowName);
+                        // You can add logic to display additional information about the window
+                        console.log("Active Window Details:", activeWindowName);
                     }
-                } catch (e) {
-                    console.error("فشل جلب معلومات النافذة النشطة:", e);
+                } catch(e) {
+                    console.error("Failed to fetch active window information:", e);
                 }
             }
             
-            
+            // Temporary to update active window information
             Timer {
                 interval: 1000
                 repeat: true
@@ -3802,7 +3974,7 @@ ApplicationWindow {
                 onTriggered: getActiveWindowInfo()
             }
             
-            
+            // Base capsule
             Rectangle {
                 id: capsuleBase
                 anchors.fill: parent
@@ -3811,15 +3983,15 @@ ApplicationWindow {
                 border.width: 0
                 layer.enabled: isExpanded || isAnimating
                 layer.smooth: isExpanded
-                layer.effect: isExpanded ? dropShadowEffect : null
+                layer.effect: isExpanded ? dropShadowEffect: null
 
                 onVisibleChanged: {
-                    if (!visible) {
+                    if(!visible) {
                         layer.enabled = false;
                     }
                 }
 
-                
+                // Window icon
                 Text {
                     id: windowIcon
                     anchors.left: parent.left
@@ -3835,7 +4007,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Window title
                 Text {
                     id: windowTitle
                     anchors.left: windowIcon.right
@@ -3852,27 +4024,27 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //======================
+            //Music player capsule
+            //======================
             Capsule {
-                icon: "\uf001"  
-                label: musicPlayer.isPlaying ? "يُشغّل" : "متوقف"
+                icon: "\uf001"  //Music icon
+                label: musicPlayer.isPlaying ? "turns on": "off"
                 colorIndex: 6
                 capsuleId: "music"
                 width: 120
                 height: 50
                 property bool isExpanded: false
 
-                
+                //Music properties
                 property bool isPlaying: false
-                property string currentTitle: "لا توجد موسيقى قيد التشغيل"
+                property string currentTitle: "No music playing"
                 property string currentArtist: ""
                 property double progress: 0.0
-                property double duration: 180.0 
+                property double duration: 180.0 // 3 minutes by default
                 property double position: 0.0
 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     id: musicHoverAnimation
                     duration: 50
@@ -3882,7 +4054,7 @@ ApplicationWindow {
                     running: false
                 }
 
-                
+                // Expansion Animation
                 ParallelAnimation {
                     id: expandAnimation
                     NumberAnimation {
@@ -3899,7 +4071,7 @@ ApplicationWindow {
                         duration: 50
                         easing.type: Easing.OutQuart
                     }
-                    
+                    // Add a "click" effect on click
                     ScaleAnimation {
                         target: capsuleBase
                         property: "scale"
@@ -3911,7 +4083,7 @@ ApplicationWindow {
                     }
                 }
 
-                
+                // Shrinkage animation
                 ParallelAnimation {
                     id: collapseAnimation
                     NumberAnimation {
@@ -3930,7 +4102,7 @@ ApplicationWindow {
                     }
                 }
 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     id: hoverAnimation
                     duration: 50
@@ -3940,7 +4112,7 @@ ApplicationWindow {
                     running: false
                 }
 
-                
+                // Click animation on click
                 ScaleAnimation {
                     id: pressAnimation
                     target: capsuleBase
@@ -3949,52 +4121,52 @@ ApplicationWindow {
                     easing.type: Easing.OutBack
                 }
 
-                
+                //Click processing
                 onClicked: {
-                    if (!isExpanded) {
-                        
+                    if(!isExpanded) {
+                        // Close all other capsules quickly
                         for (let i = 0; i < capsuleLayout.children.length; i++) {
                             let child = capsuleLayout.children[i];
-                            if (child.isExpanded && child.capsuleId !== capsule.capsuleId) {
+                            if (child.isExpanded && child.capsuleId!== capsule.capsuleId) {
                                 child.collapseAnimation.restart();
                                 child.isExpanded = false;
                             }
                         }
 
-                        
+                        // Expand this capsule
                         musicExpandAnimation.restart();
                         isExpanded = true;
                         activeCapsule = capsuleId;
 
-                        
+                        // Display the expanded music player
                         musicPlayerExpanded.visible = true;
                         musicPlayerExpanded.z = 100;
                         
-                        
+                        // Start updating music data
                         musicPlayerExpanded.musicDataTimer.running = true;
                         musicPlayerExpanded.updateMusicDisplay();
                     } else {
-                        
+                        // Close this capsule
                         musicCollapseAnimation.restart();
                         isExpanded = false;
                         activeCapsule = "";
 
-                        
+                        // Hide the extended music player
                         musicPlayerExpanded.visible = false;
                         musicPlayerExpanded.musicDataTimer.running = false;
                     }
                 }
 
-                
-                
-                
+                //============================
+                //Extended music player interface
+                //============================
                 Item {
                     id: musicPlayerExpanded
                     anchors.fill: parent
                     visible: false
                     z: 100
 
-                    
+                    // Temporary to update music data
                     Timer {
                         id: musicDataTimer
                         interval: 1000
@@ -4005,66 +4177,66 @@ ApplicationWindow {
                         }
                     }
 
-                    
+                    // Function to update music data
                     function updateMusicData() {
                         try {
-                            
+                            // Get a list of available music players
                             const dbus = Qt.createQmlObject('import Qt.labs.dbus 6.8; DBus', root, "DBus");
                             const players = getAvailablePlayers();
                             
-                            if (players.length > 0) {
+                            if(players.length > 0) {
                                 const player = players[0];
                                 
-                                
+                                // Set music properties
                                 currentTitle = getTrackTitle(player);
                                 currentArtist = getArtist(player);
                                 duration = getDuration(player);
                                 position = getPosition(player);
-                                progress = duration > 0 ? position / duration : 0;
+                                progress = duration > 0? position / duration: 0;
                                 isPlaying = isPlaying(player);
                                 
+                                // Update the capsule
+                                musicCapsule.label = isPlaying ? "on": "off";
                                 
-                                musicCapsule.label = isPlaying ? "يُشغّل" : "متوقف";
-                                
-                                
+                                // Update display
                                 if (visible) {
                                     updateMusicDisplay();
                                 }
                             } else {
-                                
-                                currentTitle = "لا توجد موسيقى قيد التشغيل";
+                                //No active music player
+                                currentTitle = "No music playing";
                                 currentArtist = "";
                                 progress = 0.0;
                                 isPlaying = false;
-                                musicCapsule.label = "متوقف";
+                                musicCapsule.label = "Stopped";
                                 
                                 if (visible) {
                                     updateMusicDisplay();
                                 }
                             }
-                        } catch (e) {
-                            console.error("فشل تحديث بيانات الموسيقى:", e);
+                        } catch(e) {
+                            console.error("Music data update failed:", e);
                         }
                     }
 
-                    
+                    // Function to update the user interface
                     function updateMusicDisplay() {
-                        if (!visible) return;
+                        if(!visible) return;
                         
-                        
+                        // Update texts
                         musicTitle.text = currentTitle;
                         musicArtist.text = currentArtist;
                         
-                        
+                        // Update progress bar
                         progressBar.width = musicProgressContainer.width * progress;
                         
-                        
-                        playPauseButton.icon = isPlaying ? "\uf04c" : "\uf04b"; 
+                        // Update control buttons
+                        playPauseButton.icon = isPlaying ? "\uf04c" : "\uf04b"; // Stop/play icon
                     }
 
-                    
-                    
-                    
+                    //====================
+                    // Music player interface
+                    //====================
                     Rectangle {
                         id: musicContainer
                         anchors.fill: parent
@@ -4072,7 +4244,7 @@ ApplicationWindow {
                         visible: false
                         z: 100
 
-                        
+                        // Background with blur effect
                         FastBlur {
                             anchors.fill: parent
                             source: parent
@@ -4080,15 +4252,15 @@ ApplicationWindow {
                             opacity: 0.8
                         }
 
-                        
+                        //Music information
                         ColumnLayout {
                             anchors.centerIn: parent
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.verticalCenter: parent.verticalCenter
-                            spacing: 20
+                            Spacing: 20
                             width: parent.width * 0.8
 
-                            
+                            // Path information
                             Item {
                                 width: parent.width
                                 height: 60
@@ -4118,7 +4290,7 @@ ApplicationWindow {
                                 }
                             }
 
-                            
+                            // Progress bar
                             Item {
                                 id: musicProgressContainer
                                 width: parent.width
@@ -4135,15 +4307,15 @@ ApplicationWindow {
                                     height: parent.height
                                     radius: 5
                                     color: pywalColors.colors[6]
-                                    width: musicProgressContainer.width * progress
+                                    width: musicProgressContainer.width*progress
                                 }
 
-                                
+                                // Show time
                                 RowLayout {
                                     anchors.top: musicProgressContainer.bottom
                                     anchors.topMargin: 5
                                     width: parent.width
-                                    spacing: 20
+                                    Spacing: 20
 
                                     Text {
                                         text: formatTime(position)
@@ -4167,26 +4339,26 @@ ApplicationWindow {
                                 }
                             }
 
-                            
+                            // Control buttons
                             RowLayout {
-                                spacing: 25
+                                Spacing: 25
                                 Layout.alignment: Qt.AlignHCenter
 
-                                
+                                //Previous button
                                 MusicButton {
                                     icon: "\uf048"
-                                    tooltip: "Previous track"
+                                    tooltip: "previous path"
                                     onClicked: {
                                         previousTrack();
                                         updateMusicData();
                                     }
                                 }
 
-                                
+                                //Play button/Stop
                                 MusicButton {
                                     id: playPauseButton
                                     icon: isPlaying ? "\uf04c" : "\uf04b"
-                                    tooltip: isPlaying ? "Pause" : "Play"
+                                    tooltip: isPlaying ? "off": "on"
                                     width: 40
                                     height: 40
                                     onClicked: {
@@ -4200,10 +4372,10 @@ ApplicationWindow {
                                     }
                                 }
 
-                                
+                                //Next button
                                 MusicButton {
                                     icon: "\uf051"
-                                    tooltip: "Next track"
+                                    tooltip: "Next path"
                                     onClicked: {
                                         nextTrack();
                                         updateMusicData();
@@ -4213,18 +4385,18 @@ ApplicationWindow {
                         }
                     }
 
-                    
-                    
-                    
-                    
+                    //====================
+                    //Music service functions
+                    //====================
+                    // Time format function
                     function formatTime(seconds) {
-                        if (!seconds || isNaN(seconds)) return "0:00";
+                        if(!seconds || isNaN(seconds)) return "0:00";
                         let minutes = Math.floor(seconds / 60);
                         let remainingSeconds = Math.floor(seconds % 60);
                         return minutes + ":" + (remainingSeconds < 10 ? "0" : "") + remainingSeconds;
                     }
 
-                    
+                    // Function to get available music players
                     function getAvailablePlayers() {
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -4241,13 +4413,13 @@ ApplicationWindow {
                             }
                             
                             return players;
-                        } catch (e) {
-                            console.error("فشل جلب مشغلات الموسيقى:", e);
+                        } catch(e) {
+                            console.error("Failed to fetch music players:", e);
                             return [];
                         }
                     }
 
-                    
+                    // Function to get the path address
                     function getTrackTitle(player) {
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -4255,16 +4427,16 @@ ApplicationWindow {
                             process.waitForFinished();
                             const output = process.readAllStandardOutput().trim();
                             
-                            
+                            // Parse the output to get the path address
                             const metadata = parseMetadata(output);
-                            return metadata["xesam:title"] || "عنوان غير معروف";
-                        } catch (e) {
-                            console.error("فشل جلب عنوان المسار:", e);
-                            return "عنوان غير معروف";
+                            return metadata["xesam:title"] || "Unknown title";
+                        } catch(e) {
+                            console.error("Failed to fetch path address:", e);
+                            return "Unknown address";
                         }
                     }
 
-                    
+                    // Function to get the artist's name
                     function getArtist(player) {
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -4272,17 +4444,17 @@ ApplicationWindow {
                             process.waitForFinished();
                             const output = process.readAllStandardOutput().trim();
                             
-                            
+                            // Parse the output to get the artist name
                             const metadata = parseMetadata(output);
-                            const artist = metadata["xesam:artist"] || "فنان غير معروف";
-                            return Array.isArray(artist) ? artist[0] : artist;
-                        } catch (e) {
-                            console.error("فشل جلب اسم الفنان:", e);
-                            return "فنان غير معروف";
+                            const artist = metadata["xesam:artist"] || "Unknown artist";
+                            return Array.isArray(artist)? artist[0] : artist;
+                        } catch(e) {
+                            console.error("Failed to fetch artist name:", e);
+                            return "Unknown Artist";
                         }
                     }
 
-                    
+                    // Function to get the path duration
                     function getDuration(player) {
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -4290,17 +4462,17 @@ ApplicationWindow {
                             process.waitForFinished();
                             const output = process.readAllStandardOutput().trim();
                             
-                            
+                            // Parse the output to get the duration
                             const metadata = parseMetadata(output);
                             const durationMicroseconds = metadata["mpris:length"] || 0;
-                            return durationMicroseconds / 1000000; 
-                        } catch (e) {
-                            console.error("فشل جلب مدة المسار:", e);
-                            return 180; 
+                            return durationMicroseconds / 1000000; // Convert to seconds
+                        } catch(e) {
+                            console.error("Failed to fetch path duration:", e);
+                            return 180; // 3 minutes by default
                         }
                     }
 
-                    
+                    // Function to get the current location
                     function getPosition(player) {
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -4308,16 +4480,16 @@ ApplicationWindow {
                             process.waitForFinished();
                             const output = process.readAllStandardOutput().trim();
                             
-                            
+                            // Convert position from microseconds to seconds
                             const positionMicroseconds = parseInt(output);
                             return positionMicroseconds / 1000000;
-                        } catch (e) {
-                            console.error("فشل جلب الموقع الحالي:", e);
+                        } catch(e) {
+                            console.error("Failed to fetch current location:", e);
                             return 0;
                         }
                     }
 
-                    
+                    // Function to check the operating status
                     function isPlaying(player) {
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -4326,69 +4498,69 @@ ApplicationWindow {
                             const output = process.readAllStandardOutput().trim();
                             
                             return output.includes("Playing");
-                        } catch (e) {
-                            console.error("فشل جلب حالة التشغيل:", e);
+                        } catch(e) {
+                            console.error("Failed to fetch operating status:", e);
                             return false;
                         }
                     }
 
-                    
+                    // Function to run
                     function playTrack() {
                         try {
                             const players = getAvailablePlayers();
-                            if (players.length === 0) return;
+                            if(players.length === 0) return;
                             
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                             process.start("qdbus", [players[0], "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.Play"]);
                             process.waitForFinished();
-                        } catch (e) {
-                            console.error("فشل تشغيل المسار:", e);
+                        } catch(e) {
+                            console.error("Failed to run path:", e);
                         }
                     }
 
-                    
+                    // Stop function
                     function pauseTrack() {
                         try {
                             const players = getAvailablePlayers();
-                            if (players.length === 0) return;
+                            if(players.length === 0) return;
                             
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                             process.start("qdbus", [players[0], "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.Pause"]);
                             process.waitForFinished();
-                        } catch (e) {
-                            console.error("فشل إيقاف المسار:", e);
+                        } catch(e) {
+                            console.error("Failed to stop path:", e);
                         }
                     }
 
-                    
+                    // Function for the previous path
                     function previousTrack() {
                         try {
                             const players = getAvailablePlayers();
-                            if (players.length === 0) return;
+                            if(players.length === 0) return;
                             
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                             process.start("qdbus", [players[0], "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.Previous"]);
                             process.waitForFinished();
-                        } catch (e) {
-                            console.error("فشل الانتقال للمسار السابق:", e);
+                        } catch(e) {
+                            console.error("Failed to move to previous path:", e);
                         }
                     }
 
-                    
+                    // Function for the next path
                     function nextTrack() {
                         try {
                             const players = getAvailablePlayers();
-                            if (players.length === 0) return;
+                            if(players.length === 0) return;
                             
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                             process.start("qdbus", [players[0], "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.Next"]);
                             process.waitForFinished();
-                        } catch (e) {
-                            console.error("فشل الانتقال للمسار التالي:", e);
+                        } catch(e) {
+                            console.error("Failed to move to the next path:", e);
                         }
                     }
 
-                    
+                    // Function to analyze meta data
                     function parseMetadata(metadataOutput) {
                         try {
                             const result = {};
@@ -4396,14 +4568,14 @@ ApplicationWindow {
                             
                             for (let i = 0; i < lines.length; i++) {
                                 if (lines[i].includes("variant")) {
-                                    const key = lines[i - 1].trim();
-                                    const value = lines[i + 1].trim();
+                                    const key = lines[i - 1]. trim();
+                                    const value = lines[i + 1]. trim();
                                     
                                     if (key.includes("xesam:") || key.includes("mpris:")) {
-                                        
+                                        // Remove quotes and navigation
                                         let cleanValue = value.replace(/"/g, '').trim();
                                         
-                                        
+                                        // Process array values
                                         if (cleanValue.startsWith('[') && cleanValue.endsWith(']')) {
                                             cleanValue = cleanValue.substring(1, cleanValue.length - 1)
                                                 .split(',')
@@ -4416,17 +4588,17 @@ ApplicationWindow {
                             }
                             
                             return result;
-                        } catch (e) {
-                            console.error("فشل تحليل بيانات الميتا:", e);
+                        } catch(e) {
+                            console.error("Meta data analysis failed:", e);
                             return {};
                         }
                     }
                 }
             }
 
-            
-            
-            
+            //====================
+            //Music button component
+            //====================
             Item {
                 id: MusicButton
                 property string icon
@@ -4434,14 +4606,14 @@ ApplicationWindow {
                 width: 35
                 height: 35
                 
-                
+                // Background
                 Rectangle {
                     anchors.fill: parent
                     radius: 17
                     color: "#000000"
                     border.width: 0
                     
-                    
+                    // Icon
                     Text {
                         anchors.centerIn: parent
                         text: MusicButton.icon
@@ -4450,7 +4622,7 @@ ApplicationWindow {
                         color: pywalColors.colors[7]
                     }
                     
-                    
+                    // Animation of interaction with the mouse
                     ScaleAnimation on scale {
                         duration: 50
                         easing.type: Easing.OutQuart
@@ -4459,7 +4631,7 @@ ApplicationWindow {
                         running: false
                     }
                     
-                    
+                    // Interaction area
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
@@ -4467,7 +4639,7 @@ ApplicationWindow {
                             parent.scale = 1.05
                         }
                         onReleased: {
-                            parent.scale = 1.0
+                            parent.scale=1.0
                         }
                         onClicked: {
                             if (MusicButton.onClicked) {
@@ -4475,7 +4647,7 @@ ApplicationWindow {
                             }
                         }
                         onEntered: {
-                            if (MusicButton.tooltip) {
+                            if(MusicButton.tooltip) {
                                 showTooltip(MusicButton.tooltip, mouseX, mouseY)
                             }
                         }
@@ -4486,13 +4658,13 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //====================
+            //Tips management functions
+            //====================
             function showTooltip(text, x, y) {
                 tooltipText.text = text
                 tooltip.visible = true
-                tooltip.x = x + 10
+                tooltip.x=x+10
                 tooltip.y = y - 30
             }
 
@@ -4500,9 +4672,9 @@ ApplicationWindow {
                 tooltip.visible = false
             }
 
-            
-            
-            
+            //====================
+            // Advice element
+            //====================
             Rectangle {
                 id: tooltip
                 width: tooltipText.implicitWidth + 20
@@ -4522,11 +4694,11 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //====================
+            // Workspace Capsule
+            //====================
             Capsule {
-                icon: "\uf111" 
+                icon: "\uf111" // Empty circle icon
                 label: activeWorkspace.toString()
                 colorIndex: 6
                 capsuleId: "workspaces"
@@ -4537,15 +4709,15 @@ ApplicationWindow {
                 property int maxVisible: 5
                 property int totalWorkspaces: 10
                 
-                
+                // Interaction properties
                 property bool isDragging: false
                 property var draggingWindow: null
                 property var currentWorkspace: null
                 property var windowUnderDrag: null
                 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
-                    id: workspacesHoverAnimation
+                    id:workspacesHoverAnimation
                     duration: 50
                     easing.type: Easing.OutQuart
                     from: 1
@@ -4553,7 +4725,7 @@ ApplicationWindow {
                     running: false
                 }
                 
-                
+                // Expansion Animation
                 ParallelAnimation {
                     id: expandAnimation
                     NumberAnimation {
@@ -4570,7 +4742,7 @@ ApplicationWindow {
                         duration: 50
                         easing.type: Easing.OutQuart
                     }
-                    
+                    // Add a "click" effect on click
                     ScaleAnimation {
                         target: capsuleBase
                         property: "scale"
@@ -4582,7 +4754,7 @@ ApplicationWindow {
                     }
                 }
 
-                
+                // Shrinkage animation
                 ParallelAnimation {
                     id: collapseAnimation
                     NumberAnimation {
@@ -4601,7 +4773,7 @@ ApplicationWindow {
                     }
                 }
 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     id: hoverAnimation
                     duration: 50
@@ -4611,7 +4783,7 @@ ApplicationWindow {
                     running: false
                 }
 
-                
+                // Click animation on click
                 ScaleAnimation {
                     id: pressAnimation
                     target: capsuleBase
@@ -4620,7 +4792,7 @@ ApplicationWindow {
                     easing.type: Easing.OutBack
                 }
                 
-                
+                // Right click processing
                 MouseArea {
                     anchors.fill: parent
                     acceptedButtons: Qt.RightButton
@@ -4630,54 +4802,54 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Left-click processing
                 MouseArea {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton
                     hoverEnabled: true
                     onClicked: {
-                        if (!isExpanded) {
-                            
+                        if(!isExpanded) {
+                            // Close all other capsules quickly
                             for (let i = 0; i < capsuleLayout.children.length; i++) {
                                 let child = capsuleLayout.children[i];
-                                if (child.isExpanded && child.capsuleId !== capsule.capsuleId) {
+                                if (child.isExpanded && child.capsuleId!== capsule.capsuleId) {
                                     child.collapseAnimation.restart();
                                     child.isExpanded = false;
                                 }
                             }
                             
-                            
+                            // Expand this capsule
                             workspacesExpandAnimation.restart();
                             isExpanded = true;
                             activeCapsule = capsuleId;
                             
-                            
-                            workspacesExpanded.visible = true;
-                            workspacesExpanded.z = 100;
+                            // Display the expanded panel
+                            workshopsExpanded.visible = true;
+                            workshopsExpanded.z = 100;
                         } else {
-                            
+                            // Close this capsule
                             workspacesCollapseAnimation.restart();
                             isExpanded = false;
                             activeCapsule = "";
                             
-                            
-                            workspacesExpanded.visible = false;
+                            // Hide the expanded panel
+                            workshopsExpanded.visible = false;
                         }
                     }
                 }
                 
-                
-                
-                
+                //====================
+                // Expanded Workspace Interface
+                //====================
                 Item {
-                    id: workspacesExpanded
+                    id:workspacesExpanded
                     anchors.fill: parent
                     visible: false
                     z: 100
                     
-                    
+                    // Temporary to update workspace information
                     Timer {
-                        id: workspaceTimer
+                        id:workspaceTimer
                         interval: 500
                         repeat: true
                         running: false
@@ -4687,7 +4859,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Function to extract the active workspace
                     function getActiveWorkspace() {
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -4695,20 +4867,20 @@ ApplicationWindow {
                             process.waitForFinished();
                             const output = process.readAllStandardOutput().trim();
                             
-                            if (output && output.includes("workspace ID")) {
-                                const workspaceId = parseInt(output.split("workspace ID")[1].trim().split(" ")[0]);
-                                if (!isNaN(workspaceId)) {
+                            if(output && output.includes("workspace ID")) {
+                                const workspaceId = parseInt(output.split("workspace ID")[1].trim().split("")[0]);
+                                if(!isNaN(workspaceId)) {
                                     activeWorkspace = workspaceId;
                                     return workspaceId;
                                 }
                             }
-                        } catch (e) {
-                            console.error("فشل جلب مساحة العمل النشطة:", e);
+                        } catch(e) {
+                            console.error("Failed to fetch active workspace:", e);
                         }
                         return 1;
                     }
                     
-                    
+                    // Function to display workspace information
                     function getWorkspacesInfo() {
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -4716,107 +4888,107 @@ ApplicationWindow {
                             process.waitForFinished();
                             const output = process.readAllStandardOutput().trim();
                             
-                            
+                            // Analyze the output to get workspace information
                             const workspaces = [];
                             const lines = output.split('\n');
                             
                             for (let i = 0; i < lines.length; i++) {
                                 if (lines[i].includes("workspace ID")) {
-                                    const workspaceId = parseInt(lines[i].split("workspace ID")[1].trim().split(" ")[0]);
+                                    const workspaceId = parseInt(lines[i].split("workspace ID")[1].trim().split("")[0]);
                                     const windows = [];
                                     
-                                    
+                                    // Add workspace windows
                                     for (let j = i + 1; j < lines.length; j++) {
                                         if (lines[j].includes("workspace ID")) break;
                                         if (lines[j].includes("class:")) {
                                             const className = lines[j].split("class:")[1].trim().split(" ")[0];
                                             const title = lines[j].split("title:")[1].trim();
-                                            windows.push({ className, title });
+                                            windows.push({ className, title});
                                         }
                                     }
                                     
                                     workspaces.push({
-                                        id: workspaceId,
+                                        id:workspaceId,
                                         windows: windows,
                                         active: lines[i].includes("active")
                                     });
                                 }
                             }
                             
-                            
-                            workspaces.sort((a, b) => a.id - b.id);
+                            // Sort workspaces by ID
+                            workshopspaces.sort((a, b) => a.id - b.id);
                             
                             return workspaces;
-                        } catch (e) {
-                            console.error("فشل جلب معلومات مساحات العمل:", e);
+                        } catch(e) {
+                            console.error("Failed to fetch workspace information:", e);
                             return Array.from({length: totalWorkspaces}, (_, i) => ({
                                 id: i + 1,
-                                windows: i === 0 ? [{ className: "Shell", title: "Desind" }] : [],
+                                windows: i===0? [{ className: "Shell", title: "Desind"}] : [],
                                 active: i === 0
                             }));
                         }
                     }
                     
-                    
+                    // Function to update the width of workspaces
                     function updateWorkspacesDisplay() {
-                        const workspaces = getWorkspacesInfo();
+                        const workshopspaces = getWorkspacesInfo();
                         
+                        // Update display
+                        workshopspacesGrid.model = workshopspaces;
                         
-                        workspacesGrid.model = workspaces;
-                        
-                        
-                        workspacesCapsule.activeWorkspace = getActiveWorkspace();
-                        workspacesCapsule.label = workspacesCapsule.activeWorkspace.toString();
+                        // Update workspace capsule
+                        workshopsCapsule.activeWorkspace = getActiveWorkspace();
+                        workshopsCapsule.label = workshopsCapsule.activeWorkspace.toString();
                     }
                     
-                    
+                    // Function to change the workspace
                     function switchWorkspace(workspaceId) {
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                             process.start("hyprctl", ["dispatch", "workspace", workspaceId.toString()]);
                             process.waitForFinished();
                             
-                            
+                            // Update active workspace information
                             activeWorkspace = workspaceId;
-                            workspacesCapsule.activeWorkspace = workspaceId;
-                            workspacesCapsule.label = workspaceId.toString();
+                            workshopsCapsule.activeWorkspace = workshopspaceId;
+                            workshopsCapsule.label = workshopspaceId.toString();
                             
-                            
+                            // Close the expanded capsule
                             workspacesCollapseAnimation.restart();
-                            workspacesCapsule.isExpanded = false;
+                            workshopsCapsule.isExpanded = false;
                             activeCapsule = "";
-                            workspacesExpanded.visible = false;
-                        } catch (e) {
-                            console.error("فشل تغيير مساحة العمل:", e);
+                            workshopsExpanded.visible = false;
+                        } catch(e) {
+                            console.error("Workspace change failed:", e);
                         }
                     }
                     
-                    
+                    // Function to move a window into a workspace
                     function moveWindowToWorkspace(windowClass, workspaceId) {
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                             process.start("hyprctl", ["dispatch", "movetoworkspace", workspaceId.toString(), windowClass]);
                             process.waitForFinished();
                             
-                            
+                            // Update the display immediately
                             updateWorkspacesDisplay();
-                        } catch (e) {
-                            console.error("فشل تحريك النافذة إلى مساحة العمل:", e);
+                        } catch(e) {
+                            console.error("Failed to move window to workspace:", e);
                         }
                     }
                     
-                    
+                    // Function to start dragging the window
                     function startDragging(windowItem) {
                         isDragging = true;
                         draggingWindow = windowItem;
                         windowUnderDrag = windowItem.parent.parent;
                         
-                        
+                        // Add a drag effect
                         windowItem.parent.scale = 1.1;
                         windowItem.parent.z = 100;
                     }
                     
-                    
+                    // Function to terminate the withdrawal
                     function stopDragging() {
                         isDragging = false;
                         if (draggingWindow) {
@@ -4827,17 +4999,17 @@ ApplicationWindow {
                         }
                     }
                     
-                    
-                    
-                    
+                    //====================
+                    // Expanded Workspace Interface
+                    //====================
                     Rectangle {
-                        id: workspacesContainer
+                        id:workspacesContainer
                         anchors.fill: parent
                         color: "#000000"
                         visible: false
                         z: 100
                         
-                        
+                        // Background with blur effect
                         FastBlur {
                             anchors.fill: parent
                             source: parent
@@ -4845,29 +5017,29 @@ ApplicationWindow {
                             opacity: 0.8
                         }
                         
-                        
+                        // Workspace content
                         ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: 20
-                            spacing: 20
+                            Spacing: 20
                             
-                            
+                            // Panel title
                             Text {
-                                text: "مساحات العمل"
+                                text: "Work Spaces"
                                 font.family: "IBM Plex Sans Thin"
                                 font.pixelSize: 20
                                 color: pywalColors.colors[6]
                                 Layout.alignment: Qt.AlignHCenter
                             }
                             
-                            
+                            // Navigation bar
                             RowLayout {
-                                spacing: 10
+                                Spacing: 10
                                 Layout.alignment: Qt.AlignHCenter
                                 
-                                
+                                //Previous button
                                 WorkspaceButton {
-                                    icon: "\uf060" 
+                                    icon: "\uf060" // Left arrow icon
                                     onClicked: {
                                         if (visibleStart > 1) {
                                             visibleStart = Math.max(1, visibleStart - 1);
@@ -4877,7 +5049,7 @@ ApplicationWindow {
                                     }
                                 }
                                 
-                                
+                                // Scroll indicator
                                 Rectangle {
                                     width: 150
                                     height: 8
@@ -4894,9 +5066,9 @@ ApplicationWindow {
                                     }
                                 }
                                 
-                                
+                                //Next button
                                 WorkspaceButton {
-                                    icon: "\uf061" 
+                                    icon: "\uf061" // Right arrow icon
                                     onClicked: {
                                         if (visibleStart < totalWorkspaces - maxVisible + 1) {
                                             visibleStart = Math.min(totalWorkspaces - maxVisible + 1, visibleStart + 1);
@@ -4907,15 +5079,15 @@ ApplicationWindow {
                                 }
                             }
                             
-                            
+                            //View workspaces
                             Item {
-                                id: workspacesScroller
+                                id:workspacesScroller
                                 width: parent.width
                                 height: 120
                                 clip: true
                                 
                                 GridView {
-                                    id: workspacesGrid
+                                    id:workspacesGrid
                                     x: 0
                                     y: 0
                                     width: totalWorkspaces * 80
@@ -4927,13 +5099,13 @@ ApplicationWindow {
                                         index: modelData
                                         width: parent.cellWidth
                                         height: parent.cellHeight
-                                        opacity: workspacesExpanded.isDragging && windowUnderDrag === parent ? 0.5 : 1
+                                        opacity:workspacesExpanded.isDragging && windowUnderDrag === parent ? 0.5: 1
                                     }
                                 }
                                 
-                                
+                                // Animation of scrolling between workspaces
                                 NumberAnimation on x {
-                                    id: workspaceScrollAnimation
+                                    id:workspaceScrollAnimation
                                     duration: 50
                                     easing.type: Easing.OutQuart
                                 }
@@ -4943,45 +5115,45 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //====================
+            // Workspace component
+            //====================
             Component {
-                id: workspaceItemComponent
+                id:workspaceItemComponent
                 
                 Item {
-                    id: workspaceItem
+                    id:workspaceItem
                     property int index: 0
                     property bool active: false
                     property var windows: []
                     width: parent.width
                     height: parent.height
                     
-                    
+                    // Workspace Circle
                     Rectangle {
-                        id: workspaceCircle
+                        id:workspaceCircle
                         anchors.centerIn: parent
                         width: 25
                         height: 25
                         radius: 12.5
-                        color: index + 1 === workspacesCapsule.activeWorkspace ? 
-                            Qt.rgba(pywalColors.colors[6].r, pywalColors.colors[6].g, pywalColors.colors[6].b, 0.2) : 
+                        color: index + 1 === workshopsCapsule.activeWorkspace ? 
+                            Qt.rgba(pywalColors.colors[6].r, pywalColors.colors[6].g, pywalColors.colors[6].b, 0.2): 
                             Qt.rgba(pywalColors.colors[6].r, pywalColors.colors[6].g, pywalColors.colors[6].b, 0.1)
                         border.width: 0
                         
-                        
+                        // Workspace number
                         Text {
                             anchors.centerIn: parent
                             text: (index + 1).toString()
                             font.family: "IBM Plex Sans Thin"
                             font.pixelSize: 12
-                            color: index + 1 === workspacesCapsule.activeWorkspace ? 
+                            color: index + 1 === workshopsCapsule.activeWorkspace ? 
                                 pywalColors.colors[6] : 
                                 Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
                         }
                     }
                     
-                    
+                    // Window area
                     Item {
                         id: windowsArea
                         anchors.top: workspaceCircle.bottom
@@ -4990,7 +5162,7 @@ ApplicationWindow {
                         width: 40
                         height: 40
                         
-                        
+                        // Window display
                         Repeater {
                             model: parent.parent.windows || []
                             delegate: WindowItem {
@@ -4999,12 +5171,12 @@ ApplicationWindow {
                                 windowData: modelData
                                 width: 30
                                 height: 30
-                                visible: modelIndex < 4 
+                                visible: modelIndex < 4 // Maximum width 4 windows
                                 onDragStart: {
-                                    workspacesExpanded.startDragging(parent)
+                                    workshopsExpanded.startDragging(parent)
                                 }
                                 onDragEnd: {
-                                    workspacesExpanded.stopDragging()
+                                    workshopsExpanded.stopDragging()
                                 }
                                 onDrop: {
                                     workspacesExpanded.moveWindowToWorkspace(
@@ -5016,42 +5188,42 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Drag effect
                     Rectangle {
                         id: dragOverlay
                         anchors.fill: parent
                         color: "#000000"
                         opacity: 0.4
-                        visible: workspacesExpanded.isDragging && windowUnderDrag === parent
+                        visible: workshopsExpanded.isDragging && windowUnderDrag === parent
                         radius: 15
                         border.width: 0
                         
                         Text {
                             anchors.centerIn: parent
-                            text: "إسقاط هنا"
+                            text: "Drop here"
                             font.family: "IBM Plex Sans Thin"
                             font.pixelSize: 16
                             color: pywalColors.colors[6]
                         }
                     }
                     
-                    
+                    // Interaction area
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
                         onClicked: {
-                            workspacesExpanded.switchWorkspace(index + 1);
+                            workshopsExpanded.switchWorkspace(index + 1);
                         }
                         onDoubleClicked: {
-                            workspacesExpanded.switchWorkspace(index + 1);
+                            workshopsExpanded.switchWorkspace(index + 1);
                         }
                         onEntered: {
-                            if (index + 1 !== workspacesCapsule.activeWorkspace) {
+                            if (index + 1!==workspacesCapsule.activeWorkspace) {
                                 workspaceCircle.scale = 1.2;
                             }
                         }
                         onExited: {
-                            if (index + 1 !== workspacesCapsule.activeWorkspace) {
+                            if (index + 1!==workspacesCapsule.activeWorkspace) {
                                 workspaceCircle.scale = 1.0;
                             }
                         }
@@ -5059,9 +5231,9 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //====================
+            //Work window component
+            //====================
             Component {
                 id: windowItemComponent
                 
@@ -5073,7 +5245,7 @@ ApplicationWindow {
                     width: parent.width
                     height: parent.height
                     
-                    
+                    // Determine the window position
                     property real positionX: {
                         const angle = (index / totalWindows) * 2 * Math.PI - Math.PI / 2;
                         return Math.cos(angle) * 15;
@@ -5083,7 +5255,7 @@ ApplicationWindow {
                         return Math.sin(angle) * 15;
                     }
                     
-                    
+                    // Background
                     Rectangle {
                         anchors.fill: parent
                         anchors.horizontalCenter: parent.positionX
@@ -5094,17 +5266,17 @@ ApplicationWindow {
                         color: "#000000"
                         border.width: 0
                         
-                        
+                        // Window icon
                         Text {
                             anchors.centerIn: parent
-                            text: "\uf10c" 
+                            text: "\uf10c" // Default icon
                             font.family: faSolid.name
                             font.pixelSize: 12
                             color: pywalColors.colors[7]
                         }
                     }
                     
-                    
+                    // Animation of interaction with the mouse
                     ScaleAnimation on scale {
                         duration: 50
                         easing.type: Easing.OutQuart
@@ -5113,12 +5285,12 @@ ApplicationWindow {
                         running: false
                     }
                     
-                    
+                    // Interaction area
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
                         onPressed: {
-                            
+                            // Activate drag mode
                             windowItem.scale = 1.05
                             windowItem.parent.parent.parent.parent.startDragging(windowItem)
                         }
@@ -5128,35 +5300,35 @@ ApplicationWindow {
                         }
                         onPositionChanged: {
                             if (windowItem.parent.parent.parent.parent.isDragging) {
-                                
-                                x = mouse.x - width / 2
-                                y = mouse.y - height / 2
+                                // Pull movement
+                                x = mouse.x - width/2
+                                y = mouse.y - height/2
                             }
                         }
                     }
                 }
             }
 
-            
-            
-            
+            //====================
+            // Workspace button component
+            //====================
             Component {
-                id: workspaceButtonComponent
+                id:workspaceButtonComponent
                 
                 Item {
-                    id: workspaceButton
+                    id:workspaceButton
                     property string icon
                     width: 40
                     height: 40
                     
-                    
+                    // Background
                     Rectangle {
                         anchors.fill: parent
                         radius: 20
                         color: "#000000"
                         border.width: 0
                         
-                        
+                        // Icon
                         Text {
                             anchors.centerIn: parent
                             text: workspaceButton.icon
@@ -5165,7 +5337,7 @@ ApplicationWindow {
                             color: pywalColors.colors[7]
                         }
                         
-                        
+                        // Animation of interaction with the mouse
                         ScaleAnimation on scale {
                             duration: 50
                             easing.type: Easing.OutQuart
@@ -5174,7 +5346,7 @@ ApplicationWindow {
                             running: false
                         }
                         
-                        
+                        // Interaction area
                         MouseArea {
                             anchors.fill: parent
                             hoverEnabled: true
@@ -5182,7 +5354,7 @@ ApplicationWindow {
                                 parent.scale = 1.05
                             }
                             onReleased: {
-                                parent.scale = 1.0
+                                parent.scale=1.0
                             }
                             onClicked: {
                                 if (workspaceButton.onClicked) {
@@ -5194,11 +5366,11 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //====================
+            // MCX Workspaces Panel
+            //====================
             Item {
-                id: workspacesOverlay
+                id:workspacesOverlay
                 anchors.fill: parent
                 visible: false
                 z: 998
@@ -5207,7 +5379,7 @@ ApplicationWindow {
                 property var currentWorkspace: null
                 property var windowUnderDrag: null
 
-                
+                // Transparent background
                 Rectangle {
                     anchors.fill: parent
                     color: "#000000"
@@ -5216,7 +5388,7 @@ ApplicationWindow {
                         anchors.fill: parent
                         onClicked: {
                             workspacesOverlay.visible = false;
-                            
+                            //make sure all expanded capsules are closed
                             for (let i = 0; i < capsuleLayout.children.length; i++) {
                                 let child = capsuleLayout.children[i];
                                 if (child.isExpanded) {
@@ -5228,9 +5400,9 @@ ApplicationWindow {
                     }
                 }
 
-                
+                // Workspace panel content
                 Rectangle {
-                    id: workspacesContent
+                    id:workspacesContent
                     width: parent.width * 0.9
                     height: parent.height * 0.6
                     radius: 20
@@ -5241,7 +5413,7 @@ ApplicationWindow {
                     border.width: 0
                     opacity: 0.92
 
-                    
+                    //Mild blur effect
                     FastBlur {
                         anchors.fill: parent
                         source: parent
@@ -5249,7 +5421,7 @@ ApplicationWindow {
                         opacity: 0.7
                     }
 
-                    
+                    // Address bar
                     Rectangle {
                         width: parent.width
                         height: 60
@@ -5258,13 +5430,13 @@ ApplicationWindow {
 
                         Text {
                             anchors.centerIn: parent
-                            text: "مساحات العمل"
+                            text: "Work Spaces"
                             font.family: "IBM Plex Sans Thin"
                             font.pixelSize: 20
                             color: pywalColors.colors[6]
                         }
 
-                        
+                        // Close button
                         MouseArea {
                             anchors.right: parent.right
                             anchors.rightMargin: 20
@@ -5273,7 +5445,7 @@ ApplicationWindow {
                             height: 40
                             onClicked: {
                                 workspacesOverlay.visible = false;
-                                
+                                //make sure all expanded capsules are closed
                                 for (let i = 0; i < capsuleLayout.children.length; i++) {
                                     let child = capsuleLayout.children[i];
                                     if (child.isExpanded) {
@@ -5293,7 +5465,7 @@ ApplicationWindow {
 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: "\uf00d" 
+                                    text: "\uf00d" // Close icon
                                     font.family: faSolid.name
                                     font.pixelSize: 16
                                     color: pywalColors.colors[6]
@@ -5302,27 +5474,27 @@ ApplicationWindow {
                         }
                     }
 
-                    
+                    // Workspace content
                     GridView {
-                        id: workspacesGrid
+                        id:workspacesGrid
                         anchors.top: titleBar.bottom
                         anchors.topMargin: 15
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
-                        cellWidth: (parent.width * 0.85) / 5
-                        cellHeight: (parent.height * 0.6 - 85) / 2
+                        cellWidth: (parent.width * 0.85)/5
+                        cellHeight: (parent.height * 0.6 - 85)/2
                         model: 10
                         delegate: WorkspaceItemOverlay {
                             index: modelData
                             width: parent.cellWidth
                             height: parent.cellHeight
-                            opacity: isDragging ? (modelData === currentIndex ? 1 : 0.5) : 1
+                            opacity: isDragging ? (modelData === currentIndex ? 1: 0.5): 1
                         }
                     }
                 }
 
-                
+                // Function to load workspace information
                 function loadWorkspacesInfo() {
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -5330,78 +5502,78 @@ ApplicationWindow {
                         process.waitForFinished();
                         const output = process.readAllStandardOutput().trim();
                         
-                        
+                        // Analyze the output to get workspace information
                         const workspaces = [];
                         const lines = output.split('\n');
                         
                         for (let i = 0; i < lines.length; i++) {
                             if (lines[i].includes("workspace ID")) {
-                                const workspaceId = parseInt(lines[i].split("workspace ID")[1].trim().split(" ")[0]);
+                                const workspaceId = parseInt(lines[i].split("workspace ID")[1].trim().split("")[0]);
                                 const windows = [];
                                 
-                                
+                                // Add workspace windows
                                 for (let j = i + 1; j < lines.length; j++) {
                                     if (lines[j].includes("workspace ID")) break;
                                     if (lines[j].includes("class:")) {
                                         const className = lines[j].split("class:")[1].trim().split(" ")[0];
                                         const title = lines[j].split("title:")[1].trim();
-                                        windows.push({ className, title });
+                                        windows.push({ className, title});
                                     }
                                 }
                                 
                                 workspaces.push({
-                                    id: workspaceId,
+                                    id:workspaceId,
                                     windows: windows,
                                     active: lines[i].includes("active")
                                 });
                             }
                         }
                         
+                        // Update the user interface
+                        workshopspacesGrid.model = workshopspaces;
                         
-                        workspacesGrid.model = workspaces;
-                        
-                    } catch (e) {
-                        console.error("فشل جلب معلومات مساحات العمل:", e);
-                        
-                        workspacesGrid.model = Array.from({length: 10}, (_, i) => ({
+                    } catch(e) {
+                        console.error("Failed to fetch workspace information:", e);
+                        // Use default data
+                        workshopspacesGrid.model = Array.from({length: 10}, (_, i) => ({
                             id: i + 1,
-                            windows: i % 2 === 0 ? [{ className: "Code", title: "main.qml" }] : [],
+                            windows: i % 2 === 0 ? [{ className: "Code", title: "main.qml"}] : [],
                             active: i === 0
                         }));
                     }
                 }
 
-                
+                // Function to update the workspace window
                 function updateWorkspaceWindow(workspaceId, windowClass, windowTitle) {
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         process.start("hyprctl", ["dispatch", "movetoworkspace", workspaceId.toString(), windowClass]);
                         process.waitForFinished();
                         
-                        
+                        // Update the display immediately
                         loadWorkspacesInfo();
-                    } catch (e) {
-                        console.error("فشل تحديث مساحة العمل:", e);
+                    } catch(e) {
+                        console.error("Workspace update failed:", e);
                     }
                 }
 
-                
+                // Function to activate the workspace
                 function activateWorkspace(workspaceId) {
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         process.start("hyprctl", ["dispatch", "workspace", workspaceId.toString()]);
                         process.waitForFinished();
                         
-                        
+                        // Close the panel
                         workspacesOverlay.visible = false;
-                    } catch (e) {
-                        console.error("فشل تنشيط مساحة العمل:", e);
+                    } catch(e) {
+                        console.error("Workspace activation failed:", e);
                     }
                 }
 
-                
+                // Function to operate the board
                 function showWorkspaces() {
-                    
+                    // Close all expanded capsules
                     for (let i = 0; i < capsuleLayout.children.length; i++) {
                         let child = capsuleLayout.children[i];
                         if (child.isExpanded) {
@@ -5410,25 +5582,25 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Download workspace information
                     loadWorkspacesInfo();
                     
-                    
+                    // Panel width
                     visible = true;
                 }
 
-                
+                // Function to handle window dragging
                 function startDragging(windowItem) {
                     isDragging = true;
                     draggingWindow = windowItem;
                     windowUnderDrag = windowItem.parent.parent;
                     
-                    
+                    // Add a drag effect
                     windowItem.parent.scale = 1.1;
                     windowItem.parent.z = 100;
                 }
 
-                
+                // Function to terminate the withdrawal
                 function stopDragging() {
                     isDragging = false;
                     if (draggingWindow) {
@@ -5440,28 +5612,28 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //====================
+            // Workspace component of the panel
+            //====================
             Component {
-                id: workspaceItemOverlayComponent
+                id:workspaceItemOverlayComponent
                 
                 Item {
-                    id: workspaceItem
+                    id:workspaceItem
                     property int index: 0
                     property bool active: false
                     property var windows: []
                     width: parent.width
                     height: parent.height
                     
-                    
+                    // Background
                     Rectangle {
                         anchors.fill: parent
                         radius: 15
-                        color: active ? Qt.rgba(pywalColors.colors[6].r, pywalColors.colors[6].g, pywalColors.colors[6].b, 0.1) : "#000000"
+                        color: active ? Qt.rgba(pywalColors.colors[6].r, pywalColors.colors[6].g, pywalColors.colors[6].b, 0.1): "#000000"
                         border.width: 0
                         
-                        
+                        // Workspace number
                         Text {
                             anchors.top: parent.top
                             anchors.topMargin: 15
@@ -5472,14 +5644,14 @@ ApplicationWindow {
                             color: active ? pywalColors.colors[6] : pywalColors.colors[7]
                         }
                         
-                        
+                        // Content of workspace windows
                         ColumnLayout {
                             anchors.top: titleText.bottom
                             anchors.topMargin: 15
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.bottom: parent.bottom
-                            spacing: 10
+                            Spacing: 10
                             anchors.margins: 10
                             
                             Repeater {
@@ -5506,26 +5678,26 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Drag effect
                     Rectangle {
                         id: dragOverlay
                         anchors.fill: parent
                         color: "#000000"
                         opacity: 0.4
-                        visible: workspacesOverlay.isDragging && parent.parent.index === workspacesOverlay.currentIndex
+                        visible: workshopsOverlay.isDragging && parent.parent.index === workshopsOverlay.currentIndex
                         radius: 15
                         border.width: 0
                         
                         Text {
                             anchors.centerIn: parent
-                            text: "إسقاط هنا"
+                            text: "Drop here"
                             font.family: "IBM Plex Sans Thin"
                             font.pixelSize: 16
                             color: pywalColors.colors[6]
                         }
                     }
                     
-                    
+                    // Interaction area
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
@@ -5539,9 +5711,9 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //====================
+            // Working window component of the panel
+            //====================
             Component {
                 id: windowItemOverlayComponent
                 
@@ -5551,30 +5723,30 @@ ApplicationWindow {
                     width: parent.width
                     height: parent.height
                     
-                    
+                    // Background
                     Rectangle {
                         anchors.fill: parent
                         radius: 10
                         color: "#000000"
                         border.width: 0
                         
-                        
+                        // Window icon
                         Text {
                             anchors.left: parent.left
                             anchors.leftMargin: 10
                             anchors.verticalCenter: parent.verticalCenter
-                            text: "\uf10c" 
+                            text: "\uf10c" // Default icon
                             font.family: faSolid.name
                             font.pixelSize: 16
                             color: pywalColors.colors[7]
                         }
                         
-                        
+                        // Window title
                         Text {
                             anchors.left: iconText.right
                             anchors.leftMargin: 5
                             anchors.verticalCenter: parent.verticalCenter
-                            text: windowData ? windowData.title : "نافذة"
+                            text: windowData ? windowData.title: "Window"
                             font.family: "IBM Plex Sans Thin"
                             font.pixelSize: 14
                             color: pywalColors.colors[7]
@@ -5582,7 +5754,7 @@ ApplicationWindow {
                             elide: Text.ElideRight
                         }
                         
-                        
+                        // Drag icon
                         Text {
                             anchors.right: parent.right
                             anchors.rightMargin: 10
@@ -5594,7 +5766,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Animation of interaction with the mouse
                     ScaleAnimation on scale {
                         duration: 50
                         easing.type: Easing.OutQuart
@@ -5603,12 +5775,12 @@ ApplicationWindow {
                         running: false
                     }
                     
-                    
+                    // Interaction area
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
                         onPressed: {
-                            
+                            // Activate drag mode
                             windowItem.scale = 1.05
                             workspacesOverlay.startDragging(windowItem)
                         }
@@ -5618,21 +5790,21 @@ ApplicationWindow {
                         }
                         onPositionChanged: {
                             if (workspacesOverlay.isDragging) {
-                                
-                                x = mouse.x - width / 2
-                                y = mouse.y - height / 2
+                                // Pull movement
+                                x = mouse.x - width/2
+                                y = mouse.y - height/2
                             }
                         }
                     }
                 }
             }
 
-            
-            
-            
+            //=====================
+            // Keyboard capsule
+            //=====================
             Capsule {
                 id: keyboardCapsule
-                icon: "\uf11c" 
+                icon: "\uf11c" // Keyboard icon from Font Awesome 7
                 label: "EN" "AR"
                 colorIndex: 5
                 capsuleId: "keyboard"
@@ -5641,7 +5813,7 @@ ApplicationWindow {
                 property var layouts: ["EN", "AR"]
                 property int currentLayoutIndex: 0
                 
-                
+                // Function to extract the current keyboard layout
                 function getCurrentLayout() {
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -5649,21 +5821,21 @@ ApplicationWindow {
                         process.waitForFinished();
                         const output = process.readAllStandardOutput().trim();
                         
-                        if (output && output.includes("keyboard:")) {
-                            const keyboardInfo = output.split("keyboard:")[1].split("================================")[0];
-                            if (keyboardInfo.includes("active keymap:")) {
+                        if(output && output.includes("keyboard:")) {
+                            const keyboardInfo = output.split("keyboard:")[1].split("=============================")[0];
+                            if(keyboardInfo.includes("active keymap:")) {
                                 const keymap = keyboardInfo.split("active keymap:")[1].split("\n")[0].trim();
                                 currentLayoutIndex = layouts.indexOf(keymap.toUpperCase()) !== -1 ? 
                                                    layouts.indexOf(keymap.toUpperCase()) : 0;
                                 label = layouts[currentLayoutIndex];
                             }
                         }
-                    } catch (e) {
-                        console.error("فشل جلب تخطيط لوحة المفاتيح:", e);
+                    } catch(e) {
+                        console.error("Failed to fetch keyboard layout:", e);
                     }
                 }
                 
-                
+                // Update keyboard layout every 2 seconds
                 Timer {
                     interval: 2000
                     repeat: true
@@ -5674,7 +5846,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     target: parent
                     from: 1
@@ -5685,27 +5857,27 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Improve communication with system services
             function changeKeyboardLayout(index) {
                 try {
-                    
+                    // Use an improved C++ interface
                     cppIntegration.asyncCall("keyboard.changeLayout", index, function(success) {
-                        if (success) {
+                        if(success) {
                             currentLayout = index === 0 ? "EN" : "AR";
                             label = currentLayout;
-                            console.log("تم تغيير تخطيط لوحة المفاتيح بنجاح");
+                            console.log("Keyboard layout changed successfully");
                         }
                     });
-                } catch (e) {
-                    console.error("فشل تغيير تخطيط لوحة المفاتيح:", e);
+                } catch(e) {
+                    console.error("Failed to change keyboard layout:", e);
                 }
             }
             
-            
-            
-            
+            //==============
+            //Clock capsule
+            //==============
             Capsule {
-                icon: "\uf017"  
+                icon: "\uf017"  // Clock icon
                 label: Qt.formatTime(new Date(), "hh:mm")
                 colorIndex: 4
                 capsuleId: "clock"
@@ -5713,11 +5885,11 @@ ApplicationWindow {
                 height: 50
                 property bool isExpanded: false
                 property bool isDynamicIslandActive: false
-                property string dynamicIslandSource: ""  
+                property string dynamicIslandSource: ""  // "timer" or "stopwatch"
                 property var activeTimer: null
                 property var activeStopwatch: null
                 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     id: clockHoverAnimation
                     duration: 50
@@ -5727,7 +5899,7 @@ ApplicationWindow {
                     running: false
                 }
                 
-                
+                // Expansion Animation
                 ParallelAnimation {
                     id: clockExpandAnimation
                     NumberAnimation {
@@ -5746,7 +5918,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Shrinkage animation
                 ParallelAnimation {
                     id: clockCollapseAnimation
                     NumberAnimation {
@@ -5765,7 +5937,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Timer to switch dynamic island
                 Timer {
                     id: dynamicIslandTimer
                     interval: 5000
@@ -5773,53 +5945,53 @@ ApplicationWindow {
                     running: false
                     onTriggered: {
                         if (isDynamicIslandActive) {
-                            activeTab = dynamicIslandSource === "timer" ? "timer" : "stopwatch";
+                            activeTab = dynamicIslandSource === "timer" ? "timer": "stopwatch";
                         } else {
                             activeTab = "clock";
                         }
                     }
                 }
                 
-                
+                //Click processing
                 onClicked: {
-                    if (!isExpanded) {
-                        
+                    if(!isExpanded) {
+                        // Close all other capsules quickly
                         for (let i = 0; i < capsuleLayout.children.length; i++) {
                             let child = capsuleLayout.children[i];
-                            if (child.isExpanded && child.capsuleId !== capsule.capsuleId) {
+                            if (child.isExpanded && child.capsuleId!== capsule.capsuleId) {
                                 child.collapseAnimation.restart();
                                 child.isExpanded = false;
                             }
                         }
                         
-                        
+                        // Expand this capsule
                         clockExpandAnimation.restart();
                         isExpanded = true;
                         activeCapsule = capsuleId;
                         
-                        
+                        // View the expanded watch capsule
                         clockExpanded.visible = true;
                         clockExpanded.z = 100;
                         
-                        
+                        // Check for a timer or active stopwatch
                         checkDynamicIsland();
                         
-                        
+                        // Start updating the time
                         clockExpanded.timeUpdateTimer.running = true;
                     } else {
-                        
+                        // Close this capsule
                         clockCollapseAnimation.restart();
                         isExpanded = false;
                         activeCapsule = "";
                         
-                        
+                        // Hide the expanded watch capsule
                         clockExpanded.visible = false;
                         clockExpanded.timeUpdateTimer.running = false;
                         dynamicIslandTimer.running = false;
                     }
                 }
                 
-                
+                // Function to check if a timer or stopwatch is active
                 function checkDynamicIsland() {
                     if (clockExpanded.activeTimer && clockExpanded.activeTimer.isActive) {
                         isDynamicIslandActive = true;
@@ -5834,13 +6006,13 @@ ApplicationWindow {
                         dynamicIslandTimer.running = false;
                     }
                     
-                    
+                    // Update capsule icon
                     clockCapsule.icon = isDynamicIslandActive ? 
-                                        (dynamicIslandSource === "timer" ? "\uf2f2" : "\uf2f8") : 
+                                        (dynamicIslandSource === "timer" ? "\uf2f2": "\uf2f8"): 
                                         "\uf017";
                 }
 
-                
+                // Timer to update the time
                 Timer {
                     id: timeUpdateTimer
                     interval: 1000
@@ -5851,10 +6023,10 @@ ApplicationWindow {
                         checkDynamicIsland();
                     }
                     
-                    
+                    // Timer Activity Timer
                     property var activeTimer: null
                     
-                    
+                    // Stopwatch Activity Timer
                     property var activeStopwatch: {
                         isRunning: false,
                         startTime: 0,
@@ -5862,21 +6034,21 @@ ApplicationWindow {
                         laps: []
                     }
                     
-                    
+                    // Function to update the time display
                     function updateTimeDisplay() {
-                        
+                        // Update the main clock
                         mainClockText.text = Qt.formatTime(new Date(), "hh:mm");
                         dateText.text = Qt.formatDate(new Date(), "dd MMMM yyyy");
                         
-                        
+                        // Update the counter timer if it is active
                         if (activeTimer && activeTimer.isActive) {
                             const remainingTime = activeTimer.endTime - Date.now();
                             if (remainingTime > 0) {
                                 const hours = Math.floor(remainingTime / 3600000);
-                                const minutes = Math.floor((remainingTime % 3600000) / 60000);
-                                const seconds = Math.floor((remainingTime % 60000) / 1000);
+                                const minutes = Math.floor((remainingTime %3600000) / 60000);
+                                const seconds = Math.floor((remainingTime %60000) / 1000);
                                 
-                                timerDisplayText.text = 
+                                timerDisplayText.text= 
                                     (hours > 0 ? (hours < 10 ? "0" + hours : hours) + ":" : "") +
                                     (minutes < 10 ? "0" + minutes : minutes) + ":" +
                                     (seconds < 10 ? "0" + seconds : seconds);
@@ -5887,7 +6059,7 @@ ApplicationWindow {
                             }
                         }
                         
-                        
+                        // Update the stop clock if it is active
                         if (activeStopwatch.isRunning) {
                             const currentTime = Date.now();
                             activeStopwatch.elapsedTime = currentTime - activeStopwatch.startTime;
@@ -5895,66 +6067,66 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Function to trigger the alarm
                     function playAlarm() {
                         try {
                             const alarmSound = activeTimer.soundPath || "/usr/share/sounds/classic-alarm.wav";
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                             process.start("aplay", [alarmSound]);
-                        } catch (e) {
-                            console.error("فشل تشغيل صوت المنبه:", e);
+                        } catch(e) {
+                            console.error("Alarm sound failed to play:", e);
                         }
                     }
                     
-                    
+                    // Function to update the stopwatch display
                     function updateStopwatchDisplay() {
                         const totalMs = activeStopwatch.elapsedTime;
                         const hours = Math.floor(totalMs / 3600000);
                         const minutes = Math.floor((totalMs % 3600000) / 60000);
                         const seconds = Math.floor((totalMs % 60000) / 1000);
-                        const milliseconds = Math.floor((totalMs % 1000) / 10);
+                        const milliseconds = Math.floor((totalMs %1000) / 10);
                         
-                        stopwatchDisplayText.text = 
+                        stopwatchDisplayText.text= 
                             (hours > 0 ? (hours < 10 ? "0" + hours : hours) + ":" : "") +
                             (minutes < 10 ? "0" + minutes : minutes) + ":" +
                             (seconds < 10 ? "0" + seconds : seconds) + "." +
                             (milliseconds < 10 ? "0" + milliseconds : milliseconds);
                     }
                     
-                    
+                    // Function to calculate the Hijri date
                     function getHijriDate(date) {
-                        
-                        
+                        // This is a simplified function to calculate the Hijri date
+                        // In the actual version, you can use a custom library for the Hijri date
                         const hijriYear = date.getFullYear() - 584;
                         const hijriMonth = date.getMonth() + 1;
                         const hijriDay = date.getDate();
                         
-                        return hijriDay + " " + getHijriMonthName(hijriMonth) + " " + hijriYear;
+                        return hijriDay + "" + getHijriMonthName(hijriMonth) + "" + hijriYear;
                     }
                     
-                    
+                    // Function to retrieve the name of the Hijri month
                     function getHijriMonthName(month) {
                         const months = [
-                            "محرم", "صفر", "ربيع الأول", "ربيع الثاني",
-                            "جمادى الأولى", "جمادى الآخرة", "رجب", "شعبان",
-                            "رمضان", "شوال", "ذو القعدة", "ذو الحجة"
+                            "Muharram", "Zero", "Rabi' al-Awwal", "Rabi' al-Thani"
+                            "Jumada al-Awwal", "Jumada al-Akhirah", "Rajab", "Shaaban",
+                            Ramadan, Shawwal, Dhul-Qi'dah, Dhul-Hijjah
                         ];
                         return months[month - 1] || "";
                     }
                 }
 
-                
+                //Main hour content
                 ColumnLayout {
                     anchors.centerIn: parent
-                    spacing: 20
+                    Spacing: 20
                     width: parent.width * 0.8
                             
-                    
+                    // Hour and date
                     Item {
                         width: parent.width
                         height: 80
                                 
-                        
+                        // The clock
                         Text {
                             id: mainClockText
                             text: Qt.formatTime(new Date(), "hh:mm")
@@ -5964,7 +6136,7 @@ ApplicationWindow {
                             Layout.alignment: Qt.AlignHCenter
                         }
                                 
-                        
+                        // Gregorian date
                         Text {
                             id: dateText
                             anchors.top: mainClockText.bottom
@@ -5977,16 +6149,16 @@ ApplicationWindow {
                         }
                     }
 
-                    
-                    
-                    
+                    //=======================
+                    // Expanded watch capsule
+                    //=======================
                     Item {
                         id: clockExpanded
                         anchors.fill: parent
                         visible: false
                         z: 100
 
-                    
+                    // Extended Hourly Content
                     Item {
                         id: islandContainer
                         width: parent.width * 0.9
@@ -5994,7 +6166,7 @@ ApplicationWindow {
                         anchors.bottom: parent.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
                         
-                        
+                        //Full oval background
                         Rectangle {
                             id: islandBackground
                             anchors.fill: parent
@@ -6002,7 +6174,7 @@ ApplicationWindow {
                             color: Qt.rgba(0, 0, 0, 0.85)
                             border.width: 0
                             
-                            
+                            // Improve blur (without FastBlur)
                             layer.enabled: true
                             layer.effect: OpacityMask {
                                 maskSource: Rectangle {
@@ -6014,16 +6186,16 @@ ApplicationWindow {
                             }
                         }
 
-                        
+                        // Tab bar (at the bottom)
                         RowLayout {
                             id: tabBar
                             anchors.bottom: parent.bottom
                             anchors.bottomMargin: 0
                             anchors.horizontalCenter: parent.horizontalCenter
-                            spacing: 20
+                            Spacing: 20
                             height: 50
                             
-                            
+                            // Clock tab
                             TabButton {
                                 icon: "\uf017"
                                 active: activeTab === "clock"
@@ -6032,7 +6204,7 @@ ApplicationWindow {
                                 width: 50
                             }
                             
-                            
+                            //Alarm Tab
                             TabButton {
                                 icon: "\uf0f3"
                                 active: activeTab === "alarms"
@@ -6041,7 +6213,7 @@ ApplicationWindow {
                                 width: 50
                             }
                             
-                            
+                            // Timer tab
                             TabButton {
                                 icon: "\uf2f2"
                                 active: activeTab === "timer"
@@ -6050,7 +6222,7 @@ ApplicationWindow {
                                 width: 50
                             }
                             
-                            
+                            //Stop Hour Tab
                             TabButton {
                                 icon: "\uf2f8"
                                 active: activeTab === "stopwatch"
@@ -6059,7 +6231,7 @@ ApplicationWindow {
                                 width: 50
                             }
                             
-                            
+                            //History tab
                             TabButton {
                                 icon: "\uf133"
                                 active: activeTab === "calendar"
@@ -6069,13 +6241,13 @@ ApplicationWindow {
                             }
                         }
                         
-                        
+                        // Contents of tabs
                         Item {
                             id: tabContent
                             Layout.fillWidth: true
                             height: 200
                             
-                            
+                            // Clock tab
                             Item {
                                 id: clockTab
                                 anchors.fill: parent
@@ -6083,9 +6255,9 @@ ApplicationWindow {
                                 
                                 ColumnLayout {
                                     anchors.fill: parent
-                                    spacing: 15
+                                    Spacing: 15
                                     
-                                    
+                                    // Time zone information
                                     Rectangle {
                                         id: timeZoneInfo
                                         width: parent.width
@@ -6095,34 +6267,34 @@ ApplicationWindow {
                                         
                                         Text {
                                             anchors.centerIn: parent
-                                            text: "المنطقة الزمنية: " + Intl.DateTimeFormat().resolvedOptions().timeZone
+                                            text: "Timezone: " + Intl.DateTimeFormat().resolvedOptions().timeZone
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 16
                                             color: pywalColors.colors[4]
                                         }
                                         
-                                        
+                                        // Add time zones
                                         RowLayout {
-                                            spacing: 10
+                                            Spacing: 10
                                             Layout.alignment: Qt.AlignHCenter
                                             
                                             TimeZoneButton {
                                                 timeZone: "Asia/Riyadh"
-                                                label: "الرياض"
+                                                label: "Riyadh"
                                             }
                                             
                                             TimeZoneButton {
                                                 timeZone: "Europe/London"
-                                                label: "لندن"
+                                                label: "London"
                                             }
                                             
                                             TimeZoneButton {
                                                 timeZone: "America/New_York"
-                                                label: "نيويورك"
+                                                label: "New York"
                                             }
                                         }
                                         
-                                        
+                                        // List of time zones
                                         ListView {
                                             id: timeZoneList
                                             width: parent.width
@@ -6137,7 +6309,7 @@ ApplicationWindow {
                                     }
                                 }
                                 
-                                
+                                //Alarm Tab
                                 Item {
                                     id: alarmsTab
                                     anchors.fill: parent
@@ -6145,9 +6317,9 @@ ApplicationWindow {
                                     
                                     ColumnLayout {
                                         anchors.fill: parent
-                                        spacing: 15
+                                        Spacing: 15
                                         
-                                        
+                                        // Alarm list
                                         ListView {
                                             id: alarmsList
                                             width: parent.width
@@ -6168,9 +6340,9 @@ ApplicationWindow {
                                             clip: true
                                         }
                                         
-                                        
+                                        //Add alarm button
                                         Button {
-                                            text: "إضافة منبه"
+                                            text: "Add alarm"
                                             width: parent.width * 0.8
                                             height: 40
                                             radius: 20
@@ -6184,7 +6356,7 @@ ApplicationWindow {
                                     }
                                 }
                                 
-                                
+                                // Timer tab
                                 Item {
                                     id: timerTab
                                     anchors.fill: parent
@@ -6192,9 +6364,9 @@ ApplicationWindow {
                                     
                                     ColumnLayout {
                                         anchors.fill: parent
-                                        spacing: 20
+                                        Spacing: 20
                                         
-                                        
+                                        // Display timer
                                         Text {
                                             id: timerDisplayText
                                             text: "00:00:00"
@@ -6205,34 +6377,34 @@ ApplicationWindow {
                                             Layout.fillWidth: true
                                         }
                                         
-                                        
+                                        // Set timer
                                         RowLayout {
-                                            spacing: 10
+                                            Spacing: 10
                                             Layout.alignment: Qt.AlignHCenter
                                             
                                             TimerButton {
-                                                text: "ساعة"
-                                                value: 3600000
+                                                text: "clock"
+                                                value: 3,600,000
                                             }
                                             
                                             TimerButton {
-                                                text: "دقيقة"
+                                                text: "minute"
                                                 value: 60000
                                             }
                                             
                                             TimerButton {
-                                                text: "ثانية"
+                                                text: "second"
                                                 value: 1000
                                             }
                                         }
                                         
-                                        
+                                        // Control buttons
                                         RowLayout {
-                                            spacing: 15
+                                            Spacing: 15
                                             Layout.alignment: Qt.AlignHCenter
                                             
                                             ControlButton {
-                                                icon: "\uf04b" 
+                                                icon: "\uf04b" // stop
                                                 enabled: clockExpanded.activeTimer && clockExpanded.activeTimer.isActive
                                                 onClicked: {
                                                     stopTimer();
@@ -6240,7 +6412,7 @@ ApplicationWindow {
                                             }
                                             
                                             ControlButton {
-                                                icon: activeTimer && activeTimer.isActive ? "\uf04c" : "\uf04b" 
+                                                icon: activeTimer && activeTimer.isActive ? "\uf04c" : "\uf04b" // on/off
                                                 onClicked: {
                                                     if (activeTimer && activeTimer.isActive) {
                                                         pauseTimer();
@@ -6251,7 +6423,7 @@ ApplicationWindow {
                                             }
                                             
                                             ControlButton {
-                                                icon: "\uf01e" 
+                                                icon: "\uf01e" // Reset
                                                 enabled: clockExpanded.activeTimer && (clockExpanded.activeTimer.isActive || clockExpanded.activeTimer.paused)
                                                 onClicked: {
                                                     resetTimer();
@@ -6259,7 +6431,7 @@ ApplicationWindow {
                                             }
                                         }
                                         
-                                        
+                                        // Alarm sound settings
                                         Rectangle {
                                             id: alarmSettings
                                             width: parent.width
@@ -6271,7 +6443,7 @@ ApplicationWindow {
                                                 anchors.left: parent.left
                                                 anchors.leftMargin: 15
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                text: "صوت المنبه:"
+                                                text: "Alarm sound:"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 16
                                                 color: pywalColors.colors[4]
@@ -6282,7 +6454,7 @@ ApplicationWindow {
                                                 anchors.right: parent.right
                                                 anchors.rightMargin: 15
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                text: activeTimer ? (activeTimer.soundPath || "كلاسيكي") : "كلاسيكي"
+                                                text: activeTimer ? (activeTimer.soundPath || "Classic"): "Classic"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 16
                                                 color: pywalColors.colors[4]
@@ -6298,7 +6470,7 @@ ApplicationWindow {
                                     }
                                 }
                                 
-                                
+                                //Stop Hour Tab
                                 Item {
                                     id: stopwatchTab
                                     anchors.fill: parent
@@ -6306,9 +6478,9 @@ ApplicationWindow {
                                     
                                     ColumnLayout {
                                         anchors.fill: parent
-                                        spacing: 20
+                                        Spacing: 20
                                         
-                                        
+                                        // Display the stop time
                                         Text {
                                             id: stopwatchDisplayText
                                             text: "00:00:00.00"
@@ -6319,13 +6491,13 @@ ApplicationWindow {
                                             Layout.fillWidth: true
                                         }
                                         
-                                        
+                                        // Control buttons
                                         RowLayout {
-                                            spacing: 15
+                                            Spacing: 15
                                             Layout.alignment: Qt.AlignHCenter
                                             
                                             ControlButton {
-                                                icon: "\uf0e2" 
+                                                icon: "\uf0e2" // roll
                                                 enabled: activeStopwatch.isRunning
                                                 onClicked: {
                                                     addLap();
@@ -6333,7 +6505,7 @@ ApplicationWindow {
                                             }
                                             
                                             ControlButton {
-                                                icon: activeStopwatch.isRunning ? "\uf04c" : "\uf04b" 
+                                                icon: activeStopwatch.isRunning ? "\uf04c" : "\uf04b" // on/off
                                                 onClicked: {
                                                     if (activeStopwatch.isRunning) {
                                                         stopStopwatch();
@@ -6344,7 +6516,7 @@ ApplicationWindow {
                                             }
                                             
                                             ControlButton {
-                                                icon: "\uf01e" 
+                                                icon: "\uf01e" // Reset
                                                 enabled: activeStopwatch.elapsedTime > 0
                                                 onClicked: {
                                                     resetStopwatch();
@@ -6352,14 +6524,14 @@ ApplicationWindow {
                                             }
                                         }
                                         
-                                        
+                                        //Stop hour rolls
                                         ListView {
-                                            id: lapsList
+                                            id:lapsList
                                             width: parent.width
                                             height: 120
                                             model: activeStopwatch.laps
                                             delegate: LapItem {
-                                                lapNumber: index + 1
+                                                lapNumber: index+1
                                                 lapTime: modelData
                                             }
                                             clip: true
@@ -6368,7 +6540,7 @@ ApplicationWindow {
                                     }
                                 }
                                 
-                                
+                                //History tab
                                 Item {
                                     id: calendarTab
                                     anchors.fill: parent
@@ -6376,9 +6548,9 @@ ApplicationWindow {
                                     
                                     ColumnLayout {
                                         anchors.fill: parent
-                                        spacing: 20
+                                        Spacing: 20
                                         
-                                        
+                                        // Gregorian date
                                         Rectangle {
                                             id: gregorianDate
                                             width: parent.width
@@ -6388,14 +6560,14 @@ ApplicationWindow {
                                             
                                             Text {
                                                 anchors.centerIn: parent
-                                                text: "التاريخ الميلادي: " + Qt.formatDate(new Date(), "dd MMMM yyyy")
+                                                text: "Gregorian date: " + Qt.formatDate(new Date(), "dd MMMM yyyy")
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 16
                                                 color: pywalColors.colors[4]
                                             }
                                         }
                                         
-                                        
+                                        // Hijri date
                                         Rectangle {
                                             id: hijriDate
                                             width: parent.width
@@ -6405,14 +6577,14 @@ ApplicationWindow {
                                             
                                             Text {
                                                 anchors.centerIn: parent
-                                                text: "التاريخ الهجري: " + clockExpanded.getHijriDate(new Date())
+                                                text: "Hijri Date: " + clockExpanded.getHijriDate(new Date())
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 16
                                                 color: pywalColors.colors[6]
                                             }
                                         }
                                         
-                                        
+                                        //Holiday information
                                         Rectangle {
                                             id: holidaysInfo
                                             width: parent.width
@@ -6422,17 +6594,17 @@ ApplicationWindow {
                                             
                                             Column {
                                                 anchors.centerIn: parent
-                                                spacing: 5
+                                                Spacing: 5
                                                 
                                                 Text {
-                                                    text: "العيد القريب: عيد الفطر"
+                                                    text: "The near Eid: Eid al-Fitr"
                                                     font.family: "IBM Plex Sans Thin"
                                                     font.pixelSize: 16
                                                     color: pywalColors.colors[5]
                                                 }
                                                 
                                                 Text {
-                                                    text: "بعد 25 يوماً"
+                                                    text: "After 25 days"
                                                     font.family: "IBM Plex Sans Thin"
                                                     font.pixelSize: 14
                                                     color: pywalColors.colors[5]
@@ -6440,12 +6612,12 @@ ApplicationWindow {
                                             }
                                         }
                                         
-                                        
+                                        // Interactive calendar
                                         GridView {
                                             id: calendarGrid
                                             width: parent.width
                                             height: 150
-                                            cellWidth: parent.width / 7
+                                            cellWidth: parent.width/7
                                             cellHeight: 30
                                             model: 35
                                             delegate: CalendarDay {
@@ -6460,34 +6632,34 @@ ApplicationWindow {
                         }
                     }
                     
+                    //====================
+                    // Data and functions
+                    //====================
                     
-                    
-                    
-                    
-                    
+                    // Data
                     property list<var> timeZones: [
-                        {timeZone: "Asia/Riyadh", label: "الرياض"},
-                        {timeZone: "Asia/Dubai", label: "دبي"},
-                        {timeZone: "Asia/Tokyo", label: "طوكيو"},
-                        {timeZone: "Australia/Sydney", label: "سيدني"},
-                        {timeZone: "Europe/Berlin", label: "برلين"},
-                        {timeZone: "Europe/Paris", label: "باريس"},
-                        {timeZone: "Europe/Moscow", label: "موسكو"},
-                        {timeZone: "America/Los_Angeles", label: "لوس أنجلوس"},
-                        {timeZone: "America/Chicago", label: "شيكاغو"},
-                        {timeZone: "Pacific/Honolulu", label: "هونولولو"}
+                        {timeZone: "Asia/Riyadh", label: "Riyadh"},
+                        {timeZone: "Asia/Dubai", label: "Dubai"},
+                        {timeZone: "Asia/Tokyo", label: "Tokyo"},
+                        {timeZone: "Australia/Sydney", label: "Sydney"},
+                        {timeZone: "Europe/Berlin", label: "Berlin"},
+                        {timeZone: "Europe/Paris", label: "Paris"},
+                        {timeZone: "Europe/Moscow", label: "Moscow"},
+                        {timeZone: "America/Los_Angeles", label: "Los Angeles"},
+                        {timeZone: "America/Chicago", label: "Chicago"},
+                        {timeZone: "Pacific/Honolulu", label: "Honolulu"}
                     ]
                     
                     property list<var> alarms: []
                     property var selectedAlarm: null
                     property var soundPath: ""
                     
-                    
+                    // Stimulus functions
                     function addNewAlarm() {
                         selectedAlarm = {
                             id: Date.now(),
                             time: "07:00",
-                            label: "منبه الصباح",
+                            label: "Morning Alarm"
                             days: [true, true, true, true, true, false, false],
                             isActive: true,
                             soundPath: "/usr/share/sounds/classic-alarm.wav"
@@ -6502,18 +6674,18 @@ ApplicationWindow {
                     
                     function deleteAlarm(alarm) {
                         const index = alarms.indexOf(alarm);
-                        if (index !== -1) {
+                        if(index!== -1) {
                             alarms.splice(index, 1);
                         }
                     }
                     
                     function toggleAlarm(alarm) {
-                        alarm.isActive = !alarm.isActive;
+                        alarm.isActive=!alarm.isActive;
                     }
                     
                     function saveAlarm() {
                         const index = alarms.findIndex(a => a.id === selectedAlarm.id);
-                        if (index !== -1) {
+                        if(index!== -1) {
                             alarms[index] = selectedAlarm;
                         } else {
                             alarms.push(selectedAlarm);
@@ -6521,12 +6693,12 @@ ApplicationWindow {
                         selectedAlarm = null;
                     }
                     
-                    
+                    //Timer functions
                     function startTimer() {
-                        if (!activeTimer) {
+                        if(!activeTimer) {
                             activeTimer = {
                                 id: Date.now(),
-                                endTime: Date.now() + 60000, 
+                                endTime: Date.now() + 60000, // 1 minute by default
                                 isActive: true,
                                 paused: false,
                                 soundPath: soundPath || "/usr/share/sounds/classic-alarm.wav"
@@ -6557,14 +6729,14 @@ ApplicationWindow {
                     
                     function resetTimer() {
                         if (activeTimer) {
-                            activeTimer.endTime = Date.now() + 60000; 
+                            activeTimer.endTime = Date.now() + 60000; // 1 minute
                             activeTimer.isActive = false;
                             activeTimer.paused = false;
                         }
                     }
                     
                     function addTimeToTimer(value) {
-                        if (!activeTimer) {
+                        if(!activeTimer) {
                             activeTimer = {
                                 id: Date.now(),
                                 endTime: Date.now() + value,
@@ -6581,9 +6753,9 @@ ApplicationWindow {
                         clockExpanded.activeTimer = activeTimer;
                     }
                     
-                    
+                    // Stopwatch functions
                     function startStopwatch() {
-                        if (!activeStopwatch.isRunning) {
+                        if(!activeStopwatch.isRunning) {
                             activeStopwatch.startTime = Date.now() - activeStopwatch.elapsedTime;
                             activeStopwatch.isRunning = true;
                         }
@@ -6611,28 +6783,28 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Sound settings functions
                     function openSoundSelector() {
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
-                            process.start("zenity", ["--file-selection", "--title=اختر ملف الصوت", "--file-filter=الصوت (*.mp3 *.wav)"]);
+                            process.start("zenity", ["--file-selection", "--title=Select audio file", "--file-filter=Audio (*.mp3 *.wav)"]);
                             process.waitForFinished();
                             const output = process.readAllStandardOutput().trim();
                             
-                            if (output) {
+                            if(output) {
                                 soundPath = output;
                                 if (activeTimer) {
                                     activeTimer.soundPath = output;
                                 }
                                 alarmSoundText.text = output.split('/').pop();
                             }
-                        } catch (e) {
-                            console.error("فشل اختيار ملف الصوت:", e);
-                            showToast("فشل اختيار ملف الصوت", "\uf071");
+                        } catch(e) {
+                            console.error("Audio file selection failed:", e);
+                            showToast("Audio file selection failed", "\uf071");
                         }
                     }
                     
-                    
+                    // User interface functions
                     function showAlarmEditor() {
                         alarmEditor.visible = true;
                         alarmEditor.z = 200;
@@ -6642,10 +6814,10 @@ ApplicationWindow {
                         alarmEditor.visible = false;
                     }
                     
-                    
-                    
-                    
-                    
+                    //====================
+                    // User interface components
+                    //====================
+                    // Tab component
                     Component {
                         id: tabButtonComponent
                         
@@ -6656,13 +6828,13 @@ ApplicationWindow {
                             width: 45
                             height: 45
                             
-                            
+                            // Background
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 22.5
-                                color: active ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1) : "#000000"
+                                color: active ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1): "#000000"
                                 
-                                
+                                // Icon
                                 Text {
                                     anchors.centerIn: parent
                                     text: tabButton.icon
@@ -6672,22 +6844,22 @@ ApplicationWindow {
                                 }
                             }
                             
-                            
+                            // Interaction area
                             MouseArea {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 onClicked: {
-                                    if (tabButton.onClicked) {
+                                    if(tabButton.onClicked) {
                                         tabButton.onClicked();
                                     }
                                 }
                                 onEntered: {
-                                    if (!active) {
+                                    if(!active) {
                                         parent.scale = 1.05;
                                     }
                                 }
                                 onExited: {
-                                    if (!active) {
+                                    if(!active) {
                                         parent.scale = 1.0;
                                     }
                                 }
@@ -6695,7 +6867,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    //Time zone component
                     Component {
                         id: timeZoneButtonComponent
                         
@@ -6706,7 +6878,7 @@ ApplicationWindow {
                             width: 100
                             height: 40
                             
-                            
+                            // Background
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 20
@@ -6714,7 +6886,7 @@ ApplicationWindow {
                                 border.color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                                 border.width: 0
                                 
-                                
+                                // Text
                                 Text {
                                     anchors.centerIn: parent
                                     text: timeZoneButton.label
@@ -6724,7 +6896,7 @@ ApplicationWindow {
                                 }
                             }
                             
-                            
+                            // Animation of interaction with the mouse
                             ScaleAnimation on scale {
                                 duration: 50
                                 easing.type: Easing.OutQuart
@@ -6733,7 +6905,7 @@ ApplicationWindow {
                                 running: false
                             }
                             
-                            
+                            // Interaction area
                             MouseArea {
                                 anchors.fill: parent
                                 hoverEnabled: true
@@ -6744,8 +6916,8 @@ ApplicationWindow {
                                     parent.scale = 1.0;
                                 }
                                 onClicked: {
-                                    
-                                    if (!timeZoneList.model.some(tz => tz.timeZone === timeZone)) {
+                                    // Add the time zone to the list
+                                    if(!timeZoneList.model.some(tz => tz.timeZone === timeZone)) {
                                         timeZoneList.model = [...timeZoneList.model, {timeZone, label}];
                                     }
                                 }
@@ -6753,7 +6925,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    //Time zone element component
                     Component {
                         id: timeZoneItemComponent
                         
@@ -6764,7 +6936,7 @@ ApplicationWindow {
                             width: parent.width
                             height: 40
                             
-                            
+                            // Background
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 15
@@ -6772,7 +6944,7 @@ ApplicationWindow {
                                 border.color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                                 border.width: 0
                                 
-                                
+                                // Time zone name
                                 Text {
                                     anchors.left: parent.left
                                     anchors.leftMargin: 15
@@ -6783,7 +6955,7 @@ ApplicationWindow {
                                     color: pywalColors.colors[7]
                                 }
                                 
-                                
+                                // Current time
                                 Text {
                                     anchors.right: parent.right
                                     anchors.rightMargin: 15
@@ -6795,7 +6967,7 @@ ApplicationWindow {
                                 }
                             }
                             
-                            
+                            // Animation of interaction with the mouse
                             ScaleAnimation on scale {
                                 duration: 50
                                 easing.type: Easing.OutQuart
@@ -6804,7 +6976,7 @@ ApplicationWindow {
                                 running: false
                             }
                             
-                            
+                            // Interaction area
                             MouseArea {
                                 anchors.fill: parent
                                 hoverEnabled: true
@@ -6815,9 +6987,9 @@ ApplicationWindow {
                                     parent.scale = 1.0;
                                 }
                                 onClicked: {
-                                    
+                                    // Remove the time zone from the list
                                     const index = timeZoneList.model.findIndex(tz => tz.timeZone === timeZone);
-                                    if (index !== -1) {
+                                    if(index!== -1) {
                                         const newModel = [...timeZoneList.model];
                                         newModel.splice(index, 1);
                                         timeZoneList.model = newModel;
@@ -6827,7 +6999,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Timer button component
                     Component {
                         id: timerButtonComponent
                         
@@ -6838,7 +7010,7 @@ ApplicationWindow {
                             width: 80
                             height: 40
                             
-                            
+                            // Background
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 20
@@ -6846,7 +7018,7 @@ ApplicationWindow {
                                 border.color: Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.2)
                                 border.width: 0
                                 
-                                
+                                // Text
                                 Text {
                                     anchors.centerIn: parent
                                     text: timerButton.text
@@ -6856,7 +7028,7 @@ ApplicationWindow {
                                 }
                             }
                             
-                            
+                            // Animation of interaction with the mouse
                             ScaleAnimation on scale {
                                 duration: 50
                                 easing.type: Easing.OutQuart
@@ -6865,7 +7037,7 @@ ApplicationWindow {
                                 running: false
                             }
                             
-                            
+                            // Interaction area
                             MouseArea {
                                 anchors.fill: parent
                                 hoverEnabled: true
@@ -6882,7 +7054,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    //Control button component
                     Component {
                         id: controlButtonComponent
                         
@@ -6893,15 +7065,15 @@ ApplicationWindow {
                             width: 50
                             height: 50
                             
-                            
+                            // Background
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 25
-                                color: enabled ? "#000000" : Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.1)
-                                border.color: enabled ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.2) : Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
+                                color: enabled ? "#000000": Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.1)
+                                border.color: enabled ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.2): Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                                 border.width: 0
                                 
-                                
+                                // Icon
                                 Text {
                                     anchors.centerIn: parent
                                     text: controlButton.icon
@@ -6911,7 +7083,7 @@ ApplicationWindow {
                                 }
                             }
                             
-                            
+                            // Animation of interaction with the mouse
                             ScaleAnimation on scale {
                                 duration: 50
                                 easing.type: Easing.OutQuart
@@ -6920,7 +7092,7 @@ ApplicationWindow {
                                 running: false
                             }
                             
-                            
+                            // Interaction area
                             MouseArea {
                                 anchors.fill: parent
                                 hoverEnabled: true
@@ -6944,7 +7116,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Alarm component
                     Component {
                         id: alarmItemComponent
                         
@@ -6954,15 +7126,15 @@ ApplicationWindow {
                             width: parent.width
                             height: 60
                             
-                            
+                            // Background
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 15
-                                color: alarm.isActive ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1) : "#000000"
-                                border.color: alarm.isActive ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.2) : Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
+                                color: alarm.isActive ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1): "#000000"
+                                border.color: alarm.isActive ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.2): Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                                 border.width: 0
                                 
-                                
+                                //Alarm time
                                 Text {
                                     anchors.left: parent.left
                                     anchors.leftMargin: 15
@@ -6973,7 +7145,7 @@ ApplicationWindow {
                                     color: alarm.isActive ? pywalColors.colors[4] : pywalColors.colors[7]
                                 }
                                 
-                                
+                                // Label the alarm
                                 Text {
                                     anchors.left: timeText.right
                                     anchors.leftMargin: 10
@@ -6984,7 +7156,7 @@ ApplicationWindow {
                                     color: alarm.isActive ? pywalColors.colors[4] : Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
                                 }
                                 
-                                
+                                // Edit icon
                                 Text {
                                     anchors.right: parent.right
                                     anchors.rightMargin: 45
@@ -6995,7 +7167,7 @@ ApplicationWindow {
                                     color: pywalColors.colors[6]
                                 }
                                 
-                                
+                                //Delete icon
                                 Text {
                                     anchors.right: parent.right
                                     anchors.rightMargin: 15
@@ -7007,7 +7179,7 @@ ApplicationWindow {
                                 }
                             }
                             
-                            
+                            // Animation of interaction with the mouse
                             ScaleAnimation on scale {
                                 duration: 50
                                 easing.type: Easing.OutQuart
@@ -7016,7 +7188,7 @@ ApplicationWindow {
                                 running: false
                             }
                             
-                            
+                            // Interaction area
                             MouseArea {
                                 anchors.fill: parent
                                 hoverEnabled: true
@@ -7025,7 +7197,7 @@ ApplicationWindow {
                                     alarmExpanded.alarm = alarm;
                                 }
                                 
-                                
+                                // Tahrir Area
                                 Rectangle {
                                     anchors.right: parent.right
                                     anchors.rightMargin: 40
@@ -7036,14 +7208,14 @@ ApplicationWindow {
                                     MouseArea {
                                         anchors.fill: parent
                                         onClicked: {
-                                            if (alarmItem.onEdit) {
+                                            if(alarmItem.onEdit) {
                                                 alarmItem.onEdit();
                                             }
                                         }
                                     }
                                 }
                                 
-                                
+                                //Deletion area
                                 Rectangle {
                                     anchors.right: parent.right
                                     anchors.rightMargin: 10
@@ -7054,7 +7226,7 @@ ApplicationWindow {
                                     MouseArea {
                                         anchors.fill: parent
                                         onClicked: {
-                                            if (alarmItem.onDelete) {
+                                            if(alarmItem.onDelete) {
                                                 alarmItem.onDelete();
                                             }
                                         }
@@ -7064,7 +7236,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    //Stop watch roll component
                     Component {
                         id: lapItemComponent
                     
@@ -7075,7 +7247,7 @@ ApplicationWindow {
                             width: parent.width
                             height: 30
                             
-                            
+                            // Background
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 15
@@ -7083,18 +7255,18 @@ ApplicationWindow {
                                 border.color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                                 border.width: 0
                                 
-                                
+                                // Lap number
                                 Text {
                                     anchors.left: parent.left
                                     anchors.leftMargin: 15
                                     anchors.verticalCenter: parent.verticalCenter
-                                    text: "لفة " + lapNumber
+                                    text: "roll" + lapNumber
                                     font.family: "IBM Plex Sans Thin"
                                     font.pixelSize: 14
                                     color: pywalColors.colors[7]
                                 }
                                 
-                                
+                                // Lap time
                                 Text {
                                     anchors.right: parent.right
                                     anchors.rightMargin: 15
@@ -7108,7 +7280,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Calendar day component
                     Component {
                         id: calendarDayComponent
                         
@@ -7119,34 +7291,34 @@ ApplicationWindow {
                             width: parent.cellWidth
                             height: parent.cellHeight
                             
-                            
+                            // Background
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 15
-                                color: isToday ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1) : "#000000"
-                                border.color: isToday ? pywalColors.colors[4] : Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
+                                color: isToday? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1): "#000000"
+                                border.color: isToday? pywalColors.colors[4] : Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                                 border.width: 0
                                 
-                                
+                                // Day number
                                 Text {
                                     anchors.centerIn: parent
-                                    text: day > 0 ? day.toString() : ""
+                                    text: day > 0 ? day.toString(): ""
                                     font.family: "IBM Plex Sans Thin"
                                     font.pixelSize: 16
-                                    color: isToday ? pywalColors.colors[4] : pywalColors.colors[7]
+                                    color: isToday? pywalColors.colors[4] : pywalColors.colors[7]
                                 }
                             }
                         }
                     }
                     
-                    
+                    // Alarm Editor Component
                     Item {
                         id: alarmEditor
                         anchors.fill: parent
                         visible: false
                         z: 200
                         
-                        
+                        // Transparent background
                         Rectangle {
                             anchors.fill: parent
                             color: "#000000"
@@ -7159,7 +7331,7 @@ ApplicationWindow {
                             }
                         }
                         
-                        
+                        // Alarm Editor Content
                         Rectangle {
                             id: alarmEditorContent
                             width: parent.width * 0.8
@@ -7170,7 +7342,7 @@ ApplicationWindow {
                             border.width: 0
                             opacity: 0.92
                             
-                            
+                            //Mild blur effect
                             FastBlur {
                                 anchors.fill: parent
                                 source: parent
@@ -7178,36 +7350,36 @@ ApplicationWindow {
                                 opacity: 0.7
                             }
                             
-                            
+                            // Editor's Address
                             Text {
                                 anchors.top: parent.top
                                 anchors.topMargin: 20
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                text: selectedAlarm ? "تعديل المنبه" : "إضافة منبه جديد"
+                                text: selectedAlarm ? "Edit Alarm": "Add a new alarm"
                                 font.family: "IBM Plex Sans Thin"
                                 font.pixelSize: 20
                                 color: pywalColors.colors[4]
                             }
                             
-                            
+                            // Alarm settings
                             ColumnLayout {
                                 anchors.top: titleText.bottom
                                 anchors.topMargin: 30
                                 anchors.left: parent.left
                                 anchors.right: parent.right
                                 anchors.margins: 20
-                                spacing: 20
+                                Spacing: 20
                                 
-                                
+                                //Alarm time
                                 RowLayout {
-                                    spacing: 10
+                                    Spacing: 10
                                     Layout.alignment: Qt.AlignHCenter
                                     
                                     TimePicker {
                                         id: hourPicker
                                         min: 0
                                         max: 23
-                                        value: selectedAlarm ? parseInt(selectedAlarm.time.split(':')[0]) : 7
+                                        value: selectedAlarm? parseInt(selectedAlarm.time.split(':')[0]) : 7
                                     }
                                     
                                     Text {
@@ -7222,11 +7394,11 @@ ApplicationWindow {
                                         id: minutePicker
                                         min: 0
                                         max: 59
-                                        value: selectedAlarm ? parseInt(selectedAlarm.time.split(':')[1]) : 0
+                                        value: selectedAlarm? parseInt(selectedAlarm.time.split(':')[1]): 0
                                     }
                                 }
                                 
-                                
+                                // Label the alarm
                                 Rectangle {
                                     height: 40
                                     radius: 20
@@ -7236,11 +7408,11 @@ ApplicationWindow {
                                     TextInput {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        text: selectedAlarm ? selectedAlarm.label : "منبه الصباح"
+                                        text: selectedAlarm ? selectedAlarm.label: "Morning Alarm"
                                         font.family: "IBM Plex Sans Thin"
                                         font.pixelSize: 16
                                         color: pywalColors.colors[7]
-                                        placeholderText: "اسم المنبه"
+                                        placeholderText: "Alarm Name"
                                         selectByMouse: true
                                         onAccepted: {
                                             if (selectedAlarm) {
@@ -7250,7 +7422,7 @@ ApplicationWindow {
                                     }
                                 }
                                 
-                                
+                                // Choose days
                                 Rectangle {
                                     height: 50
                                     radius: 20
@@ -7260,26 +7432,26 @@ ApplicationWindow {
                                     RowLayout {
                                         anchors.fill: parent
                                         anchors.margins: 10
-                                        spacing: 5
+                                        Spacing: 5
                                         
                                         Repeater {
-                                            model: ["ح", "ن", "ث", "ر", "خ", "ج", "س"]
+                                            model: ["h", "n", "th", "r", "kh", "c", "s"]
                                             delegate: DaySelector {
                                                 dayIndex: index
                                                 label: modelData
-                                                active: selectedAlarm ? selectedAlarm.days[index] : (index < 5)
+                                                active: selectedAlarm? selectedAlarm.days[index] : (index < 5)
                                             }
                                         }
                                     }
                                 }
                                 
-                                
+                                // Save and cancel buttons
                                 RowLayout {
-                                    spacing: 20
+                                    Spacing: 20
                                     Layout.alignment: Qt.AlignHCenter
                                     
                                     Button {
-                                        text: "إلغاء"
+                                        text: "Cancel"
                                         width: 100
                                         height: 40
                                         radius: 20
@@ -7292,7 +7464,7 @@ ApplicationWindow {
                                     }
                                     
                                     Button {
-                                        text: "حفظ"
+                                        text: "Save"
                                         width: 100
                                         height: 40
                                         radius: 20
@@ -7300,18 +7472,18 @@ ApplicationWindow {
                                         border.color: pywalColors.colors[4]
                                         border.width: 0
                                         onClicked: {
-                                            if (!selectedAlarm) {
+                                            if(!selectedAlarm) {
                                                 selectedAlarm = {
                                                     id: Date.now(),
                                                     time: hourPicker.value + ":" + (minutePicker.value < 10 ? "0" : "") + minutePicker.value,
-                                                    label: alarmNameInput.text || "منبه جديد",
+                                                    label: alarmNameInput.text || "New Alarm",
                                                     days: daySelectors.map(d => d.active),
                                                     isActive: true,
                                                     soundPath: soundPath || "/usr/share/sounds/classic-alarm.wav"
                                                 };
                                             } else {
                                                 selectedAlarm.time = hourPicker.value + ":" + (minutePicker.value < 10 ? "0" : "") + minutePicker.value;
-                                                selectedAlarm.label = alarmNameInput.text || "منبه جديد";
+                                                selectedAlarm.label = alarmNameInput.text || "New Alarm";
                                                 selectedAlarm.days = daySelectors.map(d => d.active);
                                             }
                                             saveAlarm();
@@ -7325,9 +7497,9 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //====================
+            // Tab component
+            //====================
             Item {
                 id: TabButton
                 property string icon
@@ -7335,13 +7507,13 @@ ApplicationWindow {
                 width: 45
                 height: 45
                 
-                
+                // Background
                 Rectangle {
                     anchors.fill: parent
                     radius: 22.5
-                    color: active ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1) : "#000000"
+                    color: active ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1): "#000000"
                     
-                    
+                    // Icon
                     Text {
                         anchors.centerIn: parent
                         text: TabButton.icon
@@ -7351,31 +7523,31 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Interaction area
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
-                        if (TabButton.onClicked) {
+                        if(TabButton.onClicked) {
                             TabButton.onClicked();
                         }
                     }
                     onEntered: {
-                        if (!active) {
+                        if(!active) {
                             parent.scale = 1.05;
                         }
                     }
                     onExited: {
-                        if (!active) {
+                        if(!active) {
                             parent.scale = 1.0;
                         }
                     }
                 }
             }
 
-            
-            
-            
+            //====================
+            //Time zone component
+            //====================
             Item {
                 id: TimeZoneButton
                 property string timeZone
@@ -7383,14 +7555,14 @@ ApplicationWindow {
                 width: 100
                 height: 40
                 
-                
+                // Background
                 Rectangle {
                     anchors.fill: parent
                     radius: 20
                     color: "#000000"
                     border.width: 0
                     
-                    
+                    // Text
                     Text {
                         anchors.centerIn: parent
                         text: TimeZoneButton.label
@@ -7400,7 +7572,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     duration: 50
                     easing.type: Easing.OutQuart
@@ -7409,7 +7581,7 @@ ApplicationWindow {
                     running: false
                 }
                 
-                
+                // Interaction area
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
@@ -7420,17 +7592,17 @@ ApplicationWindow {
                         parent.scale = 1.0;
                     }
                     onClicked: {
-                        
-                        if (!clockExpanded.timeZoneList.model.some(tz => tz.timeZone === timeZone)) {
+                        // Add the time zone to the list
+                        if(!clockExpanded.timeZoneList.model.some(tz => tz.timeZone === timeZone)) {
                             clockExpanded.timeZoneList.model = [...clockExpanded.timeZoneList.model, {timeZone, label}];
                         }
                     }
                 }
             }
 
-            
-            
-            
+            //====================
+            //Time zone element component
+            //====================
             Item {
                 id: TimeZoneItem
                 property string timeZone
@@ -7438,14 +7610,14 @@ ApplicationWindow {
                 width: parent.width
                 height: 40
                 
-                
+                // Background
                 Rectangle {
                     anchors.fill: parent
                     radius: 15
                     color: "#000000"
                     border.width: 0
                     
-                    
+                    // Time zone name
                     Text {
                         anchors.left: parent.left
                         anchors.leftMargin: 15
@@ -7456,7 +7628,7 @@ ApplicationWindow {
                         color: pywalColors.colors[7]
                     }
                     
-                    
+                    // Current time
                     Text {
                         anchors.right: parent.right
                         anchors.rightMargin: 15
@@ -7468,7 +7640,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     duration: 50
                     easing.type: Easing.OutQuart
@@ -7477,7 +7649,7 @@ ApplicationWindow {
                     running: false
                 }
                 
-                
+                // Interaction area
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
@@ -7488,9 +7660,9 @@ ApplicationWindow {
                         parent.scale = 1.0;
                     }
                     onClicked: {
-                        
+                        // Remove the time zone from the list
                         const index = clockExpanded.timeZoneList.model.findIndex(tz => tz.timeZone === timeZone);
-                        if (index !== -1) {
+                        if(index!== -1) {
                             const newModel = [...clockExpanded.timeZoneList.model];
                             newModel.splice(index, 1);
                             clockExpanded.timeZoneList.model = newModel;
@@ -7499,9 +7671,9 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //====================
+            // Timer button component
+            //====================
             Item {
                 id: TimerButton
                 property string text
@@ -7509,14 +7681,14 @@ ApplicationWindow {
                 width: 80
                 height: 40
                 
-                
+                // Background
                 Rectangle {
                     anchors.fill: parent
                     radius: 20
                     color: "#000000"
                     border.width: 0
                     
-                    
+                    // Text
                     Text {
                         anchors.centerIn: parent
                         text: TimerButton.text
@@ -7526,7 +7698,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     duration: 50
                     easing.type: Easing.OutQuart
@@ -7535,7 +7707,7 @@ ApplicationWindow {
                     running: false
                 }
                 
-                
+                // Interaction area
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
@@ -7551,9 +7723,9 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //====================
+            //Control button component
+            //====================
             Item {
                 id: ControlButton
                 property string icon
@@ -7561,14 +7733,14 @@ ApplicationWindow {
                 width: 50
                 height: 50
                 
-                
+                // Background
                 Rectangle {
                     anchors.fill: parent
                     radius: 25
-                    color: enabled ? "#000000" : Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.1)
+                    color: enabled ? "#000000": Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.1)
                     border.width: 0
                     
-                    
+                    // Icon
                     Text {
                         anchors.centerIn: parent
                         text: ControlButton.icon
@@ -7578,7 +7750,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     duration: 50
                     easing.type: Easing.OutQuart
@@ -7587,7 +7759,7 @@ ApplicationWindow {
                     running: false
                 }
                 
-                
+                // Interaction area
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
@@ -7610,23 +7782,23 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //====================
+            // Alarm component
+            //====================
             Item {
                 id: AlarmItem
                 property var alarm
                 width: parent.width
                 height: 60
                 
-                
+                // Background
                 Rectangle {
                     anchors.fill: parent
                     radius: 15
-                    color: alarm.isActive ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1) : "#000000"
+                    color: alarm.isActive ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1): "#000000"
                     border.width: 0
                     
-                    
+                    //Alarm time
                     Text {
                         anchors.left: parent.left
                         anchors.leftMargin: 15
@@ -7637,7 +7809,7 @@ ApplicationWindow {
                         color: alarm.isActive ? pywalColors.colors[4] : pywalColors.colors[7]
                     }
                     
-                    
+                    // Label the alarm
                     Text {
                         anchors.left: timeText.right
                         anchors.leftMargin: 10
@@ -7648,7 +7820,7 @@ ApplicationWindow {
                         color: alarm.isActive ? pywalColors.colors[4] : Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
                     }
                     
-                    
+                    // Edit icon
                     Text {
                         anchors.right: parent.right
                         anchors.rightMargin: 45
@@ -7659,7 +7831,7 @@ ApplicationWindow {
                         color: pywalColors.colors[6]
                     }
                     
-                    
+                    //Delete icon
                     Text {
                         anchors.right: parent.right
                         anchors.rightMargin: 15
@@ -7671,7 +7843,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     duration: 50
                     easing.type: Easing.OutQuart
@@ -7680,7 +7852,7 @@ ApplicationWindow {
                     running: false
                 }
                 
-                
+                // Interaction area
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
@@ -7689,7 +7861,7 @@ ApplicationWindow {
                         clockExpanded.alarmExpanded.alarm = alarm;
                     }
                     
-                    
+                    // Tahrir Area
                     Rectangle {
                         anchors.right: parent.right
                         anchors.rightMargin: 40
@@ -7700,14 +7872,14 @@ ApplicationWindow {
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
-                                if (AlarmItem.onEdit) {
+                                if(AlarmItem.onEdit) {
                                     AlarmItem.onEdit();
                                 }
                             }
                         }
                     }
                     
-                    
+                    //Deletion area
                     Rectangle {
                         anchors.right: parent.right
                         anchors.rightMargin: 10
@@ -7718,7 +7890,7 @@ ApplicationWindow {
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
-                                if (AlarmItem.onDelete) {
+                                if(AlarmItem.onDelete) {
                                     AlarmItem.onDelete();
                                 }
                             }
@@ -7727,9 +7899,9 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //====================
+            //Stop watch roll component
+            //====================
             Item {
                 id: LapItem
                 property int lapNumber
@@ -7737,25 +7909,25 @@ ApplicationWindow {
                 width: parent.width
                 height: 30
                 
-                
+                // Background
                 Rectangle {
                     anchors.fill: parent
                     radius: 15
                     color: "#000000"
                     border.width: 0
                     
-                    
+                    // Lap number
                     Text {
                         anchors.left: parent.left
                         anchors.leftMargin: 15
                         anchors.verticalCenter: parent.verticalCenter
-                        text: "لفة " + lapNumber
+                        text: "roll" + lapNumber
                         font.family: "IBM Plex Sans Thin"
                         font.pixelSize: 14
                         color: pywalColors.colors[7]
                     }
                     
-                    
+                    // Lap time
                     Text {
                         anchors.right: parent.right
                         anchors.rightMargin: 15
@@ -7768,9 +7940,9 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //====================
+            // Calendar day component
+            //====================
             Item {
                 id: CalendarDay
                 property int day
@@ -7778,27 +7950,27 @@ ApplicationWindow {
                 width: parent.cellWidth
                 height: parent.cellHeight
                 
-                
+                // Background
                 Rectangle {
                     anchors.fill: parent
                     radius: 15
-                    color: isToday ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1) : "#000000"
+                    color: isToday? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1): "#000000"
                     border.width: 0
                     
-                    
+                    // Day number
                     Text {
                         anchors.centerIn: parent
-                        text: day > 0 ? day.toString() : ""
+                        text: day > 0 ? day.toString(): ""
                         font.family: "IBM Plex Sans Thin"
                         font.pixelSize: 16
-                        color: isToday ? pywalColors.colors[4] : pywalColors.colors[7]
+                        color: isToday? pywalColors.colors[4] : pywalColors.colors[7]
                     }
                 }
             }
 
-            
-            
-            
+            //====================
+            //Time-bound component
+            //====================
             Item {
                 id: TimePicker
                 property int min: 0
@@ -7807,14 +7979,14 @@ ApplicationWindow {
                 width: 50
                 height: 40
                 
-                
+                // Background
                 Rectangle {
                     anchors.fill: parent
                     radius: 20
                     color: "#000000"
                     border.width: 0
                     
-                    
+                    // Value
                     Text {
                         anchors.centerIn: parent
                         text: value < 10 ? "0" + value : value.toString()
@@ -7824,7 +7996,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Interaction area
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
@@ -7836,14 +8008,14 @@ ApplicationWindow {
                         }
                     }
                     onClicked: {
-                        
+                        // A larger time limiter can be opened on click
                     }
                 }
             }
 
-            
-            
-            
+            //====================
+            //Days-specific component
+            //====================
             Item {
                 id: DaySelector
                 property int dayIndex
@@ -7852,15 +8024,15 @@ ApplicationWindow {
                 width: 30
                 height: 30
                 
-                
+                // Background
                 Rectangle {
                     anchors.fill: parent
                     radius: 15
-                    color: active ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1) : "#000000"
+                    color: active ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1): "#000000"
                     border.color: active ? pywalColors.colors[4] : Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                     border.width: 0
                     
-                    
+                    // Label
                     Text {
                         anchors.centerIn: parent
                         text: DaySelector.label
@@ -7870,7 +8042,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Interaction area
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
@@ -7880,10 +8052,10 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
-            
+            //====================
+            // Helper functions
+            //====================
+            // Function to format time
             function formatTime(ms) {
                 const totalSeconds = Math.floor(ms / 1000);
                 const hours = Math.floor(totalSeconds / 3600);
@@ -7895,20 +8067,20 @@ ApplicationWindow {
                     (seconds < 10 ? "0" + seconds : seconds);
             }
 
-            
+            // Function to get the current time for a time zone
             function getCurrentTime(timeZone) {
                 try {
                     const options = { timeZone, hour: '2-digit', minute: '2-digit', hour12: true };
                     return new Date().toLocaleTimeString('ar-EG', options);
-                } catch (e) {
-                    console.error("فشل الحصول على الوقت للمنطقة الزمنية:", timeZone, e);
+                } catch(e) {
+                    console.error("Failed to get time for time zone:", timeZone, e);
                     return "--:--";
                 }
             }
             
-            
-            
-            
+            //================
+            // Battery capsule
+            //================
             Capsule {
                 icon: "\uf240"
                 colorIndex: 2
@@ -7916,19 +8088,19 @@ ApplicationWindow {
                 width: 50
                 height: 50
                 
-                
+                // Battery indicator
                 property int batteryLevel: 100
                 property bool isCharging: false
                 
-                
+                // Base capsule (circular)
                 Rectangle {
                     id: capsuleBase
                     anchors.fill: parent
-                    radius: width / 2
+                    radius: width/2
                     color: "#000000"
                     border.width: 0
                     
-                    
+                    // Icon
                     Text {
                         anchors.centerIn: parent
                         text: batteryLevel > 20 ? "\uf240" : "\uf244"
@@ -7936,19 +8108,19 @@ ApplicationWindow {
                         font.pixelSize: 20
                         color: batteryLevel > 20 ? 
                             pywalColors.colors[colorIndex] : 
-                            pywalColors.colors[1] 
+                            pywalColors.colors[1] // Red when the battery is low
                     }
                     
-                    
+                    // Charging indicator (if charging)
                     Rectangle {
                         anchors.fill: parent
-                        radius: width / 2
+                        radius: width/2
                         color: "transparent"
                         border.color: pywalColors.colors[2]
                         border.width: 2
                         visible: isCharging
                         
-                        
+                        // Shipping Animation
                         ScaleAnimation on scale {
                             duration: 500
                             from: 1.0
@@ -7959,10 +8131,10 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                //Timer to update battery
                 Timer {
                     id: batteryUpdateTimer
-                    interval: 5000 
+                    interval: 5000 // Update every 5 seconds (reduce updates)
                     repeat: true
                     running: true
                     onTriggered: {
@@ -7970,45 +8142,45 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Battery level update function
                 function updateBatteryLevel() {
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         process.start("upower", ["-i", "/org/freedesktop/UPower/devices/battery_BAT0"]);
-                        process.waitForFinished(500); 
+                        process.waitForFinished(500); // 500ms timeout
                         
                         if (process.exitCode() === 0) {
                             const output = process.readAllStandardOutput().trim();
                             const match = output.match(/percentage:\s*(\d+)%/);
-                            if (match) {
+                            if(match) {
                                 batteryLevel = parseInt(match[1]);
                                 
-                                
+                                // Check shipping status
                                 const chargingMatch = output.match(/state:\s*(\w+)/);
-                                isCharging = chargingMatch && chargingMatch[1] === "charging";
+                                isCharging = chargingMatch && chargingMatch[1] === "Charging";
                             }
                         }
-                    } catch (e) {
-                        console.error("فشل جلب مستوى البطارية:", e);
+                    } catch(e) {
+                        console.error("Failed to fetch battery level:", e);
                     }
                 }
             }
             
-            
-            
-            
+            //========================
+            //Battery and power modes
+            //========================
             Item {
                 id: batteryModes
                 anchors.fill: parent
                 visible: false
                 z: 100
                 
-                
-                property string powerMode: "balanced" 
+                // Battery characteristics
+                property string powerMode: "balanced" // "performance", "balanced", "power_saver"
                 property int batteryLevel: 100
                 property bool isCharging: false
                 
-                
+                // Temporary to keep the battery updated
                 Timer {
                     id: batteryTimer
                     interval: 5000
@@ -8019,7 +8191,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Function to update battery status
                 function updateBatteryStatus() {
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -8027,26 +8199,26 @@ ApplicationWindow {
                         process.waitForFinished();
                         const output = process.readAllStandardOutput().trim();
                         
-                        
+                        // Analyze the output to get the battery percentage
                         const match = output.match(/percentage:\s+(\d+)%/);
-                        if (match) {
+                        if(match) {
                             batteryLevel = parseInt(match[1]);
                             batteryCapsule.label = batteryLevel + "%";
                         }
                         
-                        
+                        // Shipping status analysis
                         isCharging = output.includes("state:              charging");
-                    } catch (e) {
-                        console.error("فشل جلب حالة البطارية:", e);
-                        batteryLevel = 75; 
+                    } catch(e) {
+                        console.error("Failed to fetch battery status:", e);
+                        batteryLevel = 75; // Default value in case of failure
                     }
                 }
                 
-                
+                // Function to change the power mode
                 function setPowerMode(mode) {
                     powerMode = mode;
                     
-                    
+                    // Apply mode settings
                     switch(mode) {
                         case "performance":
                             applyPerformanceMode();
@@ -8059,100 +8231,100 @@ ApplicationWindow {
                             break;
                     }
                     
-                    
+                    // Save settings
                     savePowerSettings();
                 }
                 
-                
+                // Function to apply performance mode
                 function applyPerformanceMode() {
-                    
+                    // Activate all animations
                     enableAllAnimations();
                     
-                    
+                    // Increase fan speed if necessary
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         process.start("sudo", ["cpupower", "frequency-set", "--governor", "performance"]);
-                    } catch (e) {
-                        console.error("فشل تطبيق وضع الأداء:", e);
+                    } catch(e) {
+                        console.error("Performance Mode Application Failed:", e);
                     }
                 }
                 
-                
+                // Function to apply equilibrium mode
                 function applyBalancedMode() {
-                    
+                    // Activate all animations
                     enableAllAnimations();
                     
-                    
+                    // Apply balance settings
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         process.start("sudo", ["cpupower", "frequency-set", "--governor", "ondemand"]);
-                    } catch (e) {
-                        console.error("فشل تطبيق وضع التوازن:", e);
+                    } catch(e) {
+                        console.error("Balance mode application failed:", e);
                     }
                 }
                 
-                
+                // Function to apply battery saving mode
                 function applyPowerSaverMode() {
-                    
+                    // Disable most animations
                     disableNonEssentialAnimations();
                     
-                    
+                    // Reduce screen brightness
                     if (indicatorPopup.brightnessLevel > 50) {
                         indicatorPopup.setBrightnessLevel(50);
                     }
                     
-                    
+                    // Apply power saving settings
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         process.start("sudo", ["cpupower", "frequency-set", "--governor", "powersave"]);
-                    } catch (e) {
-                        console.error("فشل تطبيق وضع توفير البطارية:", e);
+                    } catch(e) {
+                        console.error("Battery Saving Mode Application Failed:", e);
                     }
                 }
                 
-                
+                // Function to activate all animations
                 function enableAllAnimations() {
-                    
+                    //Animation settings
                     animationDuration = 100;
                     animationEasing = Easing.OutQuart;
                     
-                    
+                    // Reactivate all animations
                     opacityAnimationsEnabled = true;
                     scaleAnimationsEnabled = true;
                     slideAnimationsEnabled = true;
                     rippleAnimationsEnabled = true;
                     
-                    
+                    // Update the appearance of battery modes
                     updateBatteryModesUI();
                 }
                 
-                
+                // Function to disable unnecessary animations
                 function disableNonEssentialAnimations() {
-                    
+                    // Simplified animation settings
                     animationDuration = 50;
                     animationEasing = Easing.Linear;
                     
-                    
+                    // Disable unnecessary animations
                     opacityAnimationsEnabled = false;
                     scaleAnimationsEnabled = false;
                     rippleAnimationsEnabled = false;
                     
-                    
+                    // Allow some basic animations
                     slideAnimationsEnabled = true;
                     
-                    
+                    // Update the appearance of battery modes
                     updateBatteryModesUI();
                 }
                 
-                
+                // Function to update the battery modes interface
                 function updateBatteryModesUI() {
-                    
+                    // Update mode colors
                     performanceModeItem.active = (powerMode === "performance");
                     balancedModeItem.active = (powerMode === "balanced");
                     powerSaverModeItem.active = (powerMode === "power_saver");
                 }
                 
-                
+                // Function to save power settings
                 function savePowerSettings() {
                     try {
                         const fs = Qt.createQmlObject('import QtQuick 2.0; FileIO', root, "FileIO");
@@ -8162,24 +8334,24 @@ ApplicationWindow {
                             batteryLevel: batteryLevel,
                             isCharging: isCharging
                         }));
-                    } catch (e) {
-                        console.error("فشل حفظ إعدادات الطاقة:", e);
+                    } catch(e) {
+                        console.error("Failed to save power settings:", e);
                     }
                 }
                 
-                
+                // Function to load power settings
                 function loadPowerSettings() {
                     try {
                         const fs = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         fs.source = "/home/user/.config/quickshell/power-settings.json";
                         const data = fs.read();
-                        if (data) {
-                            const settings = JSON.parse(data);
-                            powerMode = settings.powerMode || "balanced";
-                            batteryLevel = settings.batteryLevel || 100;
+                        if(data) {
+                            const settings = JSON. parse(data);
+                            powerMode = settings. powerMode || "balanced";
+                            batteryLevel = settings. batteryLevel || 100;
                             isCharging = settings.isCharging || false;
                             
-                            
+                            // Apply saved mode
                             switch(powerMode) {
                                 case "performance":
                                     applyPerformanceMode();
@@ -8191,14 +8363,14 @@ ApplicationWindow {
                                     applyBalancedMode();
                             }
                         }
-                    } catch (e) {
-                        console.error("فشل تحميل إعدادات الطاقة:", e);
+                    } catch(e) {
+                        console.error("Failed to load power settings:", e);
                     }
                 }
                 
-                
-                
-                
+                //====================
+                // Battery modes interface
+                //====================
                 Rectangle {
                     id: batteryModesContainer
                     anchors.fill: parent
@@ -8208,21 +8380,21 @@ ApplicationWindow {
                     border.width: 0
                     opacity: 0.92
                     
-                    
+                    //Mild blur effect
                     Rectangle {
                         anchors.fill: parent
                         color: "rgba(0, 0, 0, 0.7)"
                         visible: !powerSaverModeActive
                     }
 
-                    
+                    // In battery saving mode:
                     Rectangle {
                         anchors.fill: parent
                         color: "rgba(0, 0, 0, 0.92)"
                         visible: powerSaverModeActive
                     }
                     
-                    
+                    //Large battery percentage
                     Text {
                         id: largeBatteryPercentage
                         anchors.top: parent.top
@@ -8235,7 +8407,7 @@ ApplicationWindow {
                         text: batteryLevel + "%"
                         opacity: 0
                         
-                        
+                        // Appearance animation
                         OpacityAnimation on opacity {
                             duration: 50
                             easing.type: Easing.OutQuart
@@ -8249,7 +8421,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Shipping status
                     Text {
                         id: chargingStatus
                         anchors.top: largeBatteryPercentage.bottom
@@ -8259,10 +8431,10 @@ ApplicationWindow {
                         font.family: "IBM Plex Sans Thin"
                         font.pixelSize: 14
                         color: pywalColors.colors[4]
-                        text: "\uf1e6  يُشحن"
+                        text: "\uf1e6  Charges
                     }
                     
-                    
+                    // Battery progress bar
                     Rectangle {
                         id: batteryProgressTrack
                         anchors.top: chargingStatus.bottom
@@ -8278,7 +8450,7 @@ ApplicationWindow {
                             0.2
                         )
                         
-                        
+                        //Progress indicator
                         Rectangle {
                             id: batteryProgressThumb
                             width: batteryProgressTrack.width * batteryLevel / 100
@@ -8288,7 +8460,7 @@ ApplicationWindow {
                             anchors.top: parent.top
                             anchors.left: parent.left
                             
-                            
+                            // Effect of light around the pointer
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 3
@@ -8299,7 +8471,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Address of system modes
                     Text {
                         anchors.top: batteryProgressTrack.bottom
                         anchors.topMargin: 30
@@ -8307,51 +8479,51 @@ ApplicationWindow {
                         font.family: "IBM Plex Sans Thin"
                         font.pixelSize: 18
                         color: pywalColors.colors[7]
-                        text: "أوضاع النظام"
+                        text: "System Modes"
                     }
                     
-                    
+                    // System mode network
                     RowLayout {
                         anchors.top: powerModesTitle.bottom
                         anchors.topMargin: 20
                         anchors.horizontalCenter: parent.horizontalCenter
-                        spacing: 15
+                        Spacing: 15
                         
-                        
+                        // Performance Mode
                         PowerModeItem {
                             id: performanceModeItem
                             mode: "performance"
                             icon: "\uf085"
-                            label: "الأداء"
-                            description: "أقصى سرعة مع استهلاك عالي للطاقة"
+                            label: "Performance"
+                            description: "Maximum speed with high power consumption"
                             colorIndex: 4
                             active: powerMode === "performance"
                         }
                         
-                        
+                        // Balance mode
                         PowerModeItem {
                             id: balancedModeItem
                             mode: "balanced"
                             icon: "\uf1d3"
-                            label: "التوازن"
-                            description: "توازن بين الأداء واستهلاك الطاقة"
+                            label: "balance"
+                            description: "Balance between performance and power consumption"
                             colorIndex: 5
                             active: powerMode === "balanced"
                         }
                         
-                        
+                        // Battery saving mode
                         PowerModeItem {
                             id: powerSaverModeItem
                             mode: "power_saver"
                             icon: "\uf187"
-                            label: "توفير البطارية"
-                            description: "أقل استهلاك للطاقة مع أداء محدود"
+                            label: "Battery Saving"
+                            description: "Lowest power consumption with limited performance"
                             colorIndex: 3
                             active: powerMode === "power_saver"
                         }
                     }
                     
-                    
+                    //Current status information
                     Rectangle {
                         id: currentModeInfo
                         anchors.top: powerModesGrid.bottom
@@ -8380,7 +8552,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Mode information properties
                 property int modeInfoColorIndex: {
                     switch(powerMode) {
                         case "performance": return 4
@@ -8391,15 +8563,15 @@ ApplicationWindow {
                 
                 property string modeInfoText: {
                     switch(powerMode) {
-                        case "performance": return "يستخدم أقصى أداء للنظام مع زيادة استهلاك البطارية"
-                        case "power_saver": return "يقلل استهلاك البطارية مع تعطيل معظم الأنميشنات"
-                        default: return "يوازن بين الأداء واستهلاك البطارية لتحقيق أفضل تجربة"
+                        case "performance": return "Uses maximum system performance with increased battery consumption"
+                        case "power_saver": return "Reduces battery consumption while disabling most animations"
+                        default: return "Balances performance and battery consumption for the best experience"
                     }
                 }
                 
-                
-                
-                
+                //====================
+                //Power mode component
+                //====================
                 Component {
                     id: powerModeItemComponent
                     
@@ -8414,23 +8586,23 @@ ApplicationWindow {
                         width: 100
                         height: 130
                         
-                        
+                        // Background
                         Rectangle {
                             anchors.fill: parent
                             radius: 15
-                            color: active ? Qt.rgba(pywalColors.colors[colorIndex].r, pywalColors.colors[colorIndex].g, pywalColors.colors[colorIndex].b, 0.2) : "#000000"
+                            color: active ? Qt.rgba(pywalColors.colors[colorIndex].r, pywalColors.colors[colorIndex].g, pywalColors.colors[colorIndex].b, 0.2): "#000000"
                             border.width: 0
                             
-                            
+                            // Expansion effect on click
                             ScaleAnimation on scale {
                                 duration: 50
                                 easing.type: Easing.OutBack
                                 from: 1
-                                to: active ? 1.05 : 1
+                                to: active ? 1.05: 1
                                 running: false
                             }
                             
-                            
+                            // Mode icon
                             Text {
                                 anchors.top: parent.top
                                 anchors.topMargin: 15
@@ -8441,7 +8613,7 @@ ApplicationWindow {
                                 text: icon
                             }
                             
-                            
+                            // Mode name
                             Text {
                                 anchors.top: iconRect.bottom
                                 anchors.topMargin: 10
@@ -8452,7 +8624,7 @@ ApplicationWindow {
                                 text: label
                             }
                             
-                            
+                            // Describe the situation
                             Text {
                                 anchors.top: labelRect.bottom
                                 anchors.topMargin: 5
@@ -8467,57 +8639,57 @@ ApplicationWindow {
                             }
                         }
                         
-                        
+                        // Interaction area
                         MouseArea {
                             anchors.fill: parent
                             hoverEnabled: true
                             onClicked: {
-                                
+                                // Change power mode
                                 batteryModes.setPowerMode(mode)
                                 
-                                
+                                // Update interface
                                 batteryModes.updateBatteryModesUI()
                                 
-                                
+                                // Send notification
                                 notificationSystem.notificationReceived(
-                                    "الطاقة", 
-                                    "تم تغيير وضع النظام", 
-                                    "تم تفعيل وضع " + label, 
+                                    "Energy", 
+                                    "System mode changed", 
+                                    "mode activated" + label, 
                                     "\uf011"
                                 )
                             }
                             onEntered: {
-                                if (!active) {
+                                if(!active) {
                                     parent.scale = 1.05
                                 }
                             }
                             onExited: {
-                                if (!active) {
-                                    parent.scale = 1.0
+                                if(!active) {
+                                    parent.scale=1.0
                                 }
                             }
                         }
                     }
                 }
                 
-                
+                // Load power settings on startup
                 Component.onCompleted: {
                     loadPowerSettings()
                     updateBatteryStatus()
                 }
             }
 
-            
-            
-            
+            //====================
+            // Modify the battery capsule
+            //====================
             Capsule {
                 icon: "\uf240"
                 label: batteryModes.batteryLevel + "%"
-                colorIndex: batteryModes.batteryLevel > 20 ? 2 : 3
+                colorIndex: batteryModes.batteryLevel > 20 ? 2:3
                 capsuleId: "battery"
                 width: 90
                 
-                
+                // Animation expand a little faster
                 ScaleAnimation on scale {
                     id: batteryHoverAnimation
                     duration: animationDuration * 0.05
@@ -8527,7 +8699,7 @@ ApplicationWindow {
                     running: false
                 }
                 
-                
+                // Expansion Animation
                 ParallelAnimation {
                     id: expandAnimation
                     NumberAnimation {
@@ -8544,7 +8716,7 @@ ApplicationWindow {
                         duration: 50
                         easing.type: Easing.OutQuart
                     }
-                    
+                    // Add a "click" effect on click
                     ScaleAnimation {
                         target: capsuleBase
                         property: "scale"
@@ -8556,7 +8728,7 @@ ApplicationWindow {
                     }
                 }
 
-                
+                // Shrinkage animation
                 ParallelAnimation {
                     id: collapseAnimation
                     NumberAnimation {
@@ -8575,7 +8747,7 @@ ApplicationWindow {
                     }
                 }
 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     id: hoverAnimation
                     duration: 50
@@ -8585,7 +8757,7 @@ ApplicationWindow {
                     running: false
                 }
 
-                
+                // Click animation on click
                 ScaleAnimation {
                     id: pressAnimation
                     target: capsuleBase
@@ -8594,40 +8766,40 @@ ApplicationWindow {
                     easing.type: Easing.OutBack
                 }
                 
-                
+                //Click processing
                 onClicked: {
-                    if (!isExpanded) {
-                        
+                    if(!isExpanded) {
+                        // Close all other capsules quickly
                         for (let i = 0; i < capsuleLayout.children.length; i++) {
                             let child = capsuleLayout.children[i];
-                            if (child.isExpanded && child.capsuleId !== capsule.capsuleId) {
+                            if (child.isExpanded && child.capsuleId!== capsule.capsuleId) {
                                 child.collapseAnimation.restart();
                                 child.isExpanded = false;
                             }
                         }
                         
-                        
+                        // Expand this capsule
                         batteryExpandAnimation.restart();
                         isExpanded = true;
                         activeCapsule = capsuleId;
                         
-                        
+                        // Display battery modes
                         batteryModes.visible = true;
                     } else {
-                        
+                        // Close this capsule
                         collapseAnimation.restart();
                         isExpanded = false;
                         activeCapsule = "";
                         
-                        
+                        // Hide battery modes
                         batteryModes.visible = false;
                     }
                 }
             }
 
-            
-            
-            
+            //===============
+            // Network capsule
+            //==============
             Capsule {
                 icon: "\uf1eb"
                 colorIndex: 5
@@ -8635,19 +8807,19 @@ ApplicationWindow {
                 width: 50
                 height: 50
                 
-                
-                property string networkName: "غير متصل"
+                //Network properties
+                property string networkName: "Offline"
                 property int signalStrength: 0
                 
-                
+                // Base capsule (circular)
                 Rectangle {
                     id: capsuleBase
                     anchors.fill: parent
-                    radius: width / 2
+                    radius: width/2
                     color: "#000000"
                     border.width: 0
                     
-                    
+                    // Icon
                     Text {
                         anchors.centerIn: parent
                         text: signalStrength > 75 ? "\uf1eb" : 
@@ -8661,10 +8833,10 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                //Timer for network update
                 Timer {
                     id: networkUpdateTimer
-                    interval: 5000 
+                    interval: 5000 // Update every 5 seconds (reduce updates)
                     repeat: true
                     running: true
                     onTriggered: {
@@ -8672,12 +8844,12 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Network information update function
                 function updateNetworkInfo() {
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
-                        process.start("nmcli", ["-t", "-f", "ACTIVE,SSID,SIGNAL", "dev", "wifi"]);
-                        process.waitForFinished(500); 
+                        process.start("nmcli", ["-t", "-f", "ACTIVE, SSID,SIGNAL", "dev", "wifi"]);
+                        process.waitForFinished(500); // 500ms timeout
                         
                         if (process.exitCode() === 0) {
                             const output = process.readAllStandardOutput().trim();
@@ -8692,24 +8864,24 @@ ApplicationWindow {
                                 }
                             }
                             
-                            networkName = "غير متصل";
+                            networkName = "offline";
                             signalStrength = 0;
                         }
-                    } catch (e) {
-                        console.error("فشل جلب معلومات الشبكة:", e);
-                        networkName = "غير متصل";
+                    } catch(e) {
+                        console.error("Failed to fetch network information:", e);
+                        networkName = "offline";
                         signalStrength = 0;
                     }
                 }
             }
 
-            
-            
-            
+            //=============
+            // Sound capsule
+            //=============
             Capsule {
                 id: soundCapsule
-                icon: "\uf028" 
-                label: "مستوى الصوت: " + volumeLevel + "%"
+                icon: "\uf028" // Default audio icon
+                label: "Sound Level: " + volumeLevel + "%"
                 colorIndex: 3
                 capsuleId: "sound"
                 width: 150
@@ -8721,7 +8893,7 @@ ApplicationWindow {
                 property var activeMicrophoneApps: []
                 property var playlistsModel: []
 
-                
+                //=== Base capsule===
                 Rectangle {
                     id: capsuleBase
                     anchors.fill: parent
@@ -8730,36 +8902,36 @@ ApplicationWindow {
                     border.color: pywalColors.colors[colorIndex]
                     border.width: 2
 
-                    
+                    // Icon (changes based on microphone status)
                     Text {
                         id: capsuleIcon
                         anchors.left: parent.left
                         anchors.leftMargin: 15
                         anchors.verticalCenter: parent.verticalCenter
                         text: {
-                            if (isMicrophoneAndSoundActive) return "\uf130"; 
-                            if (isMicrophoneActive) return "\uf130"; 
-                            return "\uf028"; 
+                            if (isMicrophoneAndSoundActive) return "\uf130"; // Microphone and audio icon
+                            if (isMicrophoneActive) return "\uf130"; // Microphone icon
+                            return "\uf028"; // Normal audio icon
                         }
                         font.family: faSolid.name
                         font.pixelSize: 20
                         color: pywalColors.colors[colorIndex]
                     }
 
-                    
+                    // Label (sound level)
                     Text {
                         id: capsuleLabel
                         anchors.right: parent.right
                         anchors.rightMargin: 15
                         anchors.verticalCenter: parent.verticalCenter
-                        text: "مستوى الصوت: " + volumeLevel + "%"
+                        text: "Sound Level: " + volumeLevel + "%"
                         font.family: "IBM Plex Sans Thin"
                         font.pixelSize: 16
                         color: pywalColors.colors[colorIndex]
                     }
                 }
 
-                
+                // === Expansion and contraction animation ===
                 ParallelAnimation {
                     id: expandAnimation
                     NumberAnimation {
@@ -8796,46 +8968,46 @@ ApplicationWindow {
                     }
                 }
 
-                
+                // === Mouse interaction area ===
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
 
-                    
+                    // When the mouse moves over the capsule
                     onEntered: {
-                        if (!soundCapsule.isExpanded) {
+                        if(!soundCapsule.isExpanded) {
                             capsuleBase.scale = 1.05;
                         }
                     }
 
-                    
+                    // When the mouse is removed from the capsule
                     onExited: {
-                        if (!soundCapsule.isExpanded) {
+                        if(!soundCapsule.isExpanded) {
                             capsuleBase.scale = 1;
                         }
                     }
 
-                    
+                    // When left-clicking
                     onClicked: {
-                        if (!soundCapsule.isExpanded) {
-                            
+                        if(!soundCapsule.isExpanded) {
+                            // Capsule expansion
                             expandAnimation.restart();
                             soundCapsule.isExpanded = true;
 
-                            
+                            // Display the audio settings inside the capsule
                             soundSettings.visible = true;
                         } else {
-                            
+                            // Close the capsule
                             collapseAnimation.restart();
                             soundCapsule.isExpanded = false;
                             soundSettings.visible = false;
                         }
                     }
 
-                    
+                    // When right-clicking
                     onPressed: {
                         if (mouse.button === Qt.RightButton && (isMicrophoneActive || isMicrophoneAndSoundActive)) {
-                            
+                            //expand the capsule to display applications that use the microphone
                             expandAnimation.restart();
                             soundCapsule.isExpanded = true;
                             microphoneUsage.visible = true;
@@ -8843,7 +9015,7 @@ ApplicationWindow {
                     }
                 }
 
-                
+                //=== Capsule contents===
                 Item {
                     id: soundSettings
                     visible: false
@@ -8851,21 +9023,21 @@ ApplicationWindow {
 
                     ColumnLayout {
                         anchors.fill: parent
-                        spacing: 10
+                        Spacing: 10
 
-                        
+                        // Volume control bar
                         GroupBox {
-                            title: "مستويات الصوت"
+                            title: "Sound Levels"
                             Layout.fillWidth: true
                             height: 150
-                            background: Rectangle { color: "#1E1E1E"; radius: 10 }
+                            background: Rectangle { color: "#1E1E1E"; radius: 10}
 
                             ColumnLayout {
                                 anchors.fill: parent
-                                spacing: 10
+                                Spacing: 10
 
                                 RowLayout {
-                                    Label { text: "العام" }
+                                    Label {text: "General"}
                                     Slider {
                                         from: 0
                                         to: 100
@@ -8875,7 +9047,7 @@ ApplicationWindow {
                                 }
 
                                 RowLayout {
-                                    Label { text: "الإشعارات" }
+                                    Label {text: "Notifications"}
                                     Slider {
                                         from: 0
                                         to: 100
@@ -8885,7 +9057,7 @@ ApplicationWindow {
                                 }
 
                                 RowLayout {
-                                    Label { text: "المنبهات" }
+                                    Label {text: "Alarms"}
                                     Slider {
                                         from: 0
                                         to: 100
@@ -8896,47 +9068,47 @@ ApplicationWindow {
                             }
                         }
 
-                        
+                        //Voice management
                         GroupBox {
-                            title: "إدارة الأصوات"
+                            title: "Voice Management"
                             Layout.fillWidth: true
                             height: 200
-                            background: Rectangle { color: "#1E1E1E"; radius: 10 }
+                            background: Rectangle { color: "#1E1E1E"; radius: 10}
 
                             ColumnLayout {
                                 anchors.fill: parent
-                                spacing: 10
+                                Spacing: 10
 
                                 Button {
-                                    text: "اختيار ملف محلي"
+                                    text: "Choose a local file"
                                     onClicked: openFilePicker()
                                 }
 
                                 Button {
-                                    text: "تنزيل من Zedge"
+                                    text: "Download from Zedge"
                                     onClicked: openZedgeSearch()
                                 }
 
                                 Button {
-                                    text: "استيراد الأصوات"
+                                    text: "Import votes"
                                     onClicked: importSounds()
                                 }
                             }
                         }
 
-                        
+                        //Vote classification
                         GroupBox {
-                            title: "تصنيف الأصوات"
+                            title: "Voice Classification"
                             Layout.fillWidth: true
                             height: 250
-                            background: Rectangle { color: "#1E1E1E"; radius: 10 }
+                            background: Rectangle { color: "#1E1E1E"; radius: 10}
 
                             ListView {
                                 anchors.fill: parent
                                 model: [
-                                    { type: "إشعارات", sounds: ["sound1.mp3", "sound2.mp3"] },
-                                    { type: "منبهات", sounds: ["alarm1.mp3", "alarm2.mp3"] },
-                                    { type: "رسائل", sounds: ["message1.mp3", "message2.mp3"] }
+                                    { type: "Notifications", sounds: ["sound1.mp3", "sound2.mp3"] },
+                                    { type: "alarms", sounds: ["alarm1.mp3", "alarm2.mp3"] },
+                                    { type: "messages", sounds: ["message1.mp3", "message2.mp3"] }
                                 ]
                                 delegate: Item {
                                     width: parent.width
@@ -8944,7 +9116,7 @@ ApplicationWindow {
 
                                     ColumnLayout {
                                         anchors.fill: parent
-                                        spacing: 10
+                                        Spacing: 10
 
                                         Text {
                                             text: modelData.type
@@ -8965,19 +9137,19 @@ ApplicationWindow {
                             }
                         }
 
-                        
+                        // Create playlists
                         GroupBox {
-                            title: "قوائم التشغيل"
+                            title: "Playlists"
                             Layout.fillWidth: true
                             height: 200
-                            background: Rectangle { color: "#1E1E1E"; radius: 10 }
+                            background: Rectangle { color: "#1E1E1E"; radius: 10}
 
                             ColumnLayout {
                                 anchors.fill: parent
-                                spacing: 10
+                                Spacing: 10
 
                                 TextField {
-                                    placeholderText: "اسم قائمة التشغيل الجديدة"
+                                    placeholderText: "New playlist name"
                                     onAccepted: createPlaylist(text)
                                 }
 
@@ -8990,7 +9162,7 @@ ApplicationWindow {
 
                                         RowLayout {
                                             anchors.fill: parent
-                                            spacing: 10
+                                            Spacing: 10
 
                                             Text {
                                                 text: modelData.name
@@ -9000,7 +9172,7 @@ ApplicationWindow {
                                             }
 
                                             Button {
-                                                text: "حذف"
+                                                text: "Delete"
                                                 onClicked: deletePlaylist(modelData.id)
                                             }
                                         }
@@ -9011,7 +9183,7 @@ ApplicationWindow {
                     }
                 }
 
-                
+                //===View apps that use microphone===
                 Item {
                     id: microphoneUsage
                     visible: false
@@ -9019,14 +9191,14 @@ ApplicationWindow {
 
                     ListView {
                         anchors.fill: parent
-                        model: getActiveMicrophoneApps() 
+                        model: getActiveMicrophoneApps() // Call a dynamic function to get the apps
                         delegate: Item {
                             width: parent.width
                             height: 50
 
                             RowLayout {
                                 anchors.fill: parent
-                                spacing: 10
+                                Spacing: 10
 
                                 Text {
                                     text: modelData.name
@@ -9036,7 +9208,7 @@ ApplicationWindow {
                                 }
 
                                 Button {
-                                    text: "Pause"
+                                    text: "Stop"
                                     onClicked: stopMicrophoneUsage(modelData.id)
                                 }
                             }
@@ -9045,57 +9217,57 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
-            
+            //====================
+            // Auxiliary functions
+            //====================
+            // Adjust the overall volume
             function setVolumeLevel(level) {
                 soundCapsule.volumeLevel = level;
                 try {
                     const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                     process.start("wpctl", ["set-volume", "@DEFAULT_AUDIO_SINK@", level + "%"]);
-                } catch (e) {
-                    console.error("فشل تعيين مستوى الصوت:", e);
+                } catch(e) {
+                    console.error("Failed to set volume:", e);
                 }
             }
 
-            
+            // Adjust the notification volume
             function setNotificationVolume(level) {
-                console.log("ضبط مستوى صوت الإشعارات:", level);
+                console.log("Adjust notification volume:", level);
             }
 
-            
+            // Adjust the volume of alarms
             function setAlarmVolume(level) {
-                console.log("ضبط مستوى صوت المنبهات:", level);
+                console.log("Adjust alarm volume:", level);
             }
 
-            
+            // Select a local audio file
             function openFilePicker() {
-                console.log("Open اختيار ملف محلي");
+                console.log("Open local file selection");
             }
 
-            
+            // Search Zedge
             function openZedgeSearch() {
-                console.log("Open البحث في Zedge");
+                console.log("Open search in Zedge");
             }
 
-            
+            // Import votes
             function importSounds() {
-                console.log("استيراد الأصوات");
+                console.log("Import votes");
             }
 
-            
+            //Choose a specific sound
             function selectSound(soundFile) {
-                console.log("اختيار الصوت:", soundFile);
+                console.log("Audio Selection:", SoundFile);
             }
 
-            
+            // Create a new playlist
             function createPlaylist(name) {
-                if (!name.trim()) return;
-                soundCapsule.playlistsModel.push({ id: Date.now(), name: name });
+                if(!name.trim()) return;
+                soundCapsule.playlistsModel.push({ id: Date.now(), name: name});
             }
 
-            
+            // Delete playlist
             function deletePlaylist(id) {
                 for (let i = 0; i < soundCapsule.playlistsModel.length; i++) {
                     if (soundCapsule.playlistsModel[i].id === id) {
@@ -9105,13 +9277,13 @@ ApplicationWindow {
                 }
             }
 
-            
+            // Stop microphone use by a specific application
             function stopMicrophoneUsage(appId) {
-                console.log("Pause استخدام الميكروفون بواسطة التطبيق:", appId);
-                
+                console.log("Stop microphone use by app:", appId);
+                // Here you can add logic to stop the application from using the microphone
             }
 
-            
+            // Get apps that use the microphone dynamically
             function getActiveMicrophoneApps() {
                 try {
                     const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -9119,26 +9291,26 @@ ApplicationWindow {
                     process.waitForFinished();
                     const output = process.readAllStandardOutput();
 
-                    
+                    // Analyze the output to get applications that use the microphone
                     const lines = output.split("\n");
                     let activeApps = [];
                     for (let i = 0; i < lines.length; i++) {
                         if (lines[i].includes("application.name")) {
                             const appName = lines[i].split("=")[1].trim().replace(/"/g, "");
-                            const appId = lines[i - 1].split("#")[1].trim(); 
+                            const appId = lines[i - 1].split("#")[1].trim(); // Get the app ID
                             activeApps.push({ id: appId, name: appName });
                         }
                     }
                     return activeApps;
-                } catch (e) {
-                    console.error("فشل جلب التطبيقات التي تستخدم الميكروفون:", e);
+                } catch(e) {
+                    console.error("Failed to fetch applications using microphone:", e);
                     return [];
                 }
             }
 
-            
-            
-            
+            //================================
+            // Crosire AI Capsule
+            //================================
             Capsule {
                 icon: "\f70b"
                 colorIndex: 6
@@ -9152,15 +9324,15 @@ ApplicationWindow {
                 property string currentQuery: ""
                 property string token: "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"
                 
-                
+                // Function to call Crosire AI
                 function queryCrosire(query) {
                     currentQuery = query;
-                    currentResponse = "جاري التفكير...";
+                    currentResponse = "Thinking about...";
                     
                     try {
                         const xhr = new XMLHttpRequest();
-                        xhr.open("POST", "https:
-                        xhr.setRequestHeader("Authorization", "Bearer " + token);
+                        xhr.open("POST", "https://openrouter.ai/api/v1/chat/completions");
+                        xhr.setRequestHeader("Authorization", "Bearer" + token);
                         xhr.setRequestHeader("Content-Type", "application/json");
                         
                         xhr.onreadystatechange = function() {
@@ -9169,7 +9341,7 @@ ApplicationWindow {
                                     const response = JSON.parse(xhr.responseText);
                                     currentResponse = response.choices[0].message.content;
                                 } else {
-                                    currentResponse = "حدث خطأ في الاتصال بـ Crosire";
+                                    currentResponse = "An error occurred connecting to Crosire";
                                 }
                             }
                         };
@@ -9180,13 +9352,13 @@ ApplicationWindow {
                                 {"role": "user", "content": query}
                             ]
                         }));
-                    } catch (e) {
-                        console.error("فشل استدعاء Crosire:", e);
-                        currentResponse = "فشل الاتصال بـ Crosire";
+                    } catch(e) {
+                        console.error("Crosire call failed:", e);
+                        currentResponse = "Failed to connect to Crosire";
                     }
                 }
                 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     target: parent
                     from: 1
@@ -9200,9 +9372,9 @@ ApplicationWindow {
                     anchors.fill: parent
                     hoverEnabled: true
                     onEntered: parent.scale = 1.02
-                    onExited: parent.scale = 1
+                    onExited: parent.scale=1
                     onClicked: {
-                        
+                        // Expand Crosire Capsule
                         isExpanded = !isExpanded;
                         if (isExpanded) {
                             crosireExpandAnimation.restart();
@@ -9214,7 +9386,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Expansion Animation
                 ParallelAnimation {
                     id: expandAnimation
                     NumberAnimation {
@@ -9231,7 +9403,7 @@ ApplicationWindow {
                         duration: 50
                         easing.type: Easing.OutQuart
                     }
-                    
+                    // Add a "click" effect on click
                     ScaleAnimation {
                         target: capsuleBase
                         property: "scale"
@@ -9243,7 +9415,7 @@ ApplicationWindow {
                     }
                 }
 
-                
+                // Shrinkage animation
                 ParallelAnimation {
                     id: collapseAnimation
                     NumberAnimation {
@@ -9262,7 +9434,7 @@ ApplicationWindow {
                     }
                 }
 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     id: hoverAnimation
                     duration: 50
@@ -9272,7 +9444,7 @@ ApplicationWindow {
                     running: false
                 }
 
-                
+                // Click animation on click
                 ScaleAnimation {
                     id: pressAnimation
                     target: capsuleBase
@@ -9284,43 +9456,43 @@ ApplicationWindow {
         }
     }
 
-    
-    
-    
+    //=====================
+    // Extended Crosire AI Zone
+    //=====================
     Item {
         id: crosireExpanded
         anchors.fill: parent
         visible: false
         z: 994
         
-        
+        // Crosire area background
         Rectangle {
             anchors.fill: parent
             color: "#000000"
         }
         
-        
+        // Crosire area blur effect
         Rectangle {
             anchors.fill: parent
             color: "rgba(0, 0, 0, 0.7)"
             visible: !powerSaverModeActive
         }
 
-        
+        // In battery saving mode:
         Rectangle {
             anchors.fill: parent
             color: "rgba(0, 0, 0, 0.92)"
             visible: powerSaverModeActive
         }
         
-        
+        // Crosire Area Content
         ColumnLayout {
             anchors.centerIn: parent
             width: parent.width * 0.8
             height: parent.height * 0.8
-            spacing: 20
+            Spacing: 20
             
-            
+            // Address
             Text {
                 text: "Crosire AI Assistant"
                 font.family: ibmPlex.name
@@ -9329,7 +9501,7 @@ ApplicationWindow {
                 Layout.alignment: Qt.AlignHCenter
             }
             
-            
+            // Conversation area
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -9338,19 +9510,19 @@ ApplicationWindow {
                     id: crosireChat
                     anchors.fill: parent
                     model: [
-                        {role: "system", content: "مرحباً! أنا Crosire، مساعد الذكاء الاصطناعي المدمج في النظام. كيف يمكنني مساعدتك اليوم؟"}
+                        {role: "system", content: "Hello! I'm Crosire, the AI assistant built into the system. How can I help you today?"}
                     ]
                     delegate: Item {
                         width: parent.width
-                        height: role === "user" ? 60 : 80
+                        height: role==="user"? 60:80
                         
                         Rectangle {
-                            anchors.left: role === "user" ? undefined : parent.left
-                            anchors.right: role === "user" ? parent.right : undefined
+                            anchors.left: role === "user" ? undefined: parent.left
+                            anchors.right: role === "user" ? parent.right: undefined
                             width: parent.width * 0.8
                             height: implicitHeight
                             radius: 25
-                            color: role === "user" ? Qt.rgba(pywalColors.colors[6].r, pywalColors.colors[6].g, pywalColors.colors[6].b, 0.2) : "#000000"
+                            color: role==="user"? Qt.rgba(pywalColors.colors[6].r, pywalColors.colors[6].g, pywalColors.colors[6].b, 0.2): "#000000"
                             border.width: 0
                             
                             Text {
@@ -9370,9 +9542,9 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Input area
             RowLayout {
-                spacing: 10
+                Spacing: 10
                 Layout.fillWidth: true
                 
                 Rectangle {
@@ -9390,21 +9562,21 @@ ApplicationWindow {
                         color: pywalColors.colors[7]
                         font.family: ibmPlex.name
                         horizontalAlignment: Text.AlignRight
-                        placeholderText: "اكتب سؤالك هنا..."
+                        placeholderText: "Write your question here..."
                         
                         onAccepted: {
-                            if (text.trim() !== "") {
-                                
+                            if (text.trim()!== "") {
+                                // Add the message to the conversation
                                 crosireChat.model.append({role: "user", content: text});
                                 crosireInput.text = "";
                                 
+                                // Display the message "Thinking about..."
+                                crosireChat.model.append({role: "assistant", content: "Considering..."});
                                 
-                                crosireChat.model.append({role: "assistant", content: "جاري التفكير..."});
-                                
-                                
+                                // Call Crosire AI
                                 crosireCapsule.queryCrosire(text);
                                 
-                                
+                                // Update the response after a while
                                 Timer {
                                     interval: 1500
                                     onTriggered: {
@@ -9426,7 +9598,7 @@ ApplicationWindow {
                     
                     Text {
                         anchors.centerIn: parent
-                        text: "\uf1d8" 
+                        text: "\uf1d8" // Send icon from Font Awesome 7
                         font.family: faSolid.name
                         font.pixelSize: 20
                         color: pywalColors.colors[6]
@@ -9435,18 +9607,18 @@ ApplicationWindow {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            if (crosireInput.text.trim() !== "") {
-                                
+                            if (crosireInput.text.trim()!== "") {
+                                // Add the message to the conversation
                                 crosireChat.model.append({role: "user", content: crosireInput.text});
                                 crosireInput.text = "";
                                 
+                                // Display the message "Thinking about..."
+                                crosireChat.model.append({role: "assistant", content: "Considering..."});
                                 
-                                crosireChat.model.append({role: "assistant", content: "جاري التفكير..."});
-                                
-                                
+                                // Call Crosire AI
                                 crosireCapsule.queryCrosire(crosireInput.text);
                                 
-                                
+                                // Update the response after a while
                                 Timer {
                                     interval: 1500
                                     onTriggered: {
@@ -9460,7 +9632,7 @@ ApplicationWindow {
             }
         }
         
-        
+        //handle clicking on the blank to close the Crosire area
         MouseArea {
             anchors.fill: parent
             visible: crosireExpanded.visible
@@ -9475,34 +9647,34 @@ ApplicationWindow {
         }
     }
     
-    
+    // Extended AI Content
     Item {
         id: crosireContent
         anchors.fill: parent
         visible: false
         z: 1000
         
-        
+        // Crosire wallpaper
         Rectangle {
             anchors.fill: parent
             color: "#000000"
         }
         
-        
+        // Crosire blur effect
         Rectangle {
             anchors.fill: parent
             color: "rgba(0, 0, 0, 0.7)"
             visible: !powerSaverModeActive
         }
 
-        
+        // In battery saving mode:
         Rectangle {
             anchors.fill: parent
             color: "rgba(0, 0, 0, 0.92)"
             visible: powerSaverModeActive
         }
         
-        
+        // Crosire Head
         Rectangle {
             width: parent.width
             height: 70
@@ -9511,7 +9683,7 @@ ApplicationWindow {
             border.width: 0
             border.bottomWidth: 0
             
-            
+            // Address
             Text {
                 anchors.right: parent.right
                 anchors.rightMargin: 25
@@ -9522,19 +9694,19 @@ ApplicationWindow {
                 color: pywalColors.colors[7]
             }
             
-            
+            // AI icon
             Text {
                 anchors.left: parent.left
                 anchors.leftMargin: 25
                 anchors.verticalCenter: parent.verticalCenter
-                text: "\ue63d" 
+                text: "\ue63d" // AI code from Font Awesome 7
                 font.family: faSolid.name
                 font.pixelSize: 22
                 color: pywalColors.colors[6]
             }
         }
         
-        
+        //Main planning
         RowLayout {
             anchors.top: crosireContent.children[0].bottom
             anchors.bottom: parent.bottom
@@ -9542,7 +9714,7 @@ ApplicationWindow {
             width: parent.width
             spacing: 0
             
-            
+            // Left panel - Calculations and models
             Rectangle {
                 id: leftPanel
                 width: 280
@@ -9550,7 +9722,7 @@ ApplicationWindow {
                 color: "#000000"
                 border.width: 0
                 
-                
+                // Panel head
                 Rectangle {
                     width: parent.width
                     height: 50
@@ -9560,24 +9732,24 @@ ApplicationWindow {
                     
                     Text {
                         anchors.centerIn: parent
-                        text: "الحسابات والنماذج"
+                        text: "Accounts and Forms"
                         font.family: ibmPlex.name
                         font.pixelSize: 16
                         color: pywalColors.colors[7]
                     }
                 }
                 
-                
+                // Main section
                 ColumnLayout {
                     anchors.top: parent.children[0].bottom
                     anchors.topMargin: 10
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
-                    spacing: 10
+                    Spacing: 10
                     anchors.margins: 10
                     
-                    
+                    // Current account
                     Rectangle {
                         id: currentAccount
                         width: parent.width
@@ -9590,7 +9762,7 @@ ApplicationWindow {
                         RowLayout {
                             anchors.fill: parent
                             anchors.margins: 10
-                            spacing: 10
+                            Spacing: 10
                             
                             Rectangle {
                                 width: 30
@@ -9601,7 +9773,7 @@ ApplicationWindow {
                                 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: "\uf007" 
+                                    text: "\uf007" // User icon from Font Awesome 7
                                     font.family: faSolid.name
                                     font.pixelSize: 14
                                     color: "#000000"
@@ -9609,7 +9781,7 @@ ApplicationWindow {
                             }
                             
                             Text {
-                                text: "الحساب الافتراضي"
+                                text: "Default account"
                                 font.family: ibmPlex.name
                                 font.pixelSize: 14
                                 color: pywalColors.colors[7]
@@ -9625,7 +9797,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Add Account button
                     Button {
                         id: addAccountButton
                         width: parent.width
@@ -9636,13 +9808,13 @@ ApplicationWindow {
                         
                         Text {
                             anchors.centerIn: parent
-                            text: "\uf067 إضافة حساب" 
+                            text: "\uf067 Add Account" // Add icon from Font Awesome 7
                             font.family: faSolid.name
                             font.pixelSize: 14
                             color: pywalColors.colors[6]
                         }
                         
-                        
+                        // Animation of interaction with the mouse
                         ScaleAnimation on scale {
                             target: parent
                             from: 1
@@ -9660,12 +9832,12 @@ ApplicationWindow {
                             onClicked: {
                                 addAccountPopup.visible = true
                                 addAccountPopup.opacity = 0
-                                accountFade.to = 1
+                                accountFade.to=1
                             }
                         }
                     }
                     
-                    
+                    // Forms section
                     Rectangle {
                         width: parent.width
                         height: 50
@@ -9677,7 +9849,7 @@ ApplicationWindow {
                             anchors.left: parent.left
                             anchors.leftMargin: 15
                             anchors.verticalCenter: parent.verticalCenter
-                            text: "النموذج الحالي:"
+                            text: "Current model:"
                             font.family: ibmPlex.name
                             font.pixelSize: 14
                             color: pywalColors.colors[6]
@@ -9694,13 +9866,13 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // List of models
                     ListView {
                         id: modelsList
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         model: [
-                            {text: "النموذج الافتراضي", active: true, colorIndex: 6},
+                            {text: "Default model", active: true, colorIndex: 6},
                             {text: "Qwen3-Max", active: false, colorIndex: 4},
                             {text: "Qwen3-Coder", active: false, colorIndex: 5},
                             {text: "Qwen3-Omni-Flash", active: false, colorIndex: 3}
@@ -9710,15 +9882,15 @@ ApplicationWindow {
                             width: parent.width
                             height: 40
                             
-                            
+                            //Form button
                             Rectangle {
                                 id: modelButton
                                 anchors.fill: parent
                                 radius: 15
-                                color: active ? Qt.rgba(pywalColors.colors[colorIndex].r, pywalColors.colors[colorIndex].g, pywalColors.colors[colorIndex].b, 0.2) : "#000000"
+                                color: active ? Qt.rgba(pywalColors.colors[colorIndex].r, pywalColors.colors[colorIndex].g, pywalColors.colors[colorIndex].b, 0.2): "#000000"
                                 border.width: 0
                                 
-                                
+                                // Text
                                 Text {
                                     anchors.left: icon.right
                                     anchors.leftMargin: 10
@@ -9729,7 +9901,7 @@ ApplicationWindow {
                                     color: active ? pywalColors.colors[colorIndex] : pywalColors.colors[7]
                                 }
                                 
-                                
+                                // Animation of interaction with the mouse
                                 ScaleAnimation on scale {
                                     target: parent
                                     from: 1
@@ -9743,18 +9915,18 @@ ApplicationWindow {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: {
-                                        if (!active) {
+                                        if(!active) {
                                             parent.scale = 1.03;
                                         }
                                     }
                                     onExited: {
-                                        if (!active) {
+                                        if(!active) {
                                             parent.scale = 1.0;
                                         }
                                     }
                                     onClicked: {
-                                        if (!active) {
-                                            
+                                        if(!active) {
+                                            // Update the specified form
                                             modelsList.currentIndex = index;
                                         }
                                     }
@@ -9765,7 +9937,7 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Middle panel - Chat area
             Rectangle {
                 id: chatPanel
                 width: 520
@@ -9774,7 +9946,7 @@ ApplicationWindow {
                 border.width: 0
                 border.leftWidth: 0
                 
-                
+                // Chat header
                 Rectangle {
                     width: parent.width
                     height: 50
@@ -9784,19 +9956,19 @@ ApplicationWindow {
                     
                     Text {
                         anchors.centerIn: parent
-                        text: "محادثة جديدة"
+                        text: "New conversation"
                         font.family: ibmPlex.name
                         font.pixelSize: 16
                         color: pywalColors.colors[7]
                     }
                 }
                 
-                
+                // Message list
                 property list<var> crosireChatMessages: [
-                    {message: "مرحباً! كيف يمكنني مساعدتك اليوم؟", isUser: false}
+                    {message: "Hello! How can I help you today?, isUser:false}
                 ]
                 
-                
+                // Chat message component
                 Component {
                     id: chatMessageComponent
 
@@ -9807,7 +9979,7 @@ ApplicationWindow {
                     anchors.rightMargin: 10
 
                       RowLayout {
-                           spacing: 5
+                           Spacing: 5
                            Repeater {
                                model: 3
                                delegate: Rectangle {
@@ -9815,7 +9987,7 @@ ApplicationWindow {
                                    height: 8
                                    radius: 4
                                    color: pywalColors.colors[7]
-                                   opacity: (index + 1) / 4
+                                   opacity: (index + 1)/4
 
                                    OpacityAnimation on opacity {
                                        from: 0
@@ -9838,18 +10010,18 @@ ApplicationWindow {
                         width: parent.width
                         height: 80
                         
-                        
+                        // Message bubble
                         Rectangle {
                             id: messageBubble
-                            anchors.left: isUser ? undefined : parent.left
-                            anchors.right: isUser ? parent.right : undefined
+                            anchors.left: isUser? undefined: parent.left
+                            anchors.right: isUser ? parent.right: undefined
                             width: parent.width
                             height: implicitHeight
                             radius: 20
-                            color: isUser ? Qt.rgba(pywalColors.colors[colorIndex].r, pywalColors.colors[colorIndex].g, pywalColors.colors[colorIndex].b, 0.2) : "#000000"
+                            color: isUser ? Qt.rgba(pywalColors.colors[colorIndex].r, pywalColors.colors[colorIndex].g, pywalColors.colors[colorIndex].b, 0.2): "#000000"
                             border.width: 0
                             
-                            
+                            // Message text
                             Text {
                                 id: messageText
                                 anchors.left: parent.left
@@ -9864,21 +10036,21 @@ ApplicationWindow {
                                 wrapMode: Text.Wrap
                             }
                             
-                            
+                            // Time stamp
                             Text {
-                                anchors.left: isUser ? parent.left : undefined
-                                anchors.right: isUser ? undefined : parent.right
+                                anchors.left: isUser? parent.left : undefined
+                                anchors.right: isUser ? undefined: parent.right
                                 anchors.leftMargin: 15
                                 anchors.rightMargin: 15
                                 anchors.top: messageText.bottom
                                 anchors.topMargin: 5
-                                text: isUser ? "الآن" : "ثانية مضت"
+                                text: isUser ? "now": "a second ago"
                                 font.family: ibmPlex.name
                                 font.pixelSize: 12
                                 color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
                             }
                             
-                            
+                            // Message options (for sent messages only)
                             Item {
                                 id: messageOptions
                                 visible: isUser
@@ -9890,7 +10062,7 @@ ApplicationWindow {
                                 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: "\uf142" 
+                                    text: "\uf142" // Options icon from Font Awesome 7
                                     font.family: faSolid.name
                                     font.pixelSize: 14
                                     color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
@@ -9900,7 +10072,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Chat messages
                 ListView {
                     id: chatMessages
                     anchors.top: parent.children[0].bottom
@@ -9909,13 +10081,13 @@ ApplicationWindow {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.margins: 10
-                    spacing: 15
+                    Spacing: 15
                     model: crosireChatMessages
                     
                     delegate: chatMessageComponent
                 }
                 
-                
+                // Input area
                 Rectangle {
                     id: inputArea
                     width: parent.width
@@ -9928,7 +10100,7 @@ ApplicationWindow {
                     RowLayout {
                         anchors.fill: parent
                         anchors.margins: 10
-                        spacing: 10
+                        Spacing: 10
                         
                         Rectangle {
                             Layout.fillWidth: true
@@ -9947,17 +10119,17 @@ ApplicationWindow {
                                 horizontalAlignment: Text.AlignRight
                                 
                                 onAccepted: {
-                                    if (text.trim() !== "") {
+                                    if (text.trim()!== "") {
                                         crosireChatMessages.push({message: text, isUser: true});
                                         chatMessages.positionViewAtEnd();
                                         chatInput.text = "";
                                         
-                                        
+                                        // Simulate AI response
                                         const userMessage = text;
                                         Timer {
                                             interval: 500
                                             onTriggered: {
-                                                const aiResponse = "أنا أتفهم أنك قلت: " + userMessage + ". هل هناك شيء آخر يمكنني مساعدتك به؟";
+                                                const aiResponse = "I understand you said: " + userMessage + ". Is there anything else I can help you with?";
                                                 crosireChatMessages.push({message: aiResponse, isUser: false});
                                                 chatMessages.positionViewAtEnd();
                                             }
@@ -9967,7 +10139,7 @@ ApplicationWindow {
                             }
                         }
                         
-                        
+                        //Submit button
                         Rectangle {
                             width: 50
                             height: 50
@@ -9978,13 +10150,13 @@ ApplicationWindow {
                             
                             Text {
                                 anchors.centerIn: parent
-                                text: "\uf1d8" 
+                                text: "\uf1d8" // Send icon from Font Awesome 7
                                 font.family: faSolid.name
                                 font.pixelSize: 20
                                 color: pywalColors.colors[6]
                             }
                             
-                            
+                            // Animation of interaction with the mouse
                             ScaleAnimation on scale {
                                 target: parent
                                 from: 1
@@ -10000,17 +10172,17 @@ ApplicationWindow {
                                 onEntered: parent.scale = 1.1
                                 onExited: parent.scale = 1.0
                                 onClicked: {
-                                    if (chatInput.text.trim() !== "") {
+                                    if (chatInput.text.trim()!== "") {
                                         crosireChatMessages.push({message: chatInput.text, isUser: true});
                                         chatMessages.positionViewAtEnd();
                                         chatInput.text = "";
                                         
-                                        
+                                        // Simulate AI response
                                         const userMessage = chatInput.text;
                                         Timer {
                                             interval: 500
                                             onTriggered: {
-                                                const aiResponse = "أنا أتفهم أنك قلت: " + userMessage + ". هل هناك شيء آخر يمكنني مساعدتك به؟";
+                                                const aiResponse = "I understand you said: " + userMessage + ". Is there anything else I can help you with?";
                                                 crosireChatMessages.push({message: aiResponse, isUser: false});
                                                 chatMessages.positionViewAtEnd();
                                             }
@@ -10023,7 +10195,7 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Right panel - Conversations
             Rectangle {
                 id: rightPanel
                 width: 200
@@ -10032,7 +10204,7 @@ ApplicationWindow {
                 border.width: 0
                 border.leftWidth: 0
                 
-                
+                // Panel head
                 Rectangle {
                     width: parent.width
                     height: 50
@@ -10043,22 +10215,22 @@ ApplicationWindow {
                     RowLayout {
                         anchors.fill: parent
                         anchors.margins: 10
-                        spacing: 10
+                        Spacing: 10
                         
                         Text {
-                            text: "المحادثات"
+                            text: "Conversations"
                             font.family: ibmPlex.name
                             font.pixelSize: 16
                             color: pywalColors.colors[7]
                         }
                         
                         Text {
-                            text: "\uf067" 
+                            text: "\uf067" // Add icon from Font Awesome 7
                             font.family: faSolid.name
                             font.pixelSize: 16
                             color: pywalColors.colors[6]
                             
-                            
+                            // Animation of interaction with the mouse
                             ScaleAnimation on scale {
                                 target: parent
                                 from: 1
@@ -10074,15 +10246,15 @@ ApplicationWindow {
                                 onEntered: parent.scale = 1.2
                                 onExited: parent.scale = 1.0
                                 onClicked: {
-                                    
-                                    crosireChatMessages = [{message: "مرحباً! كيف يمكنني مساعدتك اليوم؟", isUser: false}];
+                                    // Create a new conversation
+                                    crosireChatMessages = [{message: "Hello! How can I help you today?, isUser:false}];
                                 }
                             }
                         }
                     }
                 }
                 
-                
+                // Chat list
                 ListView {
                     id: conversationsList
                     anchors.top: parent.children[0].bottom
@@ -10090,28 +10262,28 @@ ApplicationWindow {
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
                     anchors.margins: 10
-                    spacing: 10
+                    Spacing: 10
                     model: [
-                        {title: "محادثة جديدة", lastMessage: "مرحباً", active: true},
-                        {title: "الإعدادات", lastMessage: "كيف يمكنني ضبط الصوت؟", active: false},
-                        {title: "الدعم الفني", lastMessage: "هل تحتاج مساعدة؟", active: false}
+                        {title: "New Conversation", lastMessage: "Hello", active: true},
+                        {title: "Settings", lastMessage: "How do I adjust the sound?", active: false},
+                        {title: "Technical Support", lastMessage: "Need Help?", active: false}
                     ]
                     
                     delegate: Item {
                         width: parent.width
                         height: 60
                         
-                        
+                        //Conversation element
                         Rectangle {
                             anchors.fill: parent
                             radius: 15
-                            color: active ? Qt.rgba(pywalColors.colors[6].r, pywalColors.colors[6].g, pywalColors.colors[6].b, 0.2) : "#000000"
+                            color: active ? Qt.rgba(pywalColors.colors[6].r, pywalColors.colors[6].g, pywalColors.colors[6].b, 0.2): "#000000"
                             border.width: 0
                             
                             ColumnLayout {
                                 anchors.fill: parent
                                 anchors.margins: 10
-                                spacing: 5
+                                Spacing: 5
                                 
                                 Text {
                                     text: modelData.title
@@ -10132,7 +10304,7 @@ ApplicationWindow {
                                 }
                             }
                             
-                            
+                            // Animation of interaction with the mouse
                             ScaleAnimation on scale {
                                 target: parent
                                 from: 1
@@ -10146,18 +10318,18 @@ ApplicationWindow {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 onEntered: {
-                                    if (!active) {
+                                    if(!active) {
                                         parent.scale = 1.03;
                                     }
                                 }
                                 onExited: {
-                                    if (!active) {
+                                    if(!active) {
                                         parent.scale = 1.0;
                                     }
                                 }
                                 onClicked: {
-                                    if (!active) {
-                                        
+                                    if(!active) {
+                                        // Switch to the selected conversation
                                         conversationsList.currentIndex = index;
                                     }
                                 }
@@ -10168,7 +10340,7 @@ ApplicationWindow {
             }
         }
         
-        
+        //Close button
         Rectangle {
             id: closeButton
             width: 30
@@ -10183,13 +10355,13 @@ ApplicationWindow {
             
             Text {
                 anchors.centerIn: parent
-                text: "\uf00d" 
+                text: "\uf00d" // Close icon from Font Awesome 7
                 font.family: faSolid.name
                 font.pixelSize: 16
                 color: pywalColors.colors[7]
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 target: parent
                 from: 1
@@ -10207,7 +10379,7 @@ ApplicationWindow {
                 onClicked: {
                     crosireContent.visible = false;
                     
-                    
+                    // Close the capsule
                     for (let i = 0; i < capsuleLayout.children.length; i++) {
                         let child = capsuleLayout.children[i]
                         if (child.capsuleId === "crosire" && child.isExpanded) {
@@ -10220,12 +10392,12 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //=====================
+            // Case capsule
+            //=====================
             Capsule {
                 id: clipboardCapsule
-                icon: "\uf0ea" 
+                icon: "\uf0ea" // Clipboard icon from Font Awesome 7
                 colorIndex: 2
                 capsuleId: "clipboard"
                 width: 50
@@ -10235,7 +10407,7 @@ ApplicationWindow {
                 property list<string> clipboardItems: []
                 property int maxItems: 50
                 
-                
+                // Function to fetch the contents of the clipboard
                 function getClipboardContent() {
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -10249,22 +10421,22 @@ ApplicationWindow {
                                 clipboardItems.pop();
                             }
                         }
-                    } catch (e) {
-                        console.error("فشل جلب محتويات الحافظة:", e);
+                    } catch(e) {
+                        console.error("Failed to fetch clipboard contents:", e);
                     }
                 }
                 
-                
+                // Function to put content into the clipboard
                 function setClipboardContent(content) {
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         process.start("wl-copy", [content]);
-                    } catch (e) {
-                        console.error("فشل وضع المحتوى في الحافظة:", e);
+                    } catch(e) {
+                        console.error("Failed to put content into clipboard:", e);
                     }
                 }
                 
-                
+                // Temporary to update clipboard contents
                 Timer {
                     interval: 500
                     repeat: true
@@ -10272,7 +10444,7 @@ ApplicationWindow {
                     onTriggered: getClipboardContent()
                 }
                 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     target: parent
                     from: 1
@@ -10286,9 +10458,9 @@ ApplicationWindow {
                     anchors.fill: parent
                     hoverEnabled: true
                     onEntered: parent.scale = 1.02
-                    onExited: parent.scale = 1
+                    onExited: parent.scale=1
                     onClicked: {
-                        
+                        // Expand the clipboard capsule
                         isExpanded = !isExpanded;
                         if (isExpanded) {
                             clipboardExpandAnimation.restart();
@@ -10300,7 +10472,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Expansion Animation
                 ParallelAnimation {
                     id: expandAnimation
                     NumberAnimation {
@@ -10317,7 +10489,7 @@ ApplicationWindow {
                         duration: 50
                         easing.type: Easing.OutQuart
                     }
-                    
+                    // Add a "click" effect on click
                     ScaleAnimation {
                         target: capsuleBase
                         property: "scale"
@@ -10329,7 +10501,7 @@ ApplicationWindow {
                     }
                 }
 
-                
+                // Shrinkage animation
                 ParallelAnimation {
                     id: collapseAnimation
                     NumberAnimation {
@@ -10348,7 +10520,7 @@ ApplicationWindow {
                     }
                 }
 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     id: hoverAnimation
                     duration: 50
@@ -10358,7 +10530,7 @@ ApplicationWindow {
                     running: false
                 }
 
-                
+                // Click animation on click
                 ScaleAnimation {
                     id: pressAnimation
                     target: capsuleBase
@@ -10368,51 +10540,51 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //=====================
+            // Expanded clipboard area
+            //=====================
             Item {
                 id: clipboardExpanded
                 anchors.fill: parent
                 visible: false
                 z: 995
                 
-                
+                // Background of the clipboard area
                 Rectangle {
                     anchors.fill: parent
                     color: "#000000"
                 }
                 
-                
+                // Blur effect for the clipboard area
                 Rectangle {
                     anchors.fill: parent
                     color: "rgba(0, 0, 0, 0.7)"
                     visible: !powerSaverModeActive
                 }
 
-                
+                // In battery saving mode:
                 Rectangle {
                     anchors.fill: parent
                     color: "rgba(0, 0, 0, 0.92)"
                     visible: powerSaverModeActive
                 }
                 
-                
+                // Clipboard area content
                 ColumnLayout {
                     anchors.centerIn: parent
                     width: parent.width * 0.8
-                    spacing: 20
+                    Spacing: 20
                     
-                    
+                    // Address
                     Text {
-                        text: "الحافظة"
+                        text: "clipboard"
                         font.family: ibmPlex.name
                         font.pixelSize: 24
                         color: pywalColors.colors[7]
                         Layout.alignment: Qt.AlignHCenter
                     }
                     
-                    
+                    // List of items
                     ListView {
                         id: clipboardList
                         Layout.fillWidth: true
@@ -10444,20 +10616,20 @@ ApplicationWindow {
                                     anchors.fill: parent
                                     onClicked: {
                                         clipboardCapsule.setClipboardContent(clipboardCapsule.clipboardItems[index]);
-                                        showToast("تم نسخ المحتوى إلى الحافظة", "\uf0ea");
+                                        showToast("Content copied to clipboard", "\uf0ea");
                                     }
                                 }
                             }
                         }
                     }
                     
-                    
+                    // Control buttons
                     RowLayout {
-                        spacing: 20
+                        Spacing: 20
                         Layout.alignment: Qt.AlignHCenter
                         
                         Button {
-                            text: "مسح الكل"
+                            text: "Clear all"
                             width: 120
                             height: 40
                             radius: 20
@@ -10474,7 +10646,7 @@ ApplicationWindow {
                         }
                         
                         Button {
-                            text: "إغلاق"
+                            text: "Close"
                             width: 120
                             height: 40
                             radius: 20
@@ -10495,7 +10667,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                //process clicking on the space to close the clipboard area
                 MouseArea {
                     anchors.fill: parent
                     visible: clipboardExpanded.visible
@@ -10510,9 +10682,9 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //================
+            //Notifire Capsule
+            //================
             Capsule {
                 id: notifireCapsule
                 icon: "\f042"
@@ -10526,13 +10698,13 @@ ApplicationWindow {
                 property bool showDeveloperOptions: false
                 property var activeNotifications: []
                 
-                
+                // Performance characteristics
                 property int maxVisibleNotifications: 5
                 property int notificationHeight: 80
                 property int notificationSpacing: 10
                 property int debounceTime: 20
 
-                
+                // Expansion Animation 
                 ParallelAnimation {
                     id: notifireExpandAnimation
                     NumberAnimation {
@@ -10551,7 +10723,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Shrinkage animation 
                 ParallelAnimation {
                     id: notifireCollapseAnimation
                     NumberAnimation {
@@ -10570,15 +10742,15 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Base capsule (circular)
                 Rectangle {
                     id: capsuleBase
                     anchors.fill: parent
-                    radius: width / 2
+                    radius: width/2
                     color: "#000000"
                     border.width: 0
                     
-                    
+                    // Number (if notifications are found)
                     Rectangle {
                         id: notificationBadge
                         visible: notificationCount > 0
@@ -10593,14 +10765,14 @@ ApplicationWindow {
                         
                         Text {
                             anchors.centerIn: parent
-                            text: notificationCount > 9 ? "9+" : notificationCount.toString()
+                            text: notificationCount > 9 ? "9+": notificationCount.toString()
                             font.family: "IBM Plex Sans Thin"
                             font.pixelSize: 12
                             color: "#000000"
                         }
                     }
                     
-                    
+                    // Icon
                     Text {
                         anchors.centerIn: parent
                         text: notifireCapsule.icon
@@ -10610,7 +10782,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Hover animation 
                 ScaleAnimation {
                     id: hoverAnimation
                     target: capsuleBase
@@ -10622,13 +10794,13 @@ ApplicationWindow {
                     running: false
                 }
                 
-                
+                // Mouse interaction
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
                     
                     onEntered: {
-                        if (!isExpanded) {
+                        if(!isExpanded) {
                             hoverAnimation.running = true;
                         }
                     }
@@ -10636,37 +10808,37 @@ ApplicationWindow {
                     onExited: {
                         hoverAnimation.to = 1.0;
                         hoverAnimation.running = true;
-                        if (!isExpanded) capsuleBase.scale = 1.0;
+                        if(!isExpanded) capsuleBase.scale = 1.0;
                     }
                     
                     onClicked: {
-                        if (!isExpanded) {
-                            
+                        if(!isExpanded) {
+                            // Close all other capsules quickly
                             for (let i = 0; i < capsuleLayout.children.length; i++) {
                                 let child = capsuleLayout.children[i];
-                                if (child.isExpanded && child.capsuleId !== capsule.capsuleId) {
+                                if (child.isExpanded && child.capsuleId!== capsule.capsuleId) {
                                     child.collapseAnimation.restart();
                                     child.isExpanded = false;
                                 }
                             }
                             
-                            
+                            // Expand this capsule
                             notifireExpandAnimation.restart();
                             isExpanded = true;
                             activeCapsule = capsuleId;
                             
-                            
+                            // View Notifire Capsule
                             notifireContent.visible = true;
                             notifireContent.opacity = 0;
                             fadeInAnimation.target = notifireContent;
                             fadeInAnimation.restart();
                         } else {
-                            
+                            // Close this capsule
                             notifireCollapseAnimation.restart();
                             isExpanded = false;
                             activeCapsule = "";
                             
-                            
+                            // Hide Notifire Capsule
                             fadeOutAnimation.target = notifireContent;
                             fadeOutAnimation.onCompleted = function() {
                                 notifireContent.visible = false;
@@ -10676,16 +10848,16 @@ ApplicationWindow {
                     }
                 }
                 
-                
-                
-                
+                //===============
+                //Notifire interface
+                //================
                 Item {
                     id: notifireContent
                     anchors.fill: parent
                     visible: false
                     opacity: 0
                     
-                    
+                    //Notification Island 
                     Item {
                         id: islandContainer
                         width: parent.width * 0.9
@@ -10693,7 +10865,7 @@ ApplicationWindow {
                         anchors.bottom: parent.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
                         
-                        
+                        //Full oval background (without FastBlur)
                         Rectangle {
                             id: islandBackground
                             anchors.fill: parent
@@ -10701,7 +10873,7 @@ ApplicationWindow {
                             color: Qt.rgba(0, 0, 0, 0.85)
                             border.width: 0
                             
-                            
+                            // Improve blur (without FastBlur)
                             layer.enabled: true
                             layer.effect: OpacityMask {
                                 maskSource: Rectangle {
@@ -10713,16 +10885,16 @@ ApplicationWindow {
                             }
                         }
                         
-                        
+                        // Tab bar
                         RowLayout {
                             id: tabBar
                             anchors.bottom: parent.bottom
                             anchors.bottomMargin: 0
                             anchors.horizontalCenter: parent.horizontalCenter
-                            spacing: 10
+                            Spacing: 10
                             height: 50
                             
-                            
+                            //Notifications tab
                             TabButton {
                                 icon: "\uf0f3"
                                 active: activeTab === "notifications"
@@ -10734,7 +10906,7 @@ ApplicationWindow {
                                 width: 50
                             }
                             
-                            
+                            //Control tab
                             TabButton {
                                 icon: "\uf013"
                                 active: activeTab === "control"
@@ -10743,7 +10915,7 @@ ApplicationWindow {
                                 width: 50
                             }
                             
-                            
+                            //Developers tab
                             TabButton {
                                 icon: "\uf121"
                                 active: activeTab === "developer"
@@ -10753,9 +10925,9 @@ ApplicationWindow {
                                 width: 50
                             }
                             
-                            
+                            // Show developer options button
                             TabButton {
-                                icon: "\uf067" 
+                                icon: "\uf067" // plus
                                 active: false
                                 visible: !showDeveloperOptions
                                 onClicked: {
@@ -10768,7 +10940,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Contents of tabs
                     Item {
                         id: tabContent
                         anchors.top: parent.top
@@ -10776,32 +10948,32 @@ ApplicationWindow {
                         width: parent.width
                         height: parent.height - 70
                         
-                        
+                        //Notifications tab
                         Item {
                             id: notificationsTab
                             anchors.fill: parent
                             visible: activeTab === "notifications"
                             
-                            
+                            // Notification list
                             ListView {
                                 id: notificationsList
                                 anchors.fill: parent
                                 clip: true
                                 interactive: false
-                                model: activeNotifications.length > 0 ? activeNotifications : null
+                                model: activeNotifications.length > 0 ? activeNotifications: null
                                 delegate: NotificationItem {
                                     width: parent.width * 0.95
                                     height: notificationHeight
                                     notification: modelData
                                     onDismiss: {
-                                        notifireManager.removeNotification(modelData.id);
+                                        notifyManager.removeNotification(modelData.id);
                                     }
                                     onAction: {
-                                        notifireManager.executeNotificationAction(modelData, actionIndex);
+                                        notifyManager.executeNotificationAction(modelData, actionIndex);
                                     }
                                 }
                                 
-                                
+                                // Appearance animation
                                 OpacityAnimation on opacity {
                                     duration: 50
                                     easing.type: Easing.OutQuart
@@ -10809,7 +10981,7 @@ ApplicationWindow {
                                     to: 1
                                 }
                                 
-                                
+                                // Animation of interaction with the mouse
                                 ScaleAnimation on scale {
                                     duration: 50
                                     easing.type: Easing.OutQuart
@@ -10819,7 +10991,7 @@ ApplicationWindow {
                                 }
                             }
                             
-                            
+                            // Clear All button
                             Button {
                                 id: clearAllButton
                                 anchors.right: parent.right
@@ -10836,21 +11008,21 @@ ApplicationWindow {
                                 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: "مسح الكل"
+                                    text: "Clear all"
                                     font.family: "IBM Plex Sans Thin"
                                     font.pixelSize: 16
                                     color: pywalColors.colors[2]
                                 }
                                 
                                 onClicked: {
-                                    notifireManager.clearAllNotifications();
+                                    notifyManager.clearAllNotifications();
                                 }
                             }
                             
-                            
+                            // "No notifications" message
                             Text {
                                 anchors.centerIn: parent
-                                text: "لا توجد إشعارات"
+                                text: "No notifications"
                                 font.family: "IBM Plex Sans Thin"
                                 font.pixelSize: 18
                                 color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.5)
@@ -10858,13 +11030,13 @@ ApplicationWindow {
                             }
                         }
                         
-                        
+                        //Control tab
                         Item {
                             id: controlTab
                             anchors.fill: parent
                             visible: activeTab === "control"
                             
-                            
+                            // List of controls
                             GridView {
                                 id: controlGrid
                                 anchors.fill: parent
@@ -10884,7 +11056,7 @@ ApplicationWindow {
                             }
                         }
                         
-                        
+                        //Developers tab
                         Item {
                             id: developerTab
                             anchors.fill: parent
@@ -10892,10 +11064,10 @@ ApplicationWindow {
                             
                             ColumnLayout {
                                 anchors.fill: parent
-                                spacing: 15
+                                Spacing: 15
                                 anchors.margins: 15
                                 
-                                
+                                // Create a test notification
                                 Rectangle {
                                     id: createNotificationSection
                                     width: parent.width
@@ -10906,23 +11078,23 @@ ApplicationWindow {
                                     ColumnLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 10
+                                        Spacing: 10
                                         
                                         Text {
-                                            text: "إنشاء إشعار تجريبي"
+                                            text: "Create a test notification"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 16
                                             color: pywalColors.colors[6]
                                         }
                                         
                                         RowLayout {
-                                            spacing: 10
+                                            Spacing: 10
                                             
                                             TextInput {
                                                 id: appNameInput
                                                 width: 100
                                                 height: 40
-                                                placeholderText: "التطبيق"
+                                                placeholderText: "Application"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 16
                                                 color: pywalColors.colors[7]
@@ -10938,7 +11110,7 @@ ApplicationWindow {
                                                 id: titleInput
                                                 width: 150
                                                 height: 40
-                                                placeholderText: "العنوان"
+                                                placeholderText: "Title"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 16
                                                 color: pywalColors.colors[7]
@@ -10954,7 +11126,7 @@ ApplicationWindow {
                                                 id: messageInput
                                                 Layout.fillWidth: true
                                                 height: 40
-                                                placeholderText: "الرسالة"
+                                                placeholderText: "Message"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 16
                                                 color: pywalColors.colors[7]
@@ -10974,7 +11146,7 @@ ApplicationWindow {
                                             color: Qt.rgba(pywalColors.colors[6].r, pywalColors.colors[6].g, pywalColors.colors[6].b, 0.1)
                                             border.color: pywalColors.colors[6]
                                             border.width: 1
-                                            text: "إنشاء"
+                                            text: "Create"
                                             
                                             onClicked: {
                                                 notifireManager.createTestNotification(
@@ -10988,7 +11160,7 @@ ApplicationWindow {
                                     }
                                 }
                                 
-                                
+                                // DBus case
                                 Rectangle {
                                     id: dbusStatusSection
                                     width: parent.width
@@ -10999,10 +11171,10 @@ ApplicationWindow {
                                     ColumnLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 5
+                                        Spacing: 5
                                         
                                         Text {
-                                            text: "حالة DBus"
+                                            text: "DBus case"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 16
                                             color: pywalColors.colors[5]
@@ -11010,15 +11182,15 @@ ApplicationWindow {
                                         
                                         Text {
                                             id: dbusStatusText
-                                            text: checkDBusStatus() ? "متصل" : "غير متصل"
+                                            text: checkDBusStatus() ? "Connected": "Offline"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 14
-                                            color: checkDBusStatus() ? pywalColors.colors[2] : pywalColors.colors[1]
+                                            color: checkDBusStatus()? pywalColors.colors[2] : pywalColors.colors[1]
                                         }
                                     }
                                 }
                                 
-                                
+                                // System information
                                 Rectangle {
                                     id: systemInfoSection
                                     width: parent.width
@@ -11029,10 +11201,10 @@ ApplicationWindow {
                                     ColumnLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 5
+                                        Spacing: 5
                                         
                                         Text {
-                                            text: "معلومات النظام"
+                                            text: "System Information"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 16
                                             color: pywalColors.colors[4]
@@ -11049,7 +11221,7 @@ ApplicationWindow {
                                     }
                                 }
                                 
-                                
+                                // Notification history
                                 Rectangle {
                                     id: logSection
                                     width: parent.width
@@ -11060,10 +11232,10 @@ ApplicationWindow {
                                     ColumnLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 5
+                                        Spacing: 5
                                         
                                         Text {
-                                            text: "سجل الإشعارات"
+                                            text: "Notification History"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 16
                                             color: pywalColors.colors[3]
@@ -11087,7 +11259,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Appearance animation
                 OpacityAnimation {
                     id: fadeInAnimation
                     from: 0
@@ -11096,7 +11268,7 @@ ApplicationWindow {
                     easing.type: Easing.OutQuart
                 }
                 
-                
+                //Disappearance Animation
                 OpacityAnimation {
                     id: fadeOutAnimation
                     from: 1
@@ -11105,14 +11277,14 @@ ApplicationWindow {
                     easing.type: Easing.OutQuart
                 }
                 
-                
-                
-                
-                
+                //=====================
+                // Notification management functions
+                //=====================
+                // Notification creation function
                 function createNotification(title, message, icon, colorIndex, timeout) {
-                    if (timeout === undefined) timeout = 5000; 
+                    if (timeout === undefined) timeout = 5000; // 5 seconds by default
                     
-                    
+                    // Create the notification object
                     let notification = {
                         id: Date.now(),
                         title: title,
@@ -11124,70 +11296,70 @@ ApplicationWindow {
                         timestamp: new Date()
                     };
                     
-                    
+                    // Add the notification to the list
                     activeNotifications.unshift(notification);
                     notificationCount = activeNotifications.length;
                     
-                    
+                    // Update display
                     updateNotifications();
                     
-                    
+                    //set a timeout to remove the notification
                     if (timeout > 0) {
                         setTimeout(function() {
                             removeNotification(notification.id);
                         }, timeout);
                     }
                     
-                    
-                    addToLog(`تم إنشاء إشعار: ${title}`);
+                    // Notification history
+                    addToLog(`Notice created: ${title}`);
                     
                     return notification.id;
                 }
                 
-                
+                // Function to create a test notification
                 function createTestNotification(appName, title, message, timeout) {
                     let colorIndex = Math.floor(Math.random() * 6) + 1;
                     let icon = Math.random() > 0.5 ? "\uf0f3" : "\uf0a2";
                     
                     createNotification(title, message, icon, colorIndex, timeout);
-                    addToLog(`تم إنشاء إشعار تجريبي من ${appName}`);
+                    addToLog(`A test notification was created from ${appName}`);
                 }
                 
-                
+                // Remove notification function
                 function removeNotification(id) {
                     for (let i = 0; i < activeNotifications.length; i++) {
                         if (activeNotifications[i].id === id) {
-                            
+                            // Setting up the disappearance animation
                             activeNotifications[i].opacity = 0.0;
                             updateNotifications();
                             
-                            
+                            // Remove notification after disappearing animation
                             setTimeout(function() {
                                 activeNotifications.splice(i, 1);
                                 notificationCount = activeNotifications.length;
                                 updateNotifications();
-                                addToLog(`تم إزالة إشعار (ID: ${id})`);
-                            }, 300); 
+                                addToLog(`Notification removed (ID: ${id})`);
+                            }, 300); // Duration of the disappearance animation
                             
                             break;
                         }
                     }
                 }
                 
-                
+                // Function to clear all notifications
                 function clearAllNotifications() {
                     if (activeNotifications.length === 0) return;
                     
-                    addToLog("تم مسح جميع الإشعارات");
+                    addToLog("All notifications have been cleared");
                     
-                    
+                    // Set up invisibility animation for all notifications
                     for (let i = 0; i < activeNotifications.length; i++) {
                         activeNotifications[i].opacity = 0.0;
                     }
                     
                     updateNotifications();
                     
-                    
+                    // Remove all notifications after disappearing animation
                     setTimeout(function() {
                         activeNotifications = [];
                         notificationCount = 0;
@@ -11195,24 +11367,24 @@ ApplicationWindow {
                     }, 300);
                 }
                 
-                
+                // Function to execute notification actions
                 function executeNotificationAction(notification, actionIndex) {
-                    addToLog(`تم تنفيذ الإجراء ${actionIndex} للإشعار: ${notification.title}`);
-                    
+                    addToLog(`Action ${actionIndex} was executed for notification: ${notification.title}`);
+                    // Here you can add the logic for executing actions
                 }
                 
-                
+                // Update notification display function
                 function updateNotifications() {
-                    
+                    // Maintain maximum visual notifications
                     let visibleNotifications = activeNotifications.slice(0, maxVisibleNotifications);
                     
-                    
+                    // Update the position of each notification
                     for (let i = 0; i < visibleNotifications.length; i++) {
                         let notification = visibleNotifications[i];
                         let yPosition = (notificationSpacing + notificationHeight) * i + notificationSpacing;
                         
-                        
-                        if (!notification.element) {
+                        // Create or update the element
+                        if(!notification.element) {
                             notification.element = notificationItemComponent.createObject(notificationsList, {
                                 "x": (notificationsList.width - notification.width) / 2,
                                 "y": yPosition,
@@ -11222,26 +11394,26 @@ ApplicationWindow {
                                 "opacity": 0.0
                             });
                             
-                            
+                            // Instant animation (no delay)
                             let fadeIn = notification.element.opacityAnimation;
                             fadeIn.to = notification.opacity;
                             fadeIn.restart();
                             
-                            
+                            // Set the disappearance animation
                             notification.element.opacityAnimation.onRunningChanged = function() {
-                                if (!fadeIn.running && notification.opacity === 0.0) {
+                                if(!fadeIn.running && notification.opacity === 0.0) {
                                     notification.element.destroy();
                                     notification.element = null;
                                 }
                             };
                         } else {
-                            
+                            // Update element position
                             notification.element.y = yPosition;
                             notification.element.opacity = notification.opacity;
                         }
                     }
                     
-                    
+                    // Clean up removed items
                     for (let i = activeNotifications.length - 1; i >= maxVisibleNotifications; i--) {
                         if (activeNotifications[i].element) {
                             activeNotifications[i].element.destroy();
@@ -11250,57 +11422,57 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // DBus status check function
                 function checkDBusStatus() {
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         process.start("dbus-send", ["--session", "--dest=org.freedesktop.DBus", "--type=method_call", "--print-reply", "/org/freedesktop/DBus", "org.freedesktop.DBus.ListNames"]);
-                        process.waitForFinished(500); 
+                        process.waitForFinished(500); // 500ms timeout
                         
                         return process.exitCode() === 0;
-                    } catch (e) {
-                        console.error("فشل التحقق من حالة DBus:", e);
+                    } catch(e) {
+                        console.error("DBus status verification failed:", e);
                         return false;
                     }
                 }
                 
-                
+                // Function to obtain system information
                 function getSystemInfo() {
                     try {
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         process.start("uname", ["-a"]);
                         process.waitForFinished(500);
                         
-                        return process.readAllStandardOutput().trim() || "غير متاح";
-                    } catch (e) {
-                        console.error("فشل جلب معلومات النظام:", e);
-                        return "غير متاح";
+                        return process.readAllStandardOutput().trim() || "Unavailable";
+                    } catch(e) {
+                        console.error("Failed to fetch system information:", e);
+                        return "unavailable";
                     }
                 }
                 
-                
+                // Notification history
                 property string notificationLog: ""
                 
-                
+                // Function to add to the record
                 function addToLog(message) {
                     const timestamp = new Date().toLocaleTimeString();
                     notificationLog = `[${timestamp}] ${message}\n${notificationLog}`;
                     
-                    
+                    // Maintain maximum log
                     const lines = notificationLog.split('\n');
-                    if (lines.length > 20) {
+                    if(lines.length > 20) {
                         notificationLog = lines.slice(0, 20).join('\n');
                     }
                     
-                    if (logText) {
+                    if(logText) {
                         logText.text = notificationLog;
                     }
                 }
                 
-                
-                
-                
-                
+                //=======================
+                // User interface components
+                //=======================
+                // Notification component
                 Component {
                     id: notificationItemComponent
                     
@@ -11309,14 +11481,14 @@ ApplicationWindow {
                         property var notification
                         property real opacity: 1.0
                         
-                        
+                        // Appearance and disappearance animation
                         OpacityAnimation on opacity {
                             id: opacityAnimation
                             duration: 50
                             easing.type: Easing.OutQuart
                         }
                         
-                        
+                        // Background with rounded edges
                         Rectangle {
                             anchors.fill: parent
                             radius: 15
@@ -11324,7 +11496,7 @@ ApplicationWindow {
                             border.width: 0
                             opacity: notificationItem.opacity
                             
-                            
+                            // Mouse interaction effect
                             ScaleAnimation on scale {
                                 duration: 50
                                 easing.type: Easing.OutQuart
@@ -11333,7 +11505,7 @@ ApplicationWindow {
                                 running: false
                             }
                             
-                            
+                            // Boundaries (appear when interacting)
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 15
@@ -11345,13 +11517,13 @@ ApplicationWindow {
                                 visible: false
                             }
                             
-                            
+                            // Content
                             RowLayout {
                                 anchors.fill: parent
                                 anchors.margins: 15
-                                spacing: 15
+                                Spacing: 15
                                 
-                                
+                                // Icon
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: notificationItem.notification.icon
@@ -11360,9 +11532,9 @@ ApplicationWindow {
                                     color: pywalColors.colors[notification.colorIndex]
                                 }
                                 
-                                
+                                // Title and message
                                 ColumnLayout {
-                                    spacing: 5
+                                    Spacing: 5
                                     
                                     Text {
                                         text: notificationItem.notification.title
@@ -11384,10 +11556,10 @@ ApplicationWindow {
                                     }
                                 }
                                 
-                                
+                                //Close button
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
-                                    text: "\uf00d" 
+                                    text: "\uf00d" // Close icon
                                     font.family: faSolid.name
                                     font.pixelSize: 16
                                     color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.5)
@@ -11411,7 +11583,7 @@ ApplicationWindow {
                                 }
                             }
                             
-                            
+                            // Interaction area
                             MouseArea {
                                 id: notificationMouseArea
                                 anchors.fill: parent
@@ -11420,12 +11592,12 @@ ApplicationWindow {
                                 
                                 onEntered: {
                                     parent.scale = 1.02;
-                                    parent.children[0].children[0].visible = true; 
+                                    parent.children[0].children[0].visible = true; // Show borders
                                 }
                                 
                                 onExited: {
                                     parent.scale = 1.0;
-                                    parent.children[0].children[0].visible = false; 
+                                    parent.children[0].children[0].visible = false; // Hide borders
                                 }
                                 
                                 onClicked: {
@@ -11438,7 +11610,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                //Control component
                 Component {
                     id: controlItemComponent
                     
@@ -11448,14 +11620,14 @@ ApplicationWindow {
                         width: parent.width
                         height: parent.height
                         
-                        
+                        // Background
                         Rectangle {
                             anchors.fill: parent
                             radius: 20
                             color: "#000000"
                             border.width: 0
                             
-                            
+                            // Icon
                             Text {
                                 anchors.centerIn: parent
                                 text: controlItem.item.icon
@@ -11466,7 +11638,7 @@ ApplicationWindow {
                                     Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.5)
                             }
                             
-                            
+                            // Activity indicator
                             Rectangle {
                                 anchors.bottom: parent.bottom
                                 anchors.bottomMargin: 5
@@ -11479,7 +11651,7 @@ ApplicationWindow {
                             }
                         }
                         
-                        
+                        // Animation of interaction with the mouse
                         ScaleAnimation on scale {
                             duration: 50
                             easing.type: Easing.OutQuart
@@ -11488,7 +11660,7 @@ ApplicationWindow {
                             running: false
                         }
                         
-                        
+                        // Interaction area
                         MouseArea {
                             anchors.fill: parent
                             hoverEnabled: true
@@ -11507,7 +11679,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Tab component
                 Component {
                     id: tabButtonComponent
                     
@@ -11518,13 +11690,13 @@ ApplicationWindow {
                         width: 50
                         height: 50
                         
-                        
+                        // Background
                         Rectangle {
                             anchors.fill: parent
                             radius: 25
-                            color: active ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1) : "#000000"
+                            color: active ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1): "#000000"
                             
-                            
+                            // Icon
                             Text {
                                 anchors.centerIn: parent
                                 text: tabButton.icon
@@ -11534,22 +11706,22 @@ ApplicationWindow {
                             }
                         }
                         
-                        
+                        // Interaction area
                         MouseArea {
                             anchors.fill: parent
                             hoverEnabled: true
                             onClicked: {
-                                if (tabButton.onClicked) {
+                                if(tabButton.onClicked) {
                                     tabButton.onClicked();
                                 }
                             }
                             onEntered: {
-                                if (!active) {
+                                if(!active) {
                                     parent.scale = 1.05;
                                 }
                             }
                             onExited: {
-                                if (!active) {
+                                if(!active) {
                                     parent.scale = 1.0;
                                 }
                             }
@@ -11558,91 +11730,91 @@ ApplicationWindow {
                 }
             }
 
-            
-            
-            
+            //===============
+            // Notification Manager
+            //===============
             QtObject {
                 id: notifireManager
                 
-                
+                // Create a notification
                 function createNotification(title, message, icon, colorIndex, timeout) {
-                    notifireCapsule.createNotification(title, message, icon, colorIndex, timeout);
+                    notifyCapsule.createNotification(title, message, icon, colorIndex, timeout);
                 }
                 
-                
+                // Create a test notification
                 function createTestNotification(appName, title, message, timeout) {
-                    notifireCapsule.createTestNotification(appName, title, message, timeout);
+                    notifyCapsule.createTestNotification(appName, title, message, timeout);
                 }
                 
-                
+                // Remove notification
                 function removeNotification(id) {
-                    notifireCapsule.removeNotification(id);
+                    notifyCapsule.removeNotification(id);
                 }
                 
-                
+                // Clear all notifications
                 function clearAllNotifications() {
-                    notifireCapsule.clearAllNotifications();
+                    notifyCapsule.clearAllNotifications();
                 }
                 
-                
+                // Receive notifications from the system via DBus
                 Connections {
                     target: notificationSystem
                     onNotificationReceived: {
+                        // Specify the notification color based on the type
+                        let colorIndex = 4; // Default (blue)
+                        if (appName === "Mail") colorIndex = 3; //Green for mail
+                        else if (appName === "Calendar") colorIndex = 5; //Violet for calendar
+                        else if (appName === "System") colorIndex = 1; //red for system
                         
-                        let colorIndex = 4; 
-                        if (appName === "Mail") colorIndex = 3; 
-                        else if (appName === "Calendar") colorIndex = 5; 
-                        else if (appName === "System") colorIndex = 1; 
-                        
-                        
-                        notifireCapsule.createNotification(
+                        // Create notification
+                        notifyCapsule.createNotification(
                             summary,
                             body,
-                            iconPath ? iconPath : "\uf0f3", 
+                            iconPath ? iconPath: "\uf0f3", // Default bell icon
                             colorIndex,
-                            5000 
+                            5000 // 5 seconds
                         );
                     }
                 }
             }
 
-            
-            
-            
+            //================================
+            // DBus Notification Receiving System
+            //================================
             QtObject {
                 id: notificationSystem
                 signal notificationReceived(string appName, string summary, string body, string iconPath)
                 
                 Component.onCompleted: {
-                    
+                    // Create a DBus connection to receive notifications
                     try {
                         const dbus = Qt.createQmlObject('import Qt.labs.dbus 6.8; DBus', root, "DBus");
-                        const connection = dbus.sessionBus();
+                        const connection = dbus. sessionBus();
                         
-                        if (connection) {
-                            
+                        if(connection) {
+                            //Subscribe to system notifications
                             connection.connect("org.freedesktop.Notifications", "/org/freedesktop/Notifications", 
-                                "org.freedesktop.Notifications", "Notification", function(appName, replacesId, appIcon, summary, body, actions, hints, expireTimeout) {
+                                "org.freedesktop.Notifications", "Notification", function(appName, replacementsId, appIcon, summary, body, actions, hints, expireTimeout) {
                                 notificationReceived(appName, summary, body, appIcon);
                             });
                         }
-                    } catch (e) {
-                        console.error("فشل إنشاء اتصال DBus:", e);
+                    } catch(e) {
+                        console.error("Failed to establish DBus connection:", e);
                     }
                 }
             }
 
-            
-            
-            
+            //===============================
+            // Process keyboard shortcuts
+            //===============================
             Keys.onPressed: {
-                
+                //Meta+N shortcut to open Notifire capsule
                 if (event.key === Qt.Key_N && event.modifiers & Qt.MetaModifier) {
                     notifireCapsule.onClicked();
                     event.accepted = true;
                 }
                 
-                
+                //Esc shortcut to close the Notifire capsule
                 if (event.key === Qt.Key_Escape && notifireCapsule.isExpanded) {
                     notifireCollapseAnimation.restart();
                     notifireCapsule.isExpanded = false;
@@ -11650,19 +11822,19 @@ ApplicationWindow {
                     event.accepted = true;
                 }
                 
-                
+                // Shortcut to clear all notifications (Meta+Shift+C)
                 if (event.key === Qt.Key_C && event.modifiers & Qt.MetaModifier && event.modifiers & Qt.ShiftModifier) {
-                    notifireCapsule.clearAllNotifications();
+                    notifyCapsule.clearAllNotifications();
                     event.accepted = true;
                 }
             }
 
-            
-            
-            
+            //=================
+            // Settings capsule
+            //=================
             Capsule {
                 id: settingsCapsule
-                icon: "\uf013" 
+                icon: "\uf013" // Settings icon
                 colorIndex: 4
                 capsuleId: "settings"
                 width: 50
@@ -11671,7 +11843,7 @@ ApplicationWindow {
                 property bool isRightClicked: false
                 property int animationduration: 50
                 
-                
+                // Right-button expansion animation 
                 ParallelAnimation {
                     id: rightClickExpandAnimation
                     NumberAnimation {
@@ -11690,7 +11862,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Right button shrink animation 
                 ParallelAnimation {
                     id: rightClickCollapseAnimation
                     NumberAnimation {
@@ -11709,7 +11881,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                //Left button expansion animation 
                 ParallelAnimation {
                     id: settingsExpandAnimation
                     NumberAnimation {
@@ -11728,7 +11900,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Shrink animation for left button 
                 ParallelAnimation {
                     id: settingsCollapseAnimation
                     NumberAnimation {
@@ -11747,15 +11919,15 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Base capsule (circular)
                 Rectangle {
                     id: capsuleBase
                     anchors.fill: parent
-                    radius: width / 2
+                    radius: width/2
                     color: "#000000"
                     border.width: 0
                     
-                    
+                    // Icon
                     Text {
                         anchors.centerIn: parent
                         text: settingsCapsule.icon
@@ -11765,7 +11937,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Hover animation 
                 ScaleAnimation {
                     id: hoverAnimation
                     target: capsuleBase
@@ -11777,7 +11949,7 @@ ApplicationWindow {
                     running: false
                 }
                 
-                
+                // Mouse interaction
                 MouseArea {
                     id: settingsMouseArea
                     anchors.fill: parent
@@ -11785,7 +11957,7 @@ ApplicationWindow {
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                     
                     onEntered: {
-                        if (!isExpanded) {
+                        if(!isExpanded) {
                             hoverAnimation.running = true;
                         }
                     }
@@ -11793,30 +11965,30 @@ ApplicationWindow {
                     onExited: {
                         hoverAnimation.to = 1.0;
                         hoverAnimation.running = true;
-                        if (!isExpanded) capsuleBase.scale = 1.0;
+                        if(!isExpanded) capsuleBase.scale = 1.0;
                     }
                     
-                    
+                    // Left-click processing
                     onClicked: {
                         if (mouse.button === Qt.LeftButton) {
-                            
+                            // Close all other capsules
                             for (let i = 0; i < capsuleLayout.children.length; i++) {
                                 let child = capsuleLayout.children[i];
-                                if (child.isExpanded && child.capsuleId !== "settings") {
+                                if (child.isExpanded && child.capsuleId!== "settings") {
                                     child.collapseAnimation.restart();
                                     child.isExpanded = false;
                                 }
                             }
                             
-                            
+                            // Temporarily expand this capsule
                             settingsExpandAnimation.restart();
                             isExpanded = true;
                             activeCapsule = capsuleId;
                             
-                            
+                            // Open the Settings app as a separate app
                             openSettingsApp();
                             
-                            
+                            // Close the capsule after opening the settings
                             setTimeout(function() {
                                 settingsCollapseAnimation.restart();
                                 isExpanded = false;
@@ -11825,37 +11997,37 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Right click processing
                     onPressAndHold: {
-                        if (!isExpanded) {
-                            
+                        if(!isExpanded) {
+                            // Close all other capsules
                             for (let i = 0; i < capsuleLayout.children.length; i++) {
                                 let child = capsuleLayout.children[i];
-                                if (child.isExpanded && child.capsuleId !== "settings") {
+                                if (child.isExpanded && child.capsuleId!== "settings") {
                                     child.collapseAnimation.restart();
                                     child.isExpanded = false;
                                 }
                             }
                             
-                            
+                            // Expand this capsule
                             rightClickExpandAnimation.restart();
                             isExpanded = true;
                             isRightClicked = true;
                             activeCapsule = capsuleId;
                             
-                            
+                            // Show editing options
                             editOptions.visible = true;
                             editOptions.opacity = 0;
                             fadeInAnimation.target = editOptions;
                             fadeInAnimation.restart();
                         } else if (isRightClicked) {
-                            
+                            // Close the capsule
                             rightClickCollapseAnimation.restart();
                             isExpanded = false;
                             isRightClicked = false;
                             activeCapsule = "";
                             
-                            
+                            // Hide editing options
                             fadeOutAnimation.target = editOptions;
                             fadeOutAnimation.onCompleted = function() {
                                 editOptions.visible = false;
@@ -11865,14 +12037,14 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Modification options (shown when right-clicked)
                 Item {
                     id: editOptions
                     anchors.fill: parent
                     visible: false
                     opacity: 0
                     
-                    
+                    // Option to modify Hyprland file
                     Rectangle {
                         id: hyprlandOption
                         anchors.left: parent.left
@@ -11887,7 +12059,7 @@ ApplicationWindow {
                         
                         Text {
                             anchors.centerIn: parent
-                            text: "Hyprland file"
+                            text: "Hyprland File"
                             font.family: "IBM Plex Sans Thin"
                             font.pixelSize: 14
                             color: pywalColors.colors[2]
@@ -11908,7 +12080,7 @@ ApplicationWindow {
                         }
                     }
                     
-                    
+                    // Option to modify QuickShell file
                     Rectangle {
                         id: quickshellOption
                         anchors.left: hyprlandOption.right
@@ -11945,7 +12117,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Appearance animation
                 OpacityAnimation {
                     id: fadeInAnimation
                     from: 0
@@ -11954,7 +12126,7 @@ ApplicationWindow {
                     easing.type: Easing.OutQuart
                 }
                 
-                
+                //Disappearance Animation
                 OpacityAnimation {
                     id: fadeOutAnimation
                     from: 1
@@ -11963,113 +12135,113 @@ ApplicationWindow {
                     easing.type: Easing.OutQuart
                 }
                 
-                
-                
-                
-                
+                //====================
+                // System functions
+                //====================
+                // Open the Settings app as a separate app
                 function openSettingsApp() {
                     try {
-                        
+                        // Create a new window for the Settings app
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         
-                        
+                        // Use the appropriate command to open the Settings app
                         process.start("qrc:/SettingsApp/SettingsApp.qml", ["--new-window"]);
                         
-                        console.log("تم فتح تطبيق الإعدادات كتطبيق منفصل");
-                    } catch (e) {
-                        console.error("فشل فتح تطبيق الإعدادات:", e);
-                        
+                        console.log("The Settings app has been opened as a separate app");
+                    } catch(e) {
+                        console.error("Failed to open Settings app:", e);
+                        //Alternative attempt
                         try {
                             const alternativeProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                             alternativeProcess.start("qmlscene", ["qrc:/SettingsApp/SettingsApp.qml"]);
                         } catch (e2) {
-                            console.error("فشل جميع محاولات فتح تطبيق الإعدادات:", e2);
+                            console.error("All attempts to open the Settings app failed:", e2);
                         }
                     }
                 }
                 
-                
+                //Open Hyprland file for editing
                 function openHyprlandConfig() {
                     try {
-                        
+                        // Specify the configuration file path
                         const homeDir = "/home/" + Qt.application.arguments[2];
                         const configPath = homeDir + "/.config/hypr/hyprland.conf";
                         
-                        
+                        //Open file in Neovim
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         process.start("alacritty", ["-e", "nvim", configPath]);
                         
-                        console.log("تم فتح ملف Hyprland في Neovim");
+                        console.log("Hyprland file opened in Neovim");
                         
-                        
+                        // Close the capsule after opening the file
                         rightClickCollapseAnimation.restart();
                         isExpanded = false;
                         isRightClicked = false;
                         activeCapsule = "";
                         
-                        
+                        // Hide editing options
                         fadeOutAnimation.target = editOptions;
                         fadeOutAnimation.onCompleted = function() {
                             editOptions.visible = false;
                         };
                         fadeOutAnimation.restart();
-                    } catch (e) {
-                        console.error("فشل فتح ملف Hyprland:", e);
+                    } catch(e) {
+                        console.error("Failed to open Hyprland file:", e);
                         
-                        
+                        //Alternative attempt
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                             process.start("xterm", ["-e", "nvim", configPath]);
                         } catch (e2) {
-                            console.error("فشل جميع محاولات فتح ملف Hyprland:", e2);
+                            console.error("All attempts to open the Hyprland file failed:", e2);
                         }
                     }
                 }
                 
-                
+                //Open QuickShell file for editing
                 function openQuickShellConfig() {
                     try {
-                        
+                        // Specify the configuration file path
                         const homeDir = "/home/" + Qt.application.arguments[2];
                         const configPath = homeDir + "/.config/quickshell/config.json";
                         
-                        
+                        //Open file in Neovim
                         const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                         process.start("alacritty", ["-e", "nvim", configPath]);
                         
-                        console.log("تم فتح ملف QuickShell في Neovim");
+                        console.log("QuickShell file opened in Neovim");
                         
-                        
+                        // Close the capsule after opening the file
                         rightClickCollapseAnimation.restart();
                         isExpanded = false;
                         isRightClicked = false;
                         activeCapsule = "";
                         
-                        
+                        // Hide editing options
                         fadeOutAnimation.target = editOptions;
                         fadeOutAnimation.onCompleted = function() {
                             editOptions.visible = false;
                         };
                         fadeOutAnimation.restart();
-                    } catch (e) {
-                        console.error("فشل فتح ملف QuickShell:", e);
+                    } catch(e) {
+                        console.error("Failed to open QuickShell file:", e);
                         
-                        
+                        //Alternative attempt
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                             process.start("xterm", ["-e", "nvim", configPath]);
                         } catch (e2) {
-                            console.error("فشل جميع محاولات فتح ملف QuickShell:", e2);
+                            console.error("All attempts to open the QuickShell file failed:", e2);
                         }
                     }
                 }
             }
 
-            
-            
-            
+            //=====================
+            // Energy capsule
+            //=====================
             Capsule {
-                icon: "\uf011" 
+                icon: "\uf011" // Power icon from Font Awesome 7
                 colorIndex: 1
                 capsuleId: "power"
                 width: 50
@@ -12079,44 +12251,44 @@ ApplicationWindow {
         }
     }
     
-    
-    
-    
-    
+    //=====================
+    // Energy List
+    //=====================
+    //Power menu area
     Item {
         id: powerMenu
         anchors.fill: parent
         visible: isPowerMenuOpen
         z: 996
         
-        
+        //Power menu background
         Rectangle {
             anchors.fill: parent
             color: "#000000"
         }
         
-        
+        // Blur effect for power menu
         Rectangle {
             anchors.fill: parent
             color: "rgba(0, 0, 0, 0.7)"
             visible: !powerSaverModeActive
         }
 
-        
+        // In battery saving mode:
         Rectangle {
             anchors.fill: parent
             color: "rgba(0, 0, 0, 0.92)"
             visible: powerSaverModeActive
         }
         
-        
+        // Energy list content
         Item {
             id: powerContent
             anchors.centerIn: parent
             width: 300
             height: 400
             
-            
+            // Background with rounded edges
             Rectangle {
                 anchors.fill: parent
                 radius: 30
@@ -12125,25 +12297,25 @@ ApplicationWindow {
                 border.width: 0
             }
             
-            
+            // List title
             Text {
                 anchors.top: parent.top
                 anchors.topMargin: 20
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "الطاقة"
+                text: "Energy"
                 font.family: ibmPlex.name
                 font.pixelSize: 24
                 color: pywalColors.colors[7]
             }
             
-            
+            //Option buttons
             Repeater {
                 model: [
-                    {icon: "\uf011", text: "Pause التشغيل", color: 1},
-                    {icon: "\uf021", text: "إعادة التشغيل", color: 4},
-                    {icon: "\uf090", text: "وضع السكون", color: 5},
-                    {icon: "\uf08b", text: "التسجيل الخروج", color: 3},
-                    {icon: "\uf00d", text: "إلغاء", color: 7}
+                    {icon: "\uf011", text: "Shutdown", color: 1},
+                    {icon: "\uf021", text: "Restart", color: 4},
+                    {icon: "\uf090", text: "sleep mode", color: 5},
+                    {icon: "\uf08b", text: "Log Out", color: 3},
+                    {icon: "\uf00d", text: "Cancel", color: 7}
                 ]
                 
                 delegate: PowerMenuItem {
@@ -12156,15 +12328,15 @@ ApplicationWindow {
                         if (index === 4) {
                             isPowerMenuOpen = false
                         } else {
-                            
-                            console.log("تنفيذ: " + modelData.text)
+                            //Energy procedure logic
+                            console.log("Execution: " + modelData.text)
                         }
                     }
                 }
             }
         }
         
-        
+        // Appearance animation
         OpacityAnimation on opacity {
             from: 0
             to: 1
@@ -12172,17 +12344,17 @@ ApplicationWindow {
             easing.type: Easing.OutQuart
         }
         
-        
+        //handle clicking on the blank to close the power menu
         MouseArea {
             anchors.fill: parent
             onClicked: isPowerMenuOpen = false
         }
     }
     
-    
-    
-    
-    
+    //====================
+    // MCX System Indicators
+    //====================
+    // The main component of system indicators
     Item {
         id: systemIndicators
         anchors.bottom: parent.bottom
@@ -12193,27 +12365,27 @@ ApplicationWindow {
         visible: false
         z: 100
 
-        
-        property string currentIndicator: "volume"  
+        // Pointer properties
+        property string currentIndicator: "volume"  // "volume", "brightness", "microphone"
         property int volumeLevel: 75
         property int brightnessLevel: 75
         property bool microphoneMuted: false
         property bool isAnimating: false
 
-        
+        // Temporary to automatically hide the cursor
         Timer {
             id: autoHideTimer
             interval: 2000
             onTriggered: {
-                if (!isAnimating) {
+                if(!isAnimating) {
                     systemIndicators.visible = false
                 }
             }
         }
 
-        
-        
-        
+        //====================
+        // Main indicator design
+        //====================
         Rectangle {
             id: indicatorContainer
             anchors.fill: parent
@@ -12223,34 +12395,34 @@ ApplicationWindow {
             border.width: 1
             opacity: 0.92
 
-            
+            //Mild blur effect
             Rectangle {
                 anchors.fill: parent
                 color: "rgba(0, 0, 0, 0.7)"
                 visible: !powerSaverModeActive
             }
 
-            
+            // In battery saving mode:
             Rectangle {
                 anchors.fill: parent
                 color: "rgba(0, 0, 0, 0.92)"
                 visible: powerSaverModeActive
             }
 
-            
+            // In battery saving mode:
             Rectangle {
                 anchors.fill: parent
                 color: "rgba(0, 0, 0, 0.92)"
                 visible: powerSaverModeActive
             }
 
-            
+            // The effect of transparency when interacting
             OpacityAnimation on opacity {
                 duration: 75
                 easing.type: Easing.OutQuart
             }
 
-            
+            // Expansion effect upon appearance
             ScaleAnimation on scale {
                 id: indicatorExpandAnimation
                 duration: 50
@@ -12259,15 +12431,15 @@ ApplicationWindow {
                 to: 1.0
             }
 
-            
-            
-            
+            //====================
+            // Pointer content
+            //====================
             RowLayout {
                 anchors.fill: parent
                 anchors.margins: 15
-                spacing: 15
+                Spacing: 15
 
-                
+                // Pointer icon
                 Text {
                     id: indicatorIcon
                     layout.alignment: Qt.AlignVCenter
@@ -12277,7 +12449,7 @@ ApplicationWindow {
                     text: indicatorIconText
                 }
 
-                
+                // Progress bar
                 Rectangle {
                     id: progressTrack
                     Layout.fillWidth: true
@@ -12290,7 +12462,7 @@ ApplicationWindow {
                         0.2
                     )
 
-                    
+                    //Progress indicator
                     Rectangle {
                         id: progressThumb
                         width: 22
@@ -12299,9 +12471,9 @@ ApplicationWindow {
                         color: "#000000"
                         border.color: indicatorColor
                         border.width: 1
-                        x: (parent.width * currentLevel / 100) - width / 2
+                        x: (parent.width * currentLevel/100) - width/2
 
-                        
+                        // Effect of light around the pointer
                         Rectangle {
                             anchors.fill: parent
                             radius: 10
@@ -12315,7 +12487,7 @@ ApplicationWindow {
                             border.width: 0
                         }
 
-                        
+                        // Effect of interacting with the mouse
                         ScaleAnimation on scale {
                             duration: 50
                             easing.type: Easing.OutQuart
@@ -12344,7 +12516,7 @@ ApplicationWindow {
                         }
                     }
 
-                    
+                    // Larger interaction area
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
@@ -12359,7 +12531,7 @@ ApplicationWindow {
                     }
                 }
 
-                
+                // Percentage
                 Text {
                     id: percentageText
                     layout.alignment: Qt.AlignVCenter
@@ -12371,11 +12543,11 @@ ApplicationWindow {
             }
         }
 
+        //====================
+        // Functions and properties
+        //====================
         
-        
-        
-        
-        
+        // Specify the cursor color based on the type
         property color indicatorColor: {
             switch(currentIndicator) {
                 case "volume": return pywalColors.colors[3]
@@ -12385,59 +12557,59 @@ ApplicationWindow {
             }
         }
 
-        
+        // Select the cursor icon based on the type
         property string indicatorIconText: {
             switch(currentIndicator) {
                 case "volume":
-                    if (volumeLevel === 0) return "\uf026"  
-                    if (volumeLevel < 30) return "\uf027"    
-                    return "\uf028"                         
+                    if (volumeLevel === 0) return "\uf026"  // mute
+                    if (volumeLevel < 30) return "\uf027"    // low volume
+                    return "\uf028"                         // high volume
                 case "brightness":
-                    return "\uf185"  
+                    return "\uf185"  //brightness icon
                 case "microphone":
-                    return microphoneMuted ? "\uf131" : "\uf130"  
-                default: return "\uf013"  
+                    return microphoneMuted? "\uf131" : "\uf130"  // microphone mute/unmute
+                default: return "\uf013"  // settings icon
             }
         }
 
-        
+        // Specify the current level based on the type
         property int currentLevel: {
             switch(currentIndicator) {
                 case "volume": return volumeLevel
                 case "brightness": return brightnessLevel
-                case "microphone": return microphoneMuted ? 0 : 100
+                case "microphone": return microphoneMuted ? 0:100
                 default: return 100
             }
         }
 
-        
+        // Function to display the cursor
         function showIndicator(type) {
             currentIndicator = type
             visible = true
             isAnimating = true
             indicatorExpandAnimation.restart()
             
-            
+            // Restart the auto-disappearance timer
             autoHideTimer.restart()
             
-            
+            // Hide the cursor after a while
             setTimeout(() => {
                 isAnimating = false
                 autoHideTimer.start()
             }, 500)
         }
 
-        
+        // Sound control functions
         function setVolumeLevel(level) {
-            volumeLevel = Math.round(level / 5) * 5  
+            volumeLevel = Math.round(level / 5) * 5  // Round to nearest 5
             autoHideTimer.restart()
             
-            
+            // Update the system volume
             try {
                 const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process")
                 process.start("wpctl", ["set-volume", "@DEFAULT_AUDIO_SINK@", volumeLevel + "%"])
-            } catch (e) {
-                console.error("فشل تعيين مستوى الصوت:", e)
+            } catch(e) {
+                console.error("Failed to set volume:", e)
             }
         }
 
@@ -12449,47 +12621,47 @@ ApplicationWindow {
             }
         }
 
-        
+        // Brightness control functions
         function setBrightnessLevel(level) {
-            brightnessLevel = Math.round(level / 5) * 5  
+            brightnessLevel = Math.round(level / 5) * 5  // Round to nearest 5
             autoHideTimer.restart()
             
-            
+            // Update the brightness level in the system
             try {
                 const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process")
                 process.start("brightnessctl", ["set", brightnessLevel + "%"])
-            } catch (e) {
-                console.error("فشل تعيين مستوى السطوع:", e)
+            } catch(e) {
+                console.error("Failed to set brightness level:", e)
             }
         }
 
-        function increaseBrightness() {
+        function incrementBrightness() {
             setBrightnessLevel(Math.min(100, brightnessLevel + 5))
         }
 
-        function decreaseBrightness() {
+        function decideBrightness() {
             setBrightnessLevel(Math.max(0, brightnessLevel - 5))
         }
 
-        
+        //Microphone control functions
         function toggleMicrophoneMute() {
-            microphoneMuted = !microphoneMuted
+            microphoneMuted=!microphoneMuted
             autoHideTimer.restart()
             
-            
+            // Update the microphone status in the system
             try {
                 const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process")
                 process.start("wpctl", ["set-mute", "@DEFAULT_AUDIO_SOURCE@", microphoneMuted ? "1" : "0"])
-            } catch (e) {
-                console.error("فشل تغيير حالة المايكروفون:", e)
+            } catch(e) {
+                console.error("Failed to change microphone status:", e)
             }
         }
 
+        //====================
+        // Automatically update data
+        //====================
         
-        
-        
-        
-        
+        // Automatically update volume
         Timer {
             interval: 1000
             repeat: true
@@ -12501,18 +12673,18 @@ ApplicationWindow {
                     process.waitForFinished()
                     const output = process.readAllStandardOutput().trim()
                     
-                    
+                    // Analyze the output to get the percentage
                     const match = output.match(/(\d+)%/)
-                    if (match) {
+                    if(match) {
                         volumeLevel = parseInt(match[1])
                     }
-                } catch (e) {
-                    console.error("فشل جلب مستوى الصوت:", e)
+                } catch(e) {
+                    console.error("Failed to fetch volume:", e)
                 }
             }
         }
 
-        
+        // Automatically update brightness level
         Timer {
             interval: 2000
             repeat: true
@@ -12524,59 +12696,59 @@ ApplicationWindow {
                     process.waitForFinished()
                     const output = process.readAllStandardOutput().trim()
                     
-                    
+                    // Analyze the output to get the percentage
                     const match = output.match(/Current brightness: (\d+)%/)
-                    if (match) {
+                    if(match) {
                         brightnessLevel = parseInt(match[1])
                     }
-                } catch (e) {
-                    console.error("فشل جلب مستوى السطوع:", e)
+                } catch(e) {
+                    console.error("Failed to fetch brightness level:", e)
                 }
             }
         }
 
+        //====================
+        // Handling system events
+        //====================
         
-        
-        
-        
-        
+        // Handling keyboard events
         Keys.onPressed: {
-            
+            // Mute (XF86AudioMute)
             if (event.key === Qt.Key_MediaToggle) {
                 systemIndicators.showIndicator("volume")
                 systemIndicators.toggleMute()
                 event.accepted = true
             }
             
-            
+            // Volume Up (XF86AudioRaiseVolume)
             if (event.key === Qt.Key_VolumeUp) {
                 systemIndicators.showIndicator("volume")
                 systemIndicators.setVolumeLevel(Math.min(100, systemIndicators.volumeLevel + 5))
                 event.accepted = true
             }
             
-            
+            // Lower the volume (XF86AudioLowerVolume)
             if (event.key === Qt.Key_VolumeDown) {
                 systemIndicators.showIndicator("volume")
                 systemIndicators.setVolumeLevel(Math.max(0, systemIndicators.volumeLevel - 5))
                 event.accepted = true
             }
             
-            
+            // Change brightness (XF86MonBrightnessUp)
             if (event.key === Qt.Key_BrightnessUp) {
                 systemIndicators.showIndicator("brightness")
                 systemIndicators.increaseBrightness()
                 event.accepted = true
             }
             
-            
+            // Change brightness (XF86MonBrightnessDown)
             if (event.key === Qt.Key_BrightnessDown) {
                 systemIndicators.showIndicator("brightness")
                 systemIndicators.decreaseBrightness()
                 event.accepted = true
             }
             
-            
+            //Mute/Unmute Microphone (XF86AudioMicMute)
             if (event.key === Qt.Key_MicMuteToggle) {
                 systemIndicators.showIndicator("microphone")
                 systemIndicators.toggleMicrophoneMute()
@@ -12585,11 +12757,11 @@ ApplicationWindow {
         }
     }
     
+    //=====================
+    // Integration with C++ to improve performance
+    //=====================
     
-    
-    
-    
-    
+    // Image processing using ImageProcessor
     Image {
         id: backgroundImage
         source: "qrc:/resources/images/wallpaper1.jpg"
@@ -12605,7 +12777,7 @@ ApplicationWindow {
         height: parent.height
         hideSource: true
         
-        
+        // Use C++ image processor to apply glass effect
         onSourceChanged: {
             const processor = ImageProcessor
             const blurred = processor.applyGlassMorphism(
@@ -12615,7 +12787,7 @@ ApplicationWindow {
         }
     }
     
-    
+    // Interact with sound to create visual effects
     Item {
         id: soundVisualizer
         anchors.fill: parent
@@ -12631,7 +12803,7 @@ ApplicationWindow {
                 y: parent.height - height
                 color: Qt.hsla(index / 64, 0.8, 0.6, 0.8)
                 
-                
+                // Sound level dependent motion effects
                 NumberAnimation on height {
                     duration: 50
                     easing.type: Easing.OutQuart
@@ -12639,7 +12811,7 @@ ApplicationWindow {
             }
         }
         
-        
+        // Interact with the microphone button
         Button {
             id: audioButton
             anchors.bottom: parent.bottom
@@ -12654,7 +12826,7 @@ ApplicationWindow {
             
             Text {
                 anchors.centerIn: parent
-                text: "\uf130" 
+                text: "\uf130" // Microphone icon from Font Awesome 7
                 font.family: faSolid.name
                 font.pixelSize: 18
                 color: "#000000"
@@ -12663,13 +12835,13 @@ ApplicationWindow {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    AudioVisualizer.isListening = !AudioVisualizer.isListening
+                    AudioVisualizer.isListening=!AudioVisualizer.isListening
                 }
             }
         }
     }
     
-    
+    // Predict user actions
     Rectangle {
         id: predictionIndicator
         width: parent.width * 0.8
@@ -12685,17 +12857,17 @@ ApplicationWindow {
         
         Text {
             id: predictionText
-            text: "التنبؤ: " + 
-                  (UserBehaviorAnalyzer.predictedNextAction !== -1 ? 
-                   ["قفل الشاشة", "Open قائمة التطبيقات", "إظهار مركز الإشعارات", "Open الإعدادات"][UserBehaviorAnalyzer.predictedNextAction] : 
-                   "لا تنبؤات حالياً")
+            text: "Prediction:" + 
+                  (UserBehaviorAnalyzer.predictedNextAction!== -1 ? 
+                   ["Lock Screen", "Open App List", "Show Notification Center", "Open Settings"][UserBehaviorAnalyzer.predictedNextAction] : 
+                   "No predictions currently")
             anchors.centerIn: parent
             color: UserBehaviorAnalyzer.predictionConfidence > 0.7 ? pywalColors.colors[4] : 
                    UserBehaviorAnalyzer.predictionConfidence > 0.4 ? pywalColors.colors[5] : pywalColors.colors[7]
             font.pixelSize: 16
             opacity: 0
             
-            
+            //Soft entry effect
             OpacityAnimation on opacity {
                 duration: 50
                 from: 0
@@ -12703,7 +12875,7 @@ ApplicationWindow {
             }
         }
         
-        
+        // Trust Index
         Rectangle {
             width: predictionIndicator.width * UserBehaviorAnalyzer.predictionConfidence
             height: 5
@@ -12718,11 +12890,11 @@ ApplicationWindow {
         }
     }
     
-    
+    // Record user actions
     Connections {
         target: statusBar
         function onActiveCapsuleChanged() {
-            if (statusBar.activeCapsule === "power") {
+            if(statusBar.activeCapsule === "power") {
                 UserBehaviorAnalyzer.recordUserAction(0, "opened_power_menu")
             } else if (statusBar.activeCapsule === "clock") {
                 UserBehaviorAnalyzer.recordUserAction(1, "checked_time")
@@ -12739,7 +12911,7 @@ ApplicationWindow {
     Connections {
         target: root
         function onIsAppLauncherOpenChanged() {
-            if (root.isAppLauncherOpen) {
+            if(root.isAppLauncherOpen) {
                 UserBehaviorAnalyzer.recordUserAction(4, "opened_app_launcher")
             }
         }
@@ -12751,7 +12923,7 @@ ApplicationWindow {
         }
     }
     
-    
+    //Memory usage indicator
     Rectangle {
         id: memoryIndicator
         width: 80
@@ -12765,7 +12937,7 @@ ApplicationWindow {
         Rectangle {
             width: memoryIndicator.width * (ResourceManager.currentMemoryUsage / ResourceManager.maxMemoryUsage)
             height: memoryIndicator.height
-            color: width > memoryIndicator.width * 0.8 ? "#FF0000" : "#4CAF50"
+            color: width > memoryIndicator.width * 0.8? "#FF0000": "#4CAF50"
             radius: 10
         }
         
@@ -12776,7 +12948,7 @@ ApplicationWindow {
             font.pixelSize: 12
         }
         
-        
+        // Warning when memory usage is high
         Connections {
             target: ResourceManager
             function onMemoryPressureWarning(current, max) {
@@ -12789,10 +12961,10 @@ ApplicationWindow {
         }
     }
     
-    
-    
-    
-    
+    //=====================
+    // System components
+    //=====================
+    // Capsule component
     Component {
         id: capsuleComponent
         
@@ -12806,16 +12978,16 @@ ApplicationWindow {
             height: 50
             property bool isExpanded: false
             
-            
+            // Base capsule (circular)
             Rectangle {
                 id: capsuleBase
                 anchors.fill: parent
-                radius: width / 2 
+                radius: width / 2 // Make it perfectly circular
                 color: "#000000"
-                border.width: 0 
+                border.width: 0 // Remove borders completely
             }
                 
-            
+            // Icon only (untitled)
             Text {
                 anchors.centerIn: parent
                 text: capsule.icon
@@ -12824,7 +12996,7 @@ ApplicationWindow {
                 color: pywalColors.colors[colorIndex]
             }
                 
-            
+            // Label
             Text {
                 anchors.right: parent.right
                 anchors.rightMargin: 15
@@ -12836,7 +13008,7 @@ ApplicationWindow {
             }
         }
         
-        
+        // Animation of interaction with the mouse
         ScaleAnimation on scale {
             target: parent
             from: 1
@@ -12851,18 +13023,18 @@ ApplicationWindow {
             hoverEnabled: true
             onEntered: {
                 parent.scale = 1.02
-                capsuleBase.border.width = 3
+                capsuleBase.border.width=3
             }
             onExited: {
                 parent.scale = 1
-                capsuleBase.border.width = 2
+                capsuleBase.border.width=2
             }
             onClicked: {
-                
+                // Special processing for AI capsule
                 if (capsule.capsuleId === "crosire") {
                     expandAnimation.to = 140
                     expandAnimation.restart()
-                    crosireContent.visible = !crosireContent.visible
+                    crosireContent.visible=!crosireContent.visible
                 } else {
                     collapseAnimation.restart()
                 }
@@ -12870,7 +13042,7 @@ ApplicationWindow {
                 capsule.isExpanded = false
                 activeCapsule = ""
                 
-                
+                // Special processing for Arch capsule
                 if (capsule.capsuleId === "arch") {
                     isAppLauncherOpen = false
                 }
@@ -12878,7 +13050,7 @@ ApplicationWindow {
         }
     }
     
-    
+    // Sound capsule component
     Component {
         id: musicCapsuleComponent
         
@@ -12892,16 +13064,16 @@ ApplicationWindow {
             height: 50
             property bool isExpanded: false
             
-            
+            // Base capsule (circular)
             Rectangle {
                 id: capsuleBase
                 anchors.fill: parent
-                radius: width / 2 
+                radius: width / 2 // Make it perfectly circular
                 color: "#000000"
-                border.width: 0 
+                border.width: 0 // Remove borders completely
             }
                 
-            
+            // Icon only (untitled)
             Text {
                 anchors.centerIn: parent
                 text: musicCapsule.icon
@@ -12910,7 +13082,7 @@ ApplicationWindow {
                 color: pywalColors.colors[colorIndex]
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 target: parent
                 from: 1
@@ -12925,14 +13097,14 @@ ApplicationWindow {
                 hoverEnabled: true
                 onEntered: {
                     parent.scale = 1.02
-                    capsuleBase.border.width = 3
+                    capsuleBase.border.width=3
                 }
                 onExited: {
                     parent.scale = 1
-                    capsuleBase.border.width = 2
+                    capsuleBase.border.width=2
                 }
                 onClicked: {
-                    
+                    // Expand the sound capsule
                     isExpanded = !isExpanded;
                     if (isExpanded) {
                         musicCapsuleExpandAnimation.restart();
@@ -12944,7 +13116,7 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Expansion Animation
             ParallelAnimation {
                 id: expandAnimation
                 NumberAnimation {
@@ -12961,7 +13133,7 @@ ApplicationWindow {
                     duration: 50
                     easing.type: Easing.OutQuart
                 }
-                
+                // Add a "click" effect on click
                 ScaleAnimation {
                     target: capsuleBase
                     property: "scale"
@@ -12973,7 +13145,7 @@ ApplicationWindow {
                 }
             }
 
-            
+            // Shrinkage animation
             ParallelAnimation {
                 id: collapseAnimation
                 NumberAnimation {
@@ -12992,7 +13164,7 @@ ApplicationWindow {
                 }
             }
 
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 id: hoverAnimation
                 duration: 50
@@ -13002,7 +13174,7 @@ ApplicationWindow {
                 running: false
             }
 
-            
+            // Click animation on click
             ScaleAnimation {
                 id: pressAnimation
                 target: capsuleBase
@@ -13013,7 +13185,7 @@ ApplicationWindow {
         }
     }
 
-    
+    //Capsule clipboard component
     Component {
         id: clipboardCapsuleComponent
         
@@ -13027,16 +13199,16 @@ ApplicationWindow {
             height: 50
             property bool isExpanded: false
             
-            
+            // Base capsule (circular)
             Rectangle {
                 id: capsuleBase
                 anchors.fill: parent
-                radius: width / 2 
+                radius: width / 2 // Make it perfectly circular
                 color: "#000000"
-                border.width: 0 
+                border.width: 0 // Remove borders completely
             }
                 
-            
+            // Icon only (untitled)
             Text {
                 anchors.centerIn: parent
                 text: clipboardCapsule.icon
@@ -13045,7 +13217,7 @@ ApplicationWindow {
                 color: pywalColors.colors[colorIndex]
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 target: parent
                 from: 1
@@ -13060,14 +13232,14 @@ ApplicationWindow {
                 hoverEnabled: true
                 onEntered: {
                     parent.scale = 1.02
-                    capsuleBase.border.width = 3
+                    capsuleBase.border.width=3
                 }
                 onExited: {
                     parent.scale = 1
-                    capsuleBase.border.width = 2
+                    capsuleBase.border.width=2
                 }
                 onClicked: {
-                    
+                    // Expand the clipboard capsule
                     isExpanded = !isExpanded;
                     if (isExpanded) {
                         clipboardCapsuleExpandAnimation.restart();
@@ -13079,7 +13251,7 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Expansion Animation
             ParallelAnimation {
                 id: expandAnimation
                 NumberAnimation {
@@ -13096,7 +13268,7 @@ ApplicationWindow {
                     duration: 50
                     easing.type: Easing.OutQuart
                 }
-                
+                // Add a "click" effect on click
                 ScaleAnimation {
                     target: capsuleBase
                     property: "scale"
@@ -13108,7 +13280,7 @@ ApplicationWindow {
                 }
             }
 
-            
+            // Shrinkage animation
             ParallelAnimation {
                 id: collapseAnimation
                 NumberAnimation {
@@ -13127,7 +13299,7 @@ ApplicationWindow {
                 }
             }
 
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 id: hoverAnimation
                 duration: 50
@@ -13137,7 +13309,7 @@ ApplicationWindow {
                 running: false
             }
 
-            
+            // Click animation on click
             ScaleAnimation {
                 id: pressAnimation
                 target: capsuleBase
@@ -13148,7 +13320,7 @@ ApplicationWindow {
         }
     }
 
-    
+    // AI capsule component
     Component {
         id: crosireCapsuleComponent
         
@@ -13163,16 +13335,16 @@ ApplicationWindow {
             property bool isExpanded: false
             property bool isListening: false
             
-            
+            // Base capsule (circular)
             Rectangle {
                 id: capsuleBase
                 anchors.fill: parent
-                radius: width / 2 
+                radius: width / 2 // Make it perfectly circular
                 color: "#000000"
-                border.width: 0 
+                border.width: 0 // Remove borders completely
             }
                 
-            
+            // Icon only (untitled)
             Text {
                 anchors.centerIn: parent
                 text: crosireCapsule.icon
@@ -13181,7 +13353,7 @@ ApplicationWindow {
                 color: pywalColors.colors[colorIndex]
             }
 
-            
+            // Animation effect run
             ScaleAnimation on scale {
             id: iconPulse
                 duration: 50
@@ -13192,7 +13364,7 @@ ApplicationWindow {
                 easing.type: Easing.OutInQuad
             }
             
-            
+            // Label
             Text {
                 anchors.right: parent.right
                 anchors.rightMargin: 15
@@ -13204,7 +13376,7 @@ ApplicationWindow {
             }
         }
         
-        
+        // Animation of interaction with the mouse
         ScaleAnimation on scale {
             target: parent
             from: 1
@@ -13219,14 +13391,14 @@ ApplicationWindow {
             hoverEnabled: true
             onEntered: {
                 parent.scale = 1.02
-                capsuleBase.border.width = 3
+                capsuleBase.border.width=3
             }
             onExited: {
                 parent.scale = 1
-                capsuleBase.border.width = 2
+                capsuleBase.border.width=2
             }
             onClicked: {
-                
+                // Expand Crosire Capsule
                 isExpanded = !isExpanded;
                 if (isExpanded) {
                     crosireCapsuleExpandAnimation.restart();
@@ -13237,7 +13409,7 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Expansion Animation
             ParallelAnimation {
                 id: expandAnimation
                 NumberAnimation {
@@ -13254,7 +13426,7 @@ ApplicationWindow {
                     duration: 50
                     easing.type: Easing.OutQuart
                 }
-                
+                // Add a "click" effect on click
                 ScaleAnimation {
                     target: capsuleBase
                     property: "scale"
@@ -13266,7 +13438,7 @@ ApplicationWindow {
                 }
             }
 
-            
+            // Shrinkage animation
             ParallelAnimation {
                 id: collapseAnimation
                 NumberAnimation {
@@ -13285,7 +13457,7 @@ ApplicationWindow {
                 }
             }
 
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 id: hoverAnimation
                 duration: 50
@@ -13295,7 +13467,7 @@ ApplicationWindow {
                 running: false
             }
 
-            
+            // Click animation on click
             ScaleAnimation {
                 id: pressAnimation
                 target: capsuleBase
@@ -13304,19 +13476,19 @@ ApplicationWindow {
                 easing.type: Easing.OutBack
             }
             
-           
+           // Artificial Intelligence Jobs
             property string currentQuery: ""
             property string currentResponse: ""
             property string token: "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";
 
             function queryCrosire(query) {
                 currentQuery = query;
-                currentResponse = "جاري التفكير...";
+                currentResponse = "Thinking about...";
                 
                 try {
                     const xhr = new XMLHttpRequest();
-                    xhr.open("POST", "https:
-                    xhr.setRequestHeader("Authorization", "Bearer " + token);
+                    xhr.open("POST", "https://openrouter.ai/api/v1/chat/completions");
+                    xhr.setRequestHeader("Authorization", "Bearer" + token);
                     xhr.setRequestHeader("Content-Type", "application/json");
                     
                     xhr.onreadystatechange = function() {
@@ -13325,7 +13497,7 @@ ApplicationWindow {
                                 const response = JSON.parse(xhr.responseText);
                                 currentResponse = response.choices[0].message.content;
                             } else {
-                                currentResponse = "حدث خطأ في الاتصال بـ Crosire";
+                                currentResponse = "An error occurred connecting to Crosire";
                             }
                         }
                     };
@@ -13336,15 +13508,15 @@ ApplicationWindow {
                             {"role": "user", "content": query}
                         ]
                     }));
-                } catch (e) {
-                    console.error("فشل استدعاء Crosire:", e);
-                    currentResponse = "فشل الاتصال بـ Crosire";
+                } catch(e) {
+                    console.error("Crosire call failed:", e);
+                    currentResponse = "Failed to connect to Crosire";
                 }
             }
         }
     }
     
-    
+    //Power button component
     Component {
         id: powerMenuItemComponent
         
@@ -13364,7 +13536,7 @@ ApplicationWindow {
                 RowLayout {
                     anchors.fill: parent
                     anchors.margins: 15
-                    spacing: 15
+                    Spacing: 15
                     
                     Text {
                         text: powerMenuItem.icon
@@ -13382,7 +13554,7 @@ ApplicationWindow {
                     }
                 }
                 
-                
+                // Animation of interaction with the mouse
                 ScaleAnimation on scale {
                     target: parent
                     from: 1
@@ -13403,87 +13575,87 @@ ApplicationWindow {
         }
     }
     
+    //=====================
+    // Handling system events
+    //=====================
     
-    
-    
-    
-    
+    // Handling keyboard events
     Keys.onPressed: {
-        
+        // Switch to lock screen (Super + L)
         if (event.key === Qt.Key_L && event.modifiers & Qt.MetaModifier) {
             isLocked = true;
             event.accepted = true;
         }
 
-        
+        // Application launcher (Super only)
         if (event.key === Qt.Key_Meta && event.modifiers === Qt.NoModifier) {
-            isAppLauncherOpen = !isAppLauncherOpen;
+            isAppLauncherOpen=!isAppLauncherOpen;
             event.accepted = true;
         }
         
-        
+        // Mute (XF86AudioMute)
         if (event.key === Qt.Key_MediaToggle) {
             indicatorPopup.showIndicator("volume")
-            indicatorPopup.setVolumeLevel(indicatorPopup.volumeLevel === 0 ? 50 : 0)
+            indicatorPopup.setVolumeLevel(indicatorPopup.volumeLevel === 0 ? 50:0)
             event.accepted = true
         }
         
-        
+        // Volume Up (XF86AudioRaiseVolume)
         if (event.key === Qt.Key_VolumeUp) {
             indicatorPopup.showIndicator("volume")
             indicatorPopup.increaseVolume()
             event.accepted = true
         }
         
-        
+        // Lower the volume (XF86AudioLowerVolume)
         if (event.key === Qt.Key_VolumeDown) {
             indicatorPopup.showIndicator("volume")
             indicatorPopup.decreaseVolume()
             event.accepted = true
         }
         
-        
+        //Mute/Unmute Microphone (XF86AudioMicMute)
         if (event.key === Qt.Key_MicMuteToggle) {
             toggleMicrophoneMute();
             event.accepted = true;
         }
 
-        
+        // Increase brightness (XF86MonBrightnessUp)
         if (event.key === Qt.Key_BrightnessUp) {
             indicatorPopup.showIndicator("brightness")
             indicatorPopup.increaseBrightness()
             event.accepted = true
         }
         
-        
+        // Reduce brightness (XF86MonBrightnessDown)
         if (event.key === Qt.Key_BrightnessDown) {
             indicatorPopup.showIndicator("brightness")
             indicatorPopup.decreaseBrightness()
             event.accepted = true
         }
         
-        
+        // Notification Center (Super + N)
         if (event.key === Qt.Key_N && event.modifiers & Qt.AltModifier) {
-            isNotificationCenterOpen = !isNotificationCenterOpen
+            isNotificationCenterOpen=!isNotificationCenterOpen
             event.accepted = true
         }
         
-        
+        // Power menu (Super + Esc)
         if (event.key === Qt.Key_Escape && event.modifiers & Qt.MetaModifier) {
-            isPowerMenuOpen = !isPowerMenuOpen;
+            isPowerMenuOpen=!isPowerMenuOpen;
             event.accepted = true;
         }
         
-        
+        // Artificial Intelligence (Super + C)
         if (event.key === Qt.Key_C && event.modifiers & Qt.AltModifier) {
-            crosireContent.visible = !crosireContent.visible
+            crosireContent.visible=!crosireContent.visible
             event.accepted = true
         }
         
         Keys.onPressed: {
-            
+            //Ctrl+Shift+Esc shortcut: Activate AOD mode
             if (event.key === Qt.Key_Escape && event.modifiers === (Qt.ControlModifier | Qt.ShiftModifier)) {
-                if (isLocked && !isAODActive) {
+                if (isLocked &&!isAODActive) {
                     lockScreen.enterAODModeMCX();
                 } else if (isAODActive) {
                     lockScreen.wakeUpFromAOD();
@@ -13491,62 +13663,62 @@ ApplicationWindow {
                 event.accepted = true;
             }
 
-        
-        
-        
+        //===========================
+        // Keyboard event handler
+        //===========================
         Keys.onPressed: {
-            
+            // Super + E shortcut: Open the Drile app
             if (event.key === Qt.Key_E && event.modifiers === Qt.MetaModifier) {
                 openDrileApp();
                 event.accepted = true;
             }
 
-            
+            // Shortcut Ctrl + Shift + Q: Open the Settings app (Home)
             if (event.key === Qt.Key_Q && event.modifiers === (Qt.ControlModifier | Qt.ShiftModifier)) {
                 openSettingsApp("main");
                 event.accepted = true;
             }
 
-            
+            // Ctrl+Shift+W shortcut: Open the Settings app (General Settings)
             if (event.key === Qt.Key_W && event.modifiers === (Qt.ControlModifier | Qt.ShiftModifier)) {
                 openSettingsApp("general");
                 event.accepted = true;
             }
 
-            
+            // Ctrl+Shift+E shortcut: Open the Settings app (shortcuts section)
             if (event.key === Qt.Key_E && event.modifiers === (Qt.ControlModifier | Qt.ShiftModifier)) {
                 openSettingsApp("shortcuts");
                 event.accepted = true;
             }
         }
 
-        
+        // Open clipboard (Super + V)
         if (event.key === Qt.Key_V && event.modifiers & Qt.AltModifier) {
-            clipboardExpanded.visible = !clipboardExpanded.visible
+            clipboardExpanded.visible=!clipboardExpanded.visible
             event.accepted = true
         }
     }
     
-    
+    //handle clicking on the space to close the expanded capsules
     MouseArea {
         anchors.fill: parent
-        visible: activeCapsule !== ""
+        visible: activeCapsule!== ""
         onClicked: {
             for (let i = 0; i < capsuleLayout.children.length; i++) {
                 let child = capsuleLayout.children[i]
                 if (child.isExpanded) {
-                    
+                    //Special processing of keyboard capsule
                     if (child.capsuleId === "keyboard") {
                         keyboardCapsule.collapseAnimation.restart()
                     }
                     
-                    
+                    // Special handling of the clipboard capsule
                     if (child.capsuleId === "clipboard") {
                         clipboardExpanded.visible = false;
                         clipboardCapsule.collapseAnimation.restart()
                     }
                     
-                    
+                    // Special processing for AI capsule
                     if (child.capsuleId === "crosire") {
                         crosireExpanded.visible = false;
                         crosireCapsule.crosireCollapseAnimation.restart()
@@ -13559,9 +13731,9 @@ ApplicationWindow {
         }
     }
 
-    
-    
-    
+    //==============================
+    // Integration with C++ (entry point)
+    //==============================
     QtObject {
         id: cppIntegration
         property bool initialized: false
@@ -13570,7 +13742,7 @@ ApplicationWindow {
         property var pendingCalls: []
         property bool isProcessingCalls: false
         
-        
+        // Basic system services
         property var systemServices: {
             "power": null,
             "battery": null,
@@ -13580,13 +13752,13 @@ ApplicationWindow {
             "resources": null
         }
         
-        
+        // Resource monitoring
         property int cpuUsage: 0
         property int memoryUsage: 0
         property int gpuUsage: 0
         property bool isThrottling: false
         
-        
+        // Performance settings
         property int animationduration: 50
         property int animationEasing: Easing.OutQuart
         property bool opacityAnimationsEnabled: true
@@ -13594,30 +13766,30 @@ ApplicationWindow {
         property bool slideAnimationsEnabled: true
         property bool rippleAnimationsEnabled: true
         
-        
+        // System configuration
         function initialize() {
             if (initialized) return;
             
             try {
-                
+                // Configure basic services
                 initializeSystemServices();
                 
-                
+                // Start monitoring resources
                 startResourceMonitoring();
                 
-                
+                // Download system settings
                 loadSystemSettings();
                 
                 initialized = true;
-                console.log("تم تهيئة التكامل مع C++ بنجاح");
-            } catch (e) {
-                console.error("فشل تهيئة التكامل مع C++:", e);
+                console.log("C++ integration configured successfully");
+            } catch(e) {
+                console.error("C++ integration configuration failed:", e);
             }
         }
         
-        
+        // Configure basic services
         function initializeSystemServices() {
-            
+            // Configure the power service
             systemServices.power = {
                 getPowerMode: function(callback) {
                     Qt.callCpp("power.getPowerMode", function(mode) {
@@ -13626,7 +13798,7 @@ ApplicationWindow {
                 },
                 setPowerMode: function(mode, callback) {
                     Qt.callCpp("power.setPowerMode", mode, function(success) {
-                        if (success) {
+                        if(success) {
                             updatePerformanceSettings(mode);
                         }
                         callback(success);
@@ -13634,7 +13806,7 @@ ApplicationWindow {
                 }
             };
             
-            
+            // Configure battery service
             systemServices.battery = {
                 getBatteryStatus: function(callback) {
                     Qt.callCpp("battery.getBatteryStatus", function(status) {
@@ -13646,7 +13818,7 @@ ApplicationWindow {
                 }
             };
             
-            
+            // Configure the audio service
             systemServices.audio = {
                 getVolume: function(callback) {
                     Qt.callCpp("audio.getVolume", function(volume) {
@@ -13666,7 +13838,7 @@ ApplicationWindow {
                 }
             };
             
-            
+            // Configure the display service
             systemServices.display = {
                 getBrightness: function(callback) {
                     Qt.callCpp("display.getBrightness", function(brightness) {
@@ -13681,7 +13853,7 @@ ApplicationWindow {
                 }
             };
             
-            
+            // Configure the network service
             systemServices.network = {
                 getActiveConnection: function(callback) {
                     Qt.callCpp("network.getActiveConnection", function(connection) {
@@ -13689,13 +13861,13 @@ ApplicationWindow {
                     });
                 },
                 scanWiFi: function(callback) {
-                    Qt.callCpp("network.scanWiFi", function(networks) {
+                    Qt.callCpp("network.scanWiFi", function(nets) {
                         callback(networks);
                     });
                 }
             };
             
-            
+            // Configure the resource service
             systemServices.resources = {
                 getSystemUsage: function(callback) {
                     Qt.callCpp("resources.getSystemUsage", function(usage) {
@@ -13711,7 +13883,7 @@ ApplicationWindow {
             };
         }
         
-        
+        // Start monitoring resources
         function startResourceMonitoring() {
             Timer {
                 id: resourceMonitorTimer
@@ -13723,7 +13895,7 @@ ApplicationWindow {
                         memoryUsage = usage.memory;
                         gpuUsage = usage.gpu || 0;
                         
-                        
+                        // Take automatic actions based on resource usage
                         if (cpuUsage > 90 || memoryUsage > 85) {
                             throttleSystem();
                         } else if (isThrottling && cpuUsage < 70 && memoryUsage < 70) {
@@ -13734,28 +13906,28 @@ ApplicationWindow {
             }
         }
         
-        
+        // Download system settings
         function loadSystemSettings() {
             try {
                 const fs = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                 fs.source = "/home/user/.config/quickshell/system-settings.json";
                 const data = fs.read();
                 
-                if (data) {
-                    const settings = JSON.parse(data);
+                if(data) {
+                    const settings = JSON. parse(data);
                     animationDuration = settings.animationDuration || 75;
                     animationEasing = settings.animationEasing || Easing.OutQuart;
                     opacityAnimationsEnabled = settings.opacityAnimationsEnabled !== false;
                     scaleAnimationsEnabled = settings.scaleAnimationsEnabled !== false;
                     slideAnimationsEnabled = settings.slideAnimationsEnabled !== false;
-                    rippleAnimationsEnabled = settings.rippleAnimationsEnabled !== false;
+                    rippleAnimationsEnabled = settings. rippleAnimationsEnabled !== false;
                 }
-            } catch (e) {
-                console.error("فشل تحميل إعدادات النظام:", e);
+            } catch(e) {
+                console.error("Failed to load system settings:", e);
             }
         }
         
-        
+        // Save system settings
         function saveSystemSettings() {
             try {
                 const fs = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -13768,12 +13940,12 @@ ApplicationWindow {
                     slideAnimationsEnabled: slideAnimationsEnabled,
                     rippleAnimationsEnabled: rippleAnimationsEnabled
                 }));
-            } catch (e) {
-                console.error("فشل حفظ إعدادات النظام:", e);
+            } catch(e) {
+                console.error("Failed to save system settings:", e);
             }
         }
         
-        
+        // Control system performance
         function updatePerformanceSettings(mode) {
             switch(mode) {
                 case "performance":
@@ -13808,54 +13980,54 @@ ApplicationWindow {
             saveSystemSettings();
         }
         
-        
+        // Reduce system performance in case of high usage
         function throttleSystem() {
             if (isThrottling) return;
             
             isThrottling = true;
-            console.log("تنشيط وضع التوفير التلقائي بسبب ارتفاع استخدام الموارد");
+            console.log("Automatic savings mode activated due to high resource usage");
             
-            
+            // Reduce the quality of animations
             animationDuration = 50;
             animationEasing = Easing.Linear;
             
-            
+            // Disable unnecessary animations
             opacityAnimationsEnabled = false;
             scaleAnimationsEnabled = false;
             rippleAnimationsEnabled = false;
             
-            
+            // Reduce system updates
             systemServices.resources.setUpdateInterval(500);
         }
         
-        
+        // Restore performance when returning to normal use
         function restorePerformance() {
             isThrottling = false;
-            console.log("استعادة الأداء الطبيعي بعد تحسن استخدام الموارد");
+            console.log("Restore normal performance after improved resource utilization");
             
-            
+            //Restore quality of animations
             animationDuration = 100;
             animationEasing = Easing.OutQuart;
             
-            
+            //Reactivate animations
             opacityAnimationsEnabled = true;
             scaleAnimationsEnabled = true;
             rippleAnimationsEnabled = false;
             
-            
+            // Restore system updates
             systemServices.resources.setUpdateInterval(300);
         }
         
-        
+        //Memory management
         function collectGarbage() {
-            
+            // Collect garbage every 5 minutes or when 70% of memory is used
             if ((Date.now() - lastGC > 300000) || (Qt.application.memoryUsage > 0.7)) {
                 systemServices.resources.collectGarbage();
                 lastGC = Date.now();
             }
         }
         
-        
+        // Asynchronous loading of functions
         function asyncCall(functionName, args, callback) {
             pendingCalls.push({
                 functionName: functionName,
@@ -13873,7 +14045,7 @@ ApplicationWindow {
             
             const call = pendingCalls.shift();
             Qt.callCpp(call.functionName, call.args, function(result) {
-                if (call.callback) {
+                if(call.callback) {
                     call.callback(result);
                 }
                 isProcessingCalls = false;
@@ -13881,22 +14053,22 @@ ApplicationWindow {
             });
         }
         
-        
+        // Monitor system performance
         function monitorPerformance() {
             Timer {
                 id: performanceMonitor
                 interval: 5000
                 running: true
                 onTriggered: {
-                    
+                    // Check the response time
                     const startTime = Date.now();
                     Qt.callCpp("test.performance", function() {
                         const responseTime = Date.now() - startTime;
                         
-                        
+                        // If the response time is high, disable animations
                         if (responseTime > 100) {
-                            if (!isThrottling) {
-                                console.log("زيادة زمن الاستجابة إلى " + responseTime + "ms، تفعيل وضع التوفير");
+                            if(!isThrottling) {
+                                console.log("Increase response time to " + responseTime + "ms, activate savings mode");
                                 throttleSystem();
                             }
                         }
@@ -13905,46 +14077,46 @@ ApplicationWindow {
             }
         }
         
-        
+        // Connection test function
         function testConnection() {
             Qt.callCpp("test.connection", function(result) {
-                console.log("اتصال C++ ناجح:", result);
+                console.log("C++ connection successful:", result);
             });
         }
         
-        
+        // Function to log errors
         function logError(error, context) {
             if (isDebugMode) {
-                console.error("خطأ في التكامل مع C++ [" + context + "]:", error);
+                console.error("Error integrating with C++ [" + context + "]:", error);
             }
             
             try {
                 const fs = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                 fs.source = "/home/user/.config/quickshell/errors.log";
                 fs.write("[" + new Date().toISOString() + "] [" + context + "]: " + error + "\n", true);
-            } catch (e) {
-                console.error("فشل تسجيل الخطأ:", e);
+            } catch(e) {
+                console.error("Error logging failed:", e);
             }
         }
         
-        
+        // Initialize the system on startup
         Component.onCompleted: {
             initialize();
             monitorPerformance();
             
-            
+            // Collect garbage periodically
             Timer {
-                interval: 60000 
+                interval: 60,000 // every minute
                 running: true
                 onTriggered: collectGarbage()
             }
         }
     }
     
-    
-    
-    
-    
+    //======================
+    // Advanced system functions
+    //======================
+    // Notification component
     Component {
         id: toastComponent
         
@@ -13956,7 +14128,7 @@ ApplicationWindow {
             anchors.bottomMargin: 20
             anchors.horizontalCenter: parent.horizontalCenter
             
-            
+            // Notification background
             Rectangle {
                 anchors.fill: parent
                 radius: 30
@@ -13965,14 +14137,14 @@ ApplicationWindow {
                 border.width: 0
                 opacity: 0.9
                 
-                
+                // Blur effect
                 Rectangle {
                     anchors.fill: parent
                     color: "rgba(0, 0, 0, 0.7)"
                     visible: !powerSaverModeActive
                 }
 
-                
+                // In battery saving mode:
                 Rectangle {
                     anchors.fill: parent
                     color: "rgba(0, 0, 0, 0.92)"
@@ -13980,11 +14152,11 @@ ApplicationWindow {
                 }
             }
             
-            
+            //Notification content
             RowLayout {
                 anchors.fill: parent
                 anchors.margins: 15
-                spacing: 15
+                Spacing: 15
                 
                 Text {
                     text: toast.icon
@@ -14002,7 +14174,7 @@ ApplicationWindow {
                 }
             }
             
-            
+            // Appearance animation
             OpacityAnimation on opacity {
                 id: showAnimation
                 from: 0
@@ -14011,7 +14183,7 @@ ApplicationWindow {
                 easing.type: Easing.OutQuart
             }
             
-            
+            //Disappearance Animation
             OpacityAnimation on opacity {
                 id: hideAnimation
                 from: 1
@@ -14019,7 +14191,7 @@ ApplicationWindow {
                 duration: 50
                 easing.type: Easing.OutQuart
                 onRunningChanged: {
-                    if (!running && to === 0) {
+                    if(!running&&to===0){
                         toast.destroy();
                     }
                 }
@@ -14027,33 +14199,33 @@ ApplicationWindow {
         }
     }
 
-    
-    
-    
+    //======================
+    // Function to open the Drile application
+    //======================
     function openDrileApp() {
-        
+        // Check if the application is already open
         if (isDrileOpen) {
-            console.log("تطبيق Drile مفتوح بالفعل.");
+            console.log("Drile application is already open.");
             return;
         }
 
-        
+        // Set the application state as open
         isDrileOpen = true;
 
-        
+        // Show Drile interface with quick animation
         drileApp.visible = true;
         drileOpenAnimation.restart();
     }
 
-    
-    
-    
+    //=================
+    //Drele application component
+    //=================
     Item {
-        id: drileApp
+        id: dreleApp
         anchors.fill: parent
         visible: false
 
-        
+        // Application background
         Rectangle {
             anchors.fill: parent
             color: "#000000"
@@ -14063,10 +14235,10 @@ ApplicationWindow {
             border.width: 1
         }
 
-        
+        // Application content
         ColumnLayout {
             anchors.centerIn: parent
-            spacing: 20
+            Spacing: 20
 
             Text {
                 text: "Drile File Manager"
@@ -14076,51 +14248,51 @@ ApplicationWindow {
             }
 
             Button {
-                text: "إغلاق Drile"
+                text: "Close Drile"
                 width: 150
                 height: 40
                 onClicked: closeDrileApp()
             }
         }
 
-        
+        // Appearance animation
         ParallelAnimation {
             id: drileOpenAnimation
             NumberAnimation {
-                target: drileApp
+                target: dreleApp
                 property: "opacity"
                 from: 0
                 to: 1
-                duration: 4 
+                duration: 4 // Instant response according to MCX standards
             }
             ScaleAnimation {
-                target: drileApp
+                target: dreleApp
                 property: "scale"
                 from: 0.8
                 to: 1
-                duration: 4 
+                duration: 4 // Instant response
             }
         }
 
-        
+        //Closing animation
         ParallelAnimation {
             id: drileCloseAnimation
             NumberAnimation {
-                target: drileApp
+                target: dreleApp
                 property: "opacity"
                 from: 1
                 to: 0
                 duration: 4
             }
             ScaleAnimation {
-                target: drileApp
+                target: dreleApp
                 property: "scale"
                 from: 1
                 to: 0.8
                 duration: 4
             }
             onRunningChanged: {
-                if (!running) {
+                if(!running) {
                     drileApp.visible = false;
                     isDrileOpen = false;
                 }
@@ -14128,18 +14300,18 @@ ApplicationWindow {
         }
     }
 
-    
+    // Function to close the Drile application
     function closeDrileApp() {
         drileCloseAnimation.restart();
     }
 
-    
-    
-    
-    
+    //==============================
+    // System monitoring by Crosire
+    //==============================
+    // Timer to monitor the system
     Timer {
         id: systemMonitor
-        interval: 60000 
+        interval: 60,000 // every minute
         repeat: true
         running: true
         onTriggered: {
@@ -14147,131 +14319,131 @@ ApplicationWindow {
         }
     }
     
-    
+    // Function to monitor the system
     function monitorSystem() {
         try {
-            
+            // Check memory usage
             const memoryProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             memoryProcess.start("free", ["-m"]);
             memoryProcess.waitForFinished();
             const memoryOutput = memoryProcess.readAllStandardOutput().trim();
             
-            if (memoryOutput) {
+            if(memoryOutput) {
                 const lines = memoryOutput.split("\n");
-                if (lines.length > 1) {
+                if(lines.length > 1) {
                     const memoryInfo = lines[1].split(/\s+/);
                     const total = parseInt(memoryInfo[1]);
                     const used = parseInt(memoryInfo[2]);
                     const usagePercent = (used / total) * 100;
                     
                     if (usagePercent > 90) {
-                        showToast("تحذير: استخدام الذاكرة مرتفع (" + usagePercent.toFixed(1) + "%)", "\uf240");
+                        showToast("Warning: High memory usage (" + usagePercent.toFixed(1) + "%)", "\uf240");
                         
-                        
-                        const crosireSuggestion = "يبدو أن استخدام الذاكرة مرتفع. هل تريد إغلاق التطبيقات غير الضرورية؟";
+                        // Suggest a solution from Crosire
+                        const crosireSuggestion = "Memory usage appears to be high. Do you want to close unnecessary apps?";
                         showToast(crosireSuggestion, "\ue2ca");
                     }
                 }
             }
             
-            
+            // Check CPU usage
             const cpuProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             cpuProcess.start("top", ["-bn1"]);
             cpuProcess.waitForFinished();
             const cpuOutput = cpuProcess.readAllStandardOutput().trim();
             
-            if (cpuOutput) {
+            if(cpuOutput) {
                 const lines = cpuOutput.split("\n");
                 for (const line of lines) {
-                    if (line.includes("Cpu(s)")) {
+                    if(line.includes("Cpu(s)")) {
                         const cpuInfo = line.split(",")[0];
                         const usagePercent = parseFloat(cpuInfo.split(":")[1].trim());
                         
                         if (usagePercent > 90) {
-                            showToast("تحذير: استخدام وحدة المعالجة المركزية مرتفع (" + usagePercent + "%)", "\uf2db");
+                            showToast("Warning: High CPU usage (" + usagePercent + "%)", "\uf2db");
                             
-                            
-                            const crosireSuggestion = "يبدو أن استخدام وحدة المعالجة المركزية مرتفع. هل تريد إغلاق التطبيقات الثقيلة؟";
+                            // Suggest a solution from Crosire
+                            const crosireSuggestion = "CPU usage appears to be high. Do you want to close heavy apps?";
                             showToast(crosireSuggestion, "\ue2ca");
                         }
                     }
                 }
             }
             
-            
+            // Check storage space
             const diskProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             diskProcess.start("df", ["/"]);
             diskProcess.waitForFinished();
             const diskOutput = diskProcess.readAllStandardOutput().trim();
             
-            if (diskOutput) {
+            if(diskOutput) {
                 const lines = diskOutput.split("\n");
-                if (lines.length > 1) {
+                if(lines.length > 1) {
                     const diskInfo = lines[1].split(/\s+/);
                     const usagePercent = parseInt(diskInfo[4].replace("%", ""));
                     
                     if (usagePercent > 90) {
-                        showToast("تحذير: مساحة التخزين منخفضة (" + usagePercent + "%)", "\uf0a0");
+                        showToast("Warning: Low storage space (" + usagePercent + "%)", "\uf0a0");
                         
-                        
-                        const crosireSuggestion = "يبدو أن مساحة التخزين منخفضة. هل تريد حذف الملفات المؤقتة؟";
+                        // Suggest a solution from Crosire
+                        const crosireSuggestion = "Storage appears to be low. Do you want to delete temporary files?";
                         showToast(crosireSuggestion, "\ue2ca");
                     }
                 }
             }
-        } catch (e) {
-            console.error("فشل مراقبة النظام:", e);
+        } catch(e) {
+            console.error("System monitoring failed:", e);
         }
     }
     
-    
-    
-    
-    
+    //==================
+    // Integration with the system
+    //==================
+    // Function to fetch battery information
     function getBatteryInfo() {
         try {
             const fs = Qt.createQmlObject('import QtQuick 2.0; FileIO', root, "FileIO")
             fs.source = "/sys/class/power_supply/BAT0/capacity"
             const capacity = fs.read().trim()
             return capacity + "%"
-        } catch (e) {
-            console.warn("لم يتم العثور على معلومات البطارية")
+        } catch(e) {
+            console.warn("Battery information not found")
             return "N/A"
         }
     }
     
-    
+    // Function to fetch network information
     function getNetworkName() {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
-            process.start("nmcli", ["-t", "-f", "ACTIVE,SSID", "dev", "wifi"]);
+            process.start("nmcli", ["-t", "-f", "ACTIVE, SSID", "dev", "wifi"]);
             process.waitForFinished();
             const output = process.readAllStandardOutput().trim();
             
-            if (output) {
+            if(output) {
                 const lines = output.split("\n");
                 for (const line of lines) {
-                    if (line.startsWith("yes:")) {
+                    if(line.startsWith("yes:")) {
                         return line.split(":")[1];
                     }
                 }
             }
             
-            return "غير متصل";
-        } catch (e) {
-            console.error("فشل جلب اسم الشبكة:", e);
-            return "غير متصل";
+            return "offline";
+        } catch(e) {
+            console.error("Failed to fetch network name:", e);
+            return "offline";
         }
     }
     
-    
-    
-    
-    
+    //=====================
+    // Integration with Crosire
+    //=====================
+    // Function to call Crosire to parse a system problem
     function analyzeSystemIssue(issueDescription) {
         try {
             const xhr = new XMLHttpRequest();
-            xhr.open("POST", "https:
+            xhr.open("POST", "https://openrouter.ai/api/v1/chat/completions");
             xhr.setRequestHeader("Authorization", "Bearer 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");
             xhr.setRequestHeader("Content-Type", "application/json");
             
@@ -14280,9 +14452,9 @@ ApplicationWindow {
                     if (xhr.status === 200) {
                         const response = JSON.parse(xhr.responseText);
                         const solution = response.choices[0].message.content;
-                        showToast("اقتراح من Crosire: " + solution, "\ue2ca");
+                        showToast("Suggestion from Crosire: " + solution, "\ue2ca");
                     } else {
-                        showToast("فشل تحليل المشكلة", "\uf071");
+                        showToast("Problem parsing failed", "\uf071");
                     }
                 }
             };
@@ -14290,21 +14462,21 @@ ApplicationWindow {
             xhr.send(JSON.stringify({
                 "model": "mistralai/mistral-7b-instruct",
                 "messages": [
-                    {"role": "system", "content": "أنت مساعد تقني خبير في حل مشاكل نظام التشغيل"},
-                    {"role": "user", "content": "المشكلة: " + issueDescription + "\nما هي الحلول الممكنة؟"}
+                    {"role": "system", "content": "You are an expert technical assistant in solving operating system problems"},
+                    {"role": "user", "content": "Problem: " + issueDescription + "\nWhat are the possible solutions?"}
                 ]
             }));
-        } catch (e) {
-            console.error("فشل استدعاء Crosire لتحليل المشكلة:", e);
-            showToast("فشل الاتصال بـ Crosire", "\uf071");
+        } catch(e) {
+            console.error("Crosire call failed to analyze the problem:", e);
+            showToast("Failed to connect to Crosire", "\uf071");
         }
     }
     
-    
+    // Function to call Crosire to improve user experience
     function optimizeUserExperience() {
         try {
             const xhr = new XMLHttpRequest();
-            xhr.open("POST", "https:
+            xhr.open("POST", "https://openrouter.ai/api/v1/chat/completions");
             xhr.setRequestHeader("Authorization", "Bearer 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");
             xhr.setRequestHeader("Content-Type", "application/json");
             
@@ -14313,7 +14485,7 @@ ApplicationWindow {
                     if (xhr.status === 200) {
                         const response = JSON.parse(xhr.responseText);
                         const recommendations = response.choices[0].message.content;
-                        showToast("توصيات من Crosire لتحسين تجربة المستخدم:\n" + recommendations, "\ue2ca");
+                        showToast("Recommendations from Crosire to improve user experience:\n" + recommendations, "\ue2ca");
                     }
                 }
             };
@@ -14321,30 +14493,33 @@ ApplicationWindow {
             xhr.send(JSON.stringify({
                 "model": "mistralai/mistral-7b-instruct",
                 "messages": [
-                    {"role": "system", "content": "أنت مساعد تقني خبير في تحسين تجربة المستخدم لنظام التشغيل"},
-                    {"role": "user", "content": "ما هي التوصيات لتحسين تجربة المستخدم لنظام QuickShell مع مراعاة الأداء والجماليات؟"}
+                    {"role": "system", "content": "You are an expert technical assistant in improving the user experience of the operating system"},
+                    {"role": "user", "content": "What are the recommendations for improving the user experience of QuickShell while considering performance and aesthetics?"}
                 ]
             }));
-        } catch (e) {
-            console.error("فشل استدعاء Crosire لتحسين تجربة المستخدم:", e);
+        } catch(e) {
+            console.error("Failed to call Crosire to improve user experience:", e);
         }
     }
     
-    
-    
-    
+    //=====================
+    // System operation
+    //=====================
     Component.onCompleted: {
-        
+        // Start system monitoring
         systemMonitor.start();
         
-        
+        // Improve user experience
         optimizeUserExperience();
     }
 }
 EOL
 
-echo "(2/5) انشاء تطبيق الإعدادات..."
-echo "-----------------------------------"
+# ============================
+# Desind Settings Application
+# ============================
+echo "(2/5) Create a settings application..."
+echo "----------------------------------
 cat <<EOL > ~/.config/QuickShell/SettingsApp/SettingsApp.qml
 import QtQuick 6.8
 import QtQuick.Controls 6.8
@@ -14356,9 +14531,9 @@ import Qt.labs.processes 6.8
 import Qt.labs.settings 6.8
 import Qt.labs.folderlistmodel 6.8
 
-
-
-
+//===============
+// Settings app
+//===============
 Item {
     id: settingsApp
     width: 1000
@@ -14368,20 +14543,20 @@ Item {
     property bool isExpanded: false
     property int animationduration: 50
     
-    
+    // Basic system components
     property var themeList: []
     property var wallpaperList: []
     property var iconList: []
     property var mouseCursorList: []
     property var fontList: []
     
-    
+    // Property to specify the current partition
     property string settingsAppSection: "main"
     
-                  
+                  // Highlight the current section
                 background: Rectangle {
                     color: settingsAppSection === modelData.section ? 
-                           Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.2) : 
+                           Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.2): 
                            "transparent"
                     border.color: settingsAppSection === modelData.section ? 
                                  pywalColors.colors[2] : 
@@ -14393,9 +14568,9 @@ Item {
         }
     }
 
-    
-    
-    
+    //=====================
+    // Settings app interface
+    //=====================
     Rectangle {
         id: settingsContainer
         anchors.fill: parent
@@ -14403,7 +14578,7 @@ Item {
         opacity: 0
         visible: false
         
-        
+        // Transparent background with blur effect
         Rectangle {
             anchors.fill: parent
             color: "#000000"
@@ -14419,7 +14594,7 @@ Item {
             }
         }
         
-        
+        //Main tab bar 
         Item {
             id: islandContainer
             width: parent.width * 0.9
@@ -14427,7 +14602,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.horizontalCenter: parent.horizontalCenter
             
-            
+            //Full oval background (without FastBlur)
             Rectangle {
                 id: islandBackground
                 anchors.fill: parent
@@ -14435,7 +14610,7 @@ Item {
                 color: Qt.rgba(0, 0, 0, 0.85)
                 border.width: 0
                 
-                
+                // Improve blur (without FastBlur)
                 layer.enabled: true
                 layer.effect: OpacityMask {
                     maskSource: Rectangle {
@@ -14447,16 +14622,16 @@ Item {
                 }
             }
             
-            
+            // Tab bar
             RowLayout {
                 id: tabBar
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 0
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 10
+                Spacing: 10
                 height: 50
                 
-                
+                // Home tab
                 TabButton {
                     icon: "\uf015"
                     active: activeTab === "home"
@@ -14468,7 +14643,7 @@ Item {
                     width: 50
                 }
                 
-                
+                //Customization Center tab
                 TabButton {
                     icon: "\uf133"
                     active: activeTab === "customization"
@@ -14480,7 +14655,7 @@ Item {
                     width: 50
                 }
                 
-                
+                // Screen Settings Tab
                 TabButton {
                     icon: "\uf108"
                     active: activeTab === "display"
@@ -14492,7 +14667,7 @@ Item {
                     width: 50
                 }
                 
-                
+                //Resources tab
                 TabButton {
                     icon: "\uf2db"
                     active: activeTab === "resources"
@@ -14504,7 +14679,7 @@ Item {
                     width: 50
                 }
                 
-                
+                //Language tab
                 TabButton {
                     text: languageManager.tr("language")
                     active: activeTab === "language"
@@ -14513,7 +14688,7 @@ Item {
                     }
                 }
 
-                
+                // Tab about the device
                 TabButton {
                     icon: "\uf108"
                     active: activeTab === "about"
@@ -14527,7 +14702,7 @@ Item {
             }
         }
         
-        
+        // Contents of tabs
         Item {
             id: tabContent
             anchors.top: parent.top
@@ -14535,7 +14710,7 @@ Item {
             width: parent.width
             height: parent.height - 70
             
-            
+            // Home tab
             Item {
                 id: homeTab
                 anchors.fill: parent
@@ -14544,9 +14719,9 @@ Item {
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 20
-                    spacing: 20
+                    Spacing: 20
                     
-                    
+                    // Crosire Recommendations
                     Rectangle {
                         id: crosireRecommendations
                         width: parent.width
@@ -14557,17 +14732,17 @@ Item {
                         ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: 15
-                            spacing: 10
+                            Spacing: 10
                             
                             Text {
-                                text: "توصيات Crosire"
+                                text: "Crosire Recommendations"
                                 font.family: "IBM Plex Sans Thin"
                                 font.pixelSize: 18
                                 color: pywalColors.colors[6]
                             }
                             
                             Text {
-                                text: "تم اكتشاف أنك تستخدم جهازًا حديثًا. نوصي بتفعيل الأنميشنات لتحسين تجربة المستخدم."
+                                text: "You have been discovered to be using a modern device. We recommend activating animations to improve the user experience."
                                 font.family: "IBM Plex Sans Thin"
                                 font.pixelSize: 14
                                 color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
@@ -14582,7 +14757,7 @@ Item {
                                 color: Qt.rgba(pywalColors.colors[6].r, pywalColors.colors[6].g, pywalColors.colors[6].b, 0.1)
                                 border.color: pywalColors.colors[6]
                                 border.width: 1
-                                text: "تطبيق التوصية"
+                                text: "Apply Recommendation"
                                 
                                 onClicked: {
                                     animationsSettings.setAnimationSpeed(100);
@@ -14591,50 +14766,50 @@ Item {
                         }
                     }
                     
-                    
+                    // Quick shortcuts
                     Grid {
                         columns: 2
                         width: parent.width
-                        spacing: 15
+                        Spacing: 15
                         
-                        
+                        //Customization Center abbreviation
                         QuickShortcut {
                             icon: "\uf133"
-                            title: "مركز التخصيص"
-                            description: "تخصيص مظهر النظام بالكامل"
+                            title: "Customization Center"
+                            description: "Customize the appearance of the entire system"
                             onClicked: {
                                 activeTab = "customization";
                                 activeSubTab = "themes";
                             }
                         }
                         
-                        
+                        // Shorten screen settings
                         QuickShortcut {
                             icon: "\uf108"
-                            title: "إعدادات الشاشة"
-                            description: "السطوع، الدقة، وحماية العينين"
+                            title: "Screen Settings"
+                            description: "Brightness, accuracy, eye protection"
                             onClicked: {
                                 activeTab = "display";
                                 displaySettings.loadDisplayInfo();
                             }
                         }
                         
-                        
+                        // Resource shortcut
                         QuickShortcut {
                             icon: "\uf2db"
-                            title: "الموارد"
-                            description: "مراقبة واستخدام الموارد"
+                            title: "Resources"
+                            description: "Monitoring and Using Resources"
                             onClicked: {
                                 activeTab = "resources";
                                 loadResourceData();
                             }
                         }
                         
-                        
+                        // Shortcut about the device
                         QuickShortcut {
                             icon: "\uf108"
-                            title: "حول الجهاز"
-                            description: "المواصفات الفنية لجهازك"
+                            title: "About the Device"
+                            description: "Technical specifications of your device"
                             onClicked: {
                                 activeTab = "about";
                                 activeSubTab = "device";
@@ -14642,7 +14817,7 @@ Item {
                         }
                     }
                     
-                    
+                    //Quick tips
                     Rectangle {
                         id: quickTips
                         width: parent.width
@@ -14653,17 +14828,17 @@ Item {
                         ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: 15
-                            spacing: 5
+                            Spacing: 5
                             
                             Text {
-                                text: "نصائح سريعة"
+                                text: "Quick Tips"
                                 font.family: "IBM Plex Sans Thin"
                                 font.pixelSize: 16
                                 color: pywalColors.colors[4]
                             }
                             
                             Text {
-                                text: "اضغط Meta + Shift + C يمكنك تخصيص الاختصارات في مركز التخصيص."
+                                Text: "Press Meta + Shift + C You can customize shortcuts in the Customization Center."
                                 font.family: "IBM Plex Sans Thin"
                                 font.pixelSize: 14
                                 color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
@@ -14675,7 +14850,7 @@ Item {
                 }
             }
             
-            
+            //Customization Center tab
             Item {
                 id: customizationTab
                 anchors.fill: parent
@@ -14683,88 +14858,88 @@ Item {
                 
                 ColumnLayout {
                     anchors.fill: parent
-                    spacing: 15
+                    Spacing: 15
                     anchors.margins: 15
                     
-                    
+                    // Subtabs bar
                     RowLayout {
                         id: subTabBar
                         width: parent.width
                         height: 40
-                        spacing: 10
+                        Spacing: 10
                         
-                        
+                        //Themes tab
                         SubTabButton {
                             icon: "\uf042"
-                            label: "الثيمات"
+                            label: "Themes"
                             active: activeSubTab === "themes"
                             onClicked: activeSubTab = "themes"
                         }
                         
-                        
+                        // Window shape tab
                         SubTabButton {
                             icon: "\uf108"
-                            label: "النوافذ"
+                            label: "windows"
                             active: activeSubTab === "windows"
                             onClicked: activeSubTab = "windows"
                         }
                         
-                        
+                        //Mouse tab
                         SubTabButton {
                             icon: "\uf245"
-                            label: "الماوس"
+                            label: "mouse"
                             active: activeSubTab === "mouse"
                             onClicked: activeSubTab = "mouse"
                         }
                         
-                        
+                        // Backgrounds tab
                         SubTabButton {
                             icon: "\uf5fc"
-                            label: "الخلفيات"
+                            label: "Backgrounds"
                             active: activeSubTab === "wallpapers"
                             onClicked: activeSubTab = "wallpapers"
                         }
                         
-                        
+                        //Icons tab
                         SubTabButton {
                             icon: "\uf11b"
-                            label: "الأيقونات"
+                            label: "Icons"
                             active: activeSubTab === "icons"
                             onClicked: activeSubTab = "icons"
                         }
                         
-                        
+                        //Lock screen tab
                         SubTabButton {
                             icon: "\uf023"
-                            label: "شاشة القفل"
+                            label: "lock screen"
                             active: activeSubTab === "lockscreen"
                             onClicked: activeSubTab = "lockscreen"
                         }
                         
-                        
+                        //Font tab
                         SubTabButton {
                             icon: "\uf031"
-                            label: "الخطوط"
+                            label: "fonts"
                             active: activeSubTab === "fonts"
                             onClicked: activeSubTab = "fonts"
                         }
                         
-                        
+                        // Shortcuts tab
                         SubTabButton {
                             icon: "\uf11c"
-                            label: "الاختصارات"
+                            label: "abbreviations"
                             active: activeSubTab === "shortcuts"
                             onClicked: activeSubTab = "shortcuts"
                         }
                     }
                     
-                    
+                    // Content of sub-tabs
                     Item {
                         id: subTabContent
                         Layout.fillWidth: true
                         height: parent.height - 40
                         
-                        
+                        //Themes tab
                         Item {
                             id: themesSubTab
                             anchors.fill: parent
@@ -14772,9 +14947,9 @@ Item {
                             
                             ColumnLayout {
                                 anchors.fill: parent
-                                spacing: 15
+                                Spacing: 15
                                 
-                                
+                                // Current theme information
                                 Rectangle {
                                     id: currentThemeInfo
                                     width: parent.width
@@ -14785,9 +14960,9 @@ Item {
                                     RowLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 15
+                                        Spacing: 15
                                         
-                                        
+                                        // Theme icon
                                         Text {
                                             anchors.verticalCenter: parent.verticalCenter
                                             text: "\uf042"
@@ -14796,19 +14971,19 @@ Item {
                                             color: pywalColors.colors[2]
                                         }
                                         
-                                        
+                                        // Theme information
                                         ColumnLayout {
-                                            spacing: 5
+                                            Spacing: 5
                                             
                                             Text {
-                                                text: "الثيم الحالي: Desind Dark"
+                                                text: "Current theme: Desind Dark"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 16
                                                 color: pywalColors.colors[2]
                                             }
                                             
                                             Text {
-                                                text: "مظهر مظلم مع ألوان متناسقة"
+                                                Text: "Dark look with harmonious colors"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 14
                                                 color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
@@ -14817,7 +14992,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // List of themes
                                 ListView {
                                     id: themesList
                                     Layout.fillWidth: true
@@ -14836,7 +15011,7 @@ Item {
                                         }
                                     }
                                     
-                                    
+                                    // Appearance animation
                                     OpacityAnimation on opacity {
                                         duration: 50
                                         easing.type: Easing.OutQuart
@@ -14845,7 +15020,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                //Theme Store button
                                 Button {
                                     width: 200
                                     height: 40
@@ -14853,7 +15028,7 @@ Item {
                                     color: Qt.rgba(pywalColors.colors[5].r, pywalColors.colors[5].g, pywalColors.colors[5].b, 0.1)
                                     border.color: pywalColors.colors[5]
                                     border.width: 1
-                                    text: "متجر الثيمات"
+                                    text: "Theme Store"
                                     
                                     onClicked: {
                                         openThemeStore();
@@ -14862,7 +15037,7 @@ Item {
                             }
                         }
                         
-                        
+                        // Window shape tab
                         Item {
                             id: windowsSubTab
                             anchors.fill: parent
@@ -14870,9 +15045,9 @@ Item {
                             
                             ColumnLayout {
                                 anchors.fill: parent
-                                spacing: 15
+                                Spacing: 15
                                 
-                                
+                                // Window properties
                                 Rectangle {
                                     id: windowProperties
                                     width: parent.width
@@ -14883,22 +15058,22 @@ Item {
                                     ColumnLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 15
+                                        Spacing: 15
                                         
-                                        
+                                        //Edge shape
                                         OptionGroup {
-                                            title: "شكل الحواف"
-                                            options: ["مربعة", "مدوّرة قليلاً", "مدوّرة بالكامل"]
+                                            title: "The Shape of the Edges"
+                                            options: ["square", "slightly rounded", "fully rounded"]
                                             currentIndex: 2
                                             onOptionSelected: {
                                                 setWindowCorners(index);
                                             }
                                         }
                                         
-                                        
+                                        //Edge size
                                         OptionGroup {
-                                            title: "حجم الحواف"
-                                            options: ["صغير", "متوسط", "كبير"]
+                                            title: "Edge Size"
+                                            options: ["small", "medium", "large"]
                                             currentIndex: 1
                                             onOptionSelected: {
                                                 setWindowRadius(index);
@@ -14907,7 +15082,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // Window Shapes Store Button
                                 Button {
                                     width: 200
                                     height: 40
@@ -14915,7 +15090,7 @@ Item {
                                     color: Qt.rgba(pywalColors.colors[5].r, pywalColors.colors[5].g, pywalColors.colors[5].b, 0.1)
                                     border.color: pywalColors.colors[5]
                                     border.width: 1
-                                    text: "متجر أشكال النوافذ"
+                                    text: "Window Shapes Store"
                                     
                                     onClicked: {
                                         openWindowStyleStore();
@@ -14924,7 +15099,7 @@ Item {
                             }
                         }
                         
-                        
+                        //Mouse tab
                         Item {
                             id: mouseSubTab
                             anchors.fill: parent
@@ -14932,9 +15107,9 @@ Item {
                             
                             ColumnLayout {
                                 anchors.fill: parent
-                                spacing: 15
+                                Spacing: 15
                                 
-                                
+                                // List of mouse pointers
                                 ListView {
                                     id: mouseCursorList
                                     Layout.fillWidth: true
@@ -14953,7 +15128,7 @@ Item {
                                         }
                                     }
                                     
-                                    
+                                    // Appearance animation
                                     OpacityAnimation on opacity {
                                         duration: 50
                                         easing.type: Easing.OutQuart
@@ -14962,7 +15137,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // Mouse properties
                                 Rectangle {
                                     id: mouseProperties
                                     width: parent.width
@@ -14973,11 +15148,11 @@ Item {
                                     ColumnLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 15
+                                        Spacing: 15
                                         
-                                        
+                                        // Mouse speed
                                         SliderControl {
-                                            title: "سرعة الماوس"
+                                            title: "Mouse Speed"
                                             min: 0
                                             max: 10
                                             value: 5
@@ -14986,9 +15161,9 @@ Item {
                                             }
                                         }
                                         
-                                        
+                                        // Reverse scrolling direction
                                         ToggleControl {
-                                            title: "عكس اتجاه التمرير"
+                                            title: "Reverse scroll direction"
                                             active: false
                                             onToggled: {
                                                 setMouseScrollDirection(active);
@@ -14997,7 +15172,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // Mouse pointer store button
                                 Button {
                                     width: 200
                                     height: 40
@@ -15005,7 +15180,7 @@ Item {
                                     color: Qt.rgba(pywalColors.colors[5].r, pywalColors.colors[5].g, pywalColors.colors[5].b, 0.1)
                                     border.color: pywalColors.colors[5]
                                     border.width: 1
-                                    text: "متجر مؤشرات الماوس"
+                                    text: "Mouse Pointers Store"
                                     
                                     onClicked: {
                                         openMouseCursorStore();
@@ -15014,7 +15189,7 @@ Item {
                             }
                         }
                         
-                        
+                        // Backgrounds tab
                         Item {
                             id: wallpapersSubTab
                             anchors.fill: parent
@@ -15022,9 +15197,9 @@ Item {
                             
                             ColumnLayout {
                                 anchors.fill: parent
-                                spacing: 15
+                                Spacing: 15
                                 
-                                
+                                // Current background
                                 Rectangle {
                                     id: currentWallpaper
                                     width: parent.width
@@ -15040,14 +15215,14 @@ Item {
                                     
                                     Text {
                                         anchors.centerIn: parent
-                                        text: "الخلفية الحالية"
+                                        text: "Current background"
                                         font.family: "IBM Plex Sans Thin"
                                         font.pixelSize: 24
                                         color: pywalColors.colors[7]
                                     }
                                 }
                                 
-                                
+                                //List of backgrounds
                                 GridView {
                                     id: wallpapersGrid
                                     Layout.fillWidth: true
@@ -15069,7 +15244,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // Background properties
                                 Rectangle {
                                     id: wallpaperProperties
                                     width: parent.width
@@ -15080,21 +15255,21 @@ Item {
                                     ColumnLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 15
+                                        Spacing: 15
                                         
-                                        
+                                        // Display mode
                                         OptionGroup {
-                                            title: "وضع العرض"
-                                            options: ["ممتلئ", "مطابق", "مُكبّر", "مُصغّر"]
+                                            title: "Display Mode"
+                                            options: ["full", "identical", "magnified", "minified"]
                                             currentIndex: 0
                                             onOptionSelected: {
                                                 setWallpaperMode(index);
                                             }
                                         }
                                         
-                                        
+                                        // Background effects
                                         ToggleControl {
-                                            title: "الخلفيات المتحركة"
+                                            title: "Animated Backgrounds"
                                             active: false
                                             onToggled: {
                                                 setAnimatedWallpaper(active);
@@ -15103,7 +15278,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // Wallpaper Store Button
                                 Button {
                                     width: 200
                                     height: 40
@@ -15111,7 +15286,7 @@ Item {
                                     color: Qt.rgba(pywalColors.colors[5].r, pywalColors.colors[5].g, pywalColors.colors[5].b, 0.1)
                                     border.color: pywalColors.colors[5]
                                     border.width: 1
-                                    text: "متجر الخلفيات"
+                                    text: "Background Store"
                                     
                                     onClicked: {
                                         openWallpaperStore();
@@ -15120,7 +15295,7 @@ Item {
                             }
                         }
                         
-                        
+                        //Icons tab
                         Item {
                             id: iconsSubTab
                             anchors.fill: parent
@@ -15128,9 +15303,9 @@ Item {
                             
                             ColumnLayout {
                                 anchors.fill: parent
-                                spacing: 15
+                                Spacing: 15
                                 
-                                
+                                // List of system icons
                                 Rectangle {
                                     id: systemIconsSection
                                     width: parent.width
@@ -15141,10 +15316,10 @@ Item {
                                     ColumnLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 10
+                                        Spacing: 10
                                         
                                         Text {
-                                            text: "أيقونات النظام"
+                                            text: "System icons"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 16
                                             color: pywalColors.colors[2]
@@ -15171,7 +15346,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // List of application icons
                                 Rectangle {
                                     id: appIconsSection
                                     width: parent.width
@@ -15182,10 +15357,10 @@ Item {
                                     ColumnLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 10
+                                        Spacing: 10
                                         
                                         Text {
-                                            text: "أيقونات التطبيقات"
+                                            text: "App icons"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 16
                                             color: pywalColors.colors[3]
@@ -15212,7 +15387,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // Icon Store Button
                                 Button {
                                     width: 200
                                     height: 40
@@ -15220,7 +15395,7 @@ Item {
                                     color: Qt.rgba(pywalColors.colors[5].r, pywalColors.colors[5].g, pywalColors.colors[5].b, 0.1)
                                     border.color: pywalColors.colors[5]
                                     border.width: 1
-                                    text: "متجر الأيقونات"
+                                    text: "Icon Store"
                                     
                                     onClicked: {
                                         openIconsStore();
@@ -15229,7 +15404,7 @@ Item {
                             }
                         }
                         
-                        
+                        //Lock screen tab
                         Item {
                             id: lockscreenSubTab
                             anchors.fill: parent
@@ -15237,9 +15412,9 @@ Item {
                             
                             ColumnLayout {
                                 anchors.fill: parent
-                                spacing: 15
+                                Spacing: 15
                                 
-                                
+                                // Preview the lock screen
                                 Rectangle {
                                     id: lockscreenPreview
                                     width: parent.width
@@ -15250,7 +15425,7 @@ Item {
                                     ColumnLayout {
                                         anchors.centerIn: parent
                                         anchors.margins: 15
-                                        spacing: 20
+                                        Spacing: 20
                                         
                                         Text {
                                             id: lockscreenTime
@@ -15270,7 +15445,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                //Lock screen properties
                                 Rectangle {
                                     id: lockscreenProperties
                                     width: parent.width
@@ -15281,31 +15456,31 @@ Item {
                                     ColumnLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 15
+                                        Spacing: 15
                                         
-                                        
+                                        // Hourly size
                                         OptionGroup {
-                                            title: "حجم الساعة"
-                                            options: ["صغير", "متوسط", "كبير"]
+                                            title: "Clock Size"
+                                            options: ["small", "medium", "large"]
                                             currentIndex: 1
                                             onOptionSelected: {
                                                 setLockscreenClockSize(index);
                                             }
                                         }
                                         
-                                        
+                                        // Clock location
                                         OptionGroup {
-                                            title: "مكان الساعة"
-                                            options: ["الأعلى", "المنتصف", "الأسفل"]
+                                            title: "The Place of the Hour"
+                                            options: ["top", "middle", "bottom"]
                                             currentIndex: 1
                                             onOptionSelected: {
                                                 setLockscreenClockPosition(index);
                                             }
                                         }
                                         
-                                        
+                                        // Clock line
                                         OptionGroup {
-                                            title: "خط الساعة"
+                                            title: "Clock Line"
                                             options: ["Thin", "Light", "Regular", "Bold"]
                                             currentIndex: 0
                                             onOptionSelected: {
@@ -15313,10 +15488,10 @@ Item {
                                             }
                                         }
                                         
-                                        
+                                        // Background
                                         OptionGroup {
-                                            title: "الخلفية"
-                                            options: ["الخلفية الحالية", "خلفية مظلمة", "صورة مخصصة"]
+                                            title: "Background"
+                                            options: ["Current Background", "Dark Background", "Custom Image"]
                                             currentIndex: 0
                                             onOptionSelected: {
                                                 setLockscreenWallpaper(index);
@@ -15327,7 +15502,7 @@ Item {
                             }
                         }
                         
-                        
+                        //Font tab
                         Item {
                             id: fontsSubTab
                             anchors.fill: parent
@@ -15335,9 +15510,9 @@ Item {
                             
                             ColumnLayout {
                                 anchors.fill: parent
-                                spacing: 15
+                                Spacing: 15
                                 
-                                
+                                // System line
                                 Rectangle {
                                     id: systemFontSection
                                     width: parent.width
@@ -15348,17 +15523,17 @@ Item {
                                     ColumnLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 10
+                                        Spacing: 10
                                         
                                         Text {
-                                            text: "خط النظام"
+                                            text: "System line"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 16
                                             color: pywalColors.colors[2]
                                         }
                                         
                                         Text {
-                                            text: "يتم استخدام هذا الخط في جميع أجزاء النظام"
+                                            text: "This font is used throughout the system."
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 14
                                             color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
@@ -15376,7 +15551,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // Application line
                                 Rectangle {
                                     id: appFontSection
                                     width: parent.width
@@ -15387,17 +15562,17 @@ Item {
                                     ColumnLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 10
+                                        Spacing: 10
                                         
                                         Text {
-                                            text: "خط التطبيقات"
+                                            text: "Application Line"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 16
                                             color: pywalColors.colors[3]
                                         }
                                         
                                         Text {
-                                            text: "يتم استخدام هذا الخط في التطبيقات المدعومة"
+                                            text: "This font is used in supported applications"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 14
                                             color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
@@ -15415,7 +15590,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // API line
                                 Rectangle {
                                     id: codeFontSection
                                     width: parent.width
@@ -15426,17 +15601,17 @@ Item {
                                     ColumnLayout {
                                         anchors.fill: parent
                                         anchors.margins: 15
-                                        spacing: 10
+                                        Spacing: 10
                                         
                                         Text {
-                                            text: "خط الواجهة البرمجية"
+                                            text: "API font"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 16
                                             color: pywalColors.colors[4]
                                         }
                                         
                                         Text {
-                                            text: "يتم استخدام هذا الخط في التطبيقات البرمجية"
+                                            text: "This font is used in software applications"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 14
                                             color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
@@ -15454,7 +15629,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // Font Store button
                                 Button {
                                     width: 200
                                     height: 40
@@ -15462,7 +15637,7 @@ Item {
                                     color: Qt.rgba(pywalColors.colors[5].r, pywalColors.colors[5].g, pywalColors.colors[5].b, 0.1)
                                     border.color: pywalColors.colors[5]
                                     border.width: 1
-                                    text: "متجر الخطوط"
+                                    text: "Font Shop"
                                     
                                     onClicked: {
                                         openFontStore();
@@ -15471,13 +15646,13 @@ Item {
                             }
                         }
                         
-                        
+                        // Shortcuts tab
                         Item {
                             id: shortcutsSubTab
                             anchors.fill: parent
                             visible: activeSubTab === "shortcuts"
 
-                        
+                        // Section header
                         Rectangle {
                             width: parent.width
                             height: 60
@@ -15489,7 +15664,7 @@ Item {
                                 anchors.right: parent.right
                                 anchors.rightMargin: 25
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: "الاختصارات"
+                                text: "abbreviations"
                                 font.family: "IBM Plex Sans Thin"
                                 font.pixelSize: 18
                                 color: pywalColors.colors[7]
@@ -15499,24 +15674,24 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 25
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: "\uf0c7" 
+                                text: "\uf0c7" // Shortcuts icon
                                 font.family: faSolid.name
                                 font.pixelSize: 20
                                 color: pywalColors.colors[6]
                             }
                         }
 
-                        
+                        // Abbreviations content
                         ColumnLayout {
                             anchors.fill: parent
                             anchors.topMargin: 60
-                            spacing: 10
+                            Spacing: 10
 
-                            
+                            // Search bar
                             TextField {
                                 id: searchInput
                                 Layout.fillWidth: true
-                                placeholderText: "ابحث عن اختصار..."
+                                placeholderText: "Find a shortcut..."
                                 background: Rectangle {
                                     radius: 10
                                     color: "#1E1E1E"
@@ -15526,7 +15701,7 @@ Item {
                                 onTextChanged: filterShortcuts(text)
                             }
 
-                            
+                            // Shortcuts list
                             ListView {
                                 id: shortcutsList
                                 Layout.fillWidth: true
@@ -15541,9 +15716,9 @@ Item {
                                 }
                             }
 
-                            
+                            //Add shortcut button
                             Button {
-                                text: "إضافة اختصار جديد"
+                                text: "Add new shortcut"
                                 width: 200
                                 height: 40
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -15551,13 +15726,13 @@ Item {
                             }
                         }
 
-                        
+                        // Dynamic Shortcuts Model
                         property var shortcutsModel: []
                         property var filteredShortcutsModel: shortcutsModel
 
-                        
+                        // Filter functions
                         function filterShortcuts(query) {
-                            if (!query.trim()) {
+                            if(!query.trim()) {
                                 filteredShortcutsModel = shortcutsModel;
                                 return;
                             }
@@ -15567,7 +15742,7 @@ Item {
                             });
                         }
 
-                        
+                        // Load shortcuts dynamically
                         Timer {
                             interval: 2000
                             repeat: true
@@ -15575,7 +15750,7 @@ Item {
                             onTriggered: loadShortcuts()
                         }
 
-                        
+                        // Shortcuts load function
                         function loadShortcuts() {
                             try {
                                 const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -15586,11 +15761,11 @@ Item {
                                 let newShortcuts = [];
                                 const lines = output.split("\n");
                                 for (let i = 0; i < lines.length; i++) {
-                                    const line = lines[i].trim();
-                                    if (line.startsWith("bind")) {
+                                    const line = lines[i]. trim();
+                                    if(line.startsWith("bind")) {
                                         const parts = line.split(" ");
                                         const key = parts[1];
-                                        const command = parts.slice(2).join(" ");
+                                        const command = parts.slice(2).join("");
                                         newShortcuts.push({
                                             id: Date.now() + i,
                                             name: getShortcutName(command),
@@ -15600,92 +15775,92 @@ Item {
                                     }
                                 }
 
-                                
+                                // Update the form
                                 shortcutsModel = newShortcuts;
                                 filteredShortcutsModel = newShortcuts;
-                            } catch (e) {
-                                console.error("فشل تحميل الاختصارات:", e);
+                            } catch(e) {
+                                console.error("Failed to load shortcuts:", e);
                             }
                         }
 
-                        
+                        // Get the shortcut name based on the command
                         function getShortcutName(command) {
                             if (command.includes("exec")) {
-                                return "تنفيذ أمر";
+                                return "Execute a command";
                             } else if (command.includes("workspace")) {
-                                return "تغيير مساحة العمل";
+                                return "Change workspace";
                             } else if (command.includes("togglefloating")) {
-                                return "تبديل وضع العوامة";
+                                return "Switch float mode";
                             } else {
-                                return "اختصار مخصص";
+                                return "custom shortcut";
                             }
                         }
 
-                        
+                        // Get the shortcut description based on the command
                         function getShortcutDescription(command) {
                             return command.replace("exec", "").trim();
                         }
 
-                        
+                        // Open the Add Shortcut window
                         function openAddShortcutDialog() {
                             addShortcutDialog.open();
                         }
 
-                        
+                        // Open a shortcut edit window
                         function openEditDialog(shortcut) {
                             editShortcutDialog.shortcut = shortcut;
                             editShortcutDialog.open();
                         }
 
-                        
+                        //Delete shortcut
                         function deleteShortcut(id) {
                             try {
                                 const index = shortcutsModel.findIndex(function(shortcut) {
                                     return shortcut.id === id;
                                 });
-                                if (index !== -1) {
+                                if(index!== -1) {
                                     shortcutsModel.splice(index, 1);
                                     saveShortcuts();
                                 }
-                            } catch (e) {
-                                console.error("فشل حذف الاختصار:", e);
+                            } catch(e) {
+                                console.error("Failed to delete shortcut:", e);
                             }
                         }
 
-                        
+                        // Save shortcuts
                         function saveShortcuts() {
                             try {
                                 const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                                 process.start("hyprctl", ["keyword", "binds", JSON.stringify(shortcutsModel)]);
                                 process.waitForFinished();
-                            } catch (e) {
-                                console.error("فشل حفظ الاختصارات:", e);
+                            } catch(e) {
+                                console.error("Failed to save shortcuts:", e);
                             }
                         }
 
-                        
+                        // Add shortcut window
                         Dialog {
                             id: addShortcutDialog
-                            title: "إضافة اختصار جديد"
+                            title: "Add a new abbreviation"
                             standardButtons: Dialog.Ok | Dialog.Cancel
 
                             ColumnLayout {
                                 anchors.fill: parent
-                                spacing: 10
+                                Spacing: 10
 
                                 TextField {
                                     id: shortcutNameInput
-                                    placeholderText: "اسم الاختصار"
+                                    placeholderText: "shortcut name"
                                 }
 
                                 TextField {
                                     id: shortcutKeyInput
-                                    placeholderText: "مفتاح الاختصار"
+                                    placeholderText: "shortcut key"
                                 }
 
                                 TextField {
                                     id: shortcutCommandInput
-                                    placeholderText: "الأمر المرتبط"
+                                    placeholderText: "Related command"
                                 }
                             }
 
@@ -15701,30 +15876,30 @@ Item {
                             }
                         }
 
-                        
+                        // Edit shortcut window
                         Dialog {
                             id: editShortcutDialog
-                            title: "تعديل اختصار"
+                            title: "Edit Shortcut"
                             standardButtons: Dialog.Ok | Dialog.Cancel
                             property var shortcut: null
 
                             ColumnLayout {
                                 anchors.fill: parent
-                                spacing: 10
+                                Spacing: 10
 
                                 TextField {
                                     id: editShortcutNameInput
-                                    text: editShortcutDialog.shortcut ? editShortcutDialog.shortcut.name : ""
+                                    text: editShortcutDialog.shortcut ? editShortcutDialog.shortcut.name: ""
                                 }
 
                                 TextField {
                                     id: editShortcutKeyInput
-                                    text: editShortcutDialog.shortcut ? editShortcutDialog.shortcut.key : ""
+                                    text: editShortcutDialog.shortcut ? editShortcutDialog.shortcut.key: ""
                                 }
 
                                 TextField {
                                     id: editShortcutCommandInput
-                                    text: editShortcutDialog.shortcut ? editShortcutDialog.shortcut.description : ""
+                                    text: editShortcutDialog.shortcut ? editShortcutDialog.shortcut.description: ""
                                 }
                             }
 
@@ -15739,7 +15914,7 @@ Item {
                         }
                     }
 
-                    
+                    // Shortcut display component
                     Component {
                         id: shortcutItemComponent
                         Item {
@@ -15749,7 +15924,7 @@ Item {
 
                             RowLayout {
                                 anchors.fill: parent
-                                spacing: 10
+                                Spacing: 10
 
                                 Text {
                                     text: shortcutName
@@ -15773,12 +15948,12 @@ Item {
                                 }
 
                                 Button {
-                                    text: "تعديل"
+                                    text: "edit"
                                     onClicked: onEditShortcut()
                                 }
 
                                 Button {
-                                    text: "حذف"
+                                    text: "Delete"
                                     onClicked: onDeleteShortcut()
                                 }
                             }
@@ -15787,18 +15962,18 @@ Item {
                 }
             }
 
-            
+            // Screen Settings Tab
             Item {
                 id: displayTab
                 anchors.fill: parent
                 visible: activeTab === "display"
                 
-                
+                // Screen settings content
                 Item {
                     id: displaySettings
                     anchors.fill: parent
                     
-                    
+                    // Function to load screen information
                     function loadDisplayInfo() {
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -15811,13 +15986,13 @@ Item {
                                 let currentMonitor = null;
                                 
                                 for (const line of lines) {
-                                    if (line.startsWith("Monitor")) {
+                                    if(line.startsWith("Monitor")) {
                                         if (currentMonitor) {
                                             monitors.push(currentMonitor);
                                         }
                                         
                                         currentMonitor = {
-                                            name: line.split(" ")[1],
+                                            name: line.split("")[1],
                                             isPrimary: line.includes("primary"),
                                             resolution: "",
                                             refreshRate: 0,
@@ -15826,7 +16001,7 @@ Item {
                                     } else if (line.includes("at")) {
                                         const parts = line.split(" ");
                                         currentMonitor.resolution = parts[0];
-                                        currentMonitor.refreshRate = parseFloat(parts[3].replace("Hz,", ""));
+                                        currentMonitor.refreshRate = parseFloat(parts[3].replace("Hz,"," ""));
                                     }
                                 }
                                 
@@ -15834,7 +16009,7 @@ Item {
                                     monitors.push(currentMonitor);
                                 }
                                 
-                                
+                                // Load brightness settings
                                 for (let i = 0; i < monitors.length; i++) {
                                     const monitor = monitors[i];
                                     try {
@@ -15845,23 +16020,23 @@ Item {
                                         if (brightnessProcess.exitCode() === 0) {
                                             const output = brightnessProcess.readAllStandardOutput().trim();
                                             const match = output.match(/Current brightness:\s*(\d+)/);
-                                            if (match) {
+                                            if(match) {
                                                 monitor.brightness = parseInt(match[1]);
                                             }
                                         }
-                                    } catch (e) {
-                                        console.error("فشل جلب سطوع الشاشة:", e);
+                                    } catch(e) {
+                                        console.error("Failed to fetch screen brightness:", e);
                                     }
                                 }
                                 
-                                
+                                // Update the user interface
                                 updateDisplayUI();
                             }
-                        } catch (e) {
-                            console.error("فشل جلب معلومات الشاشة:", e);
-                            
+                        } catch(e) {
+                            console.error("Failed to fetch screen information:", e);
+                            // Use default values in case of failure
                             monitors = [{
-                                name: "الشاشة الداخلية",
+                                name: "Internal Screen",
                                 isPrimary: true,
                                 resolution: "1920x1080",
                                 refreshRate: 60,
@@ -15871,21 +16046,21 @@ Item {
                         }
                     }
                     
-                    
+                    // Function to update the user interface
                     function updateDisplayUI() {
-                        
-                        if (monitors.length > 0) {
+                        // Update screen list
+                        if(monitors.length > 0) {
                             currentMonitor = monitors[0];
                             monitorNameText.text = currentMonitor.name;
                             resolutionText.text = currentMonitor.resolution;
-                            refreshRateText.text = currentMonitor.refreshRate + " هرتز";
+                            refreshRateText.text = currentMonitor.refreshRate + "Hz";
                             brightnessSlider.value = currentMonitor.brightness;
                         }
                     }
                     
-                    
+                    // Function to change the precision
                     function changeResolution(resolution) {
-                        if (!currentMonitor) return;
+                        if(!currentMonitor) return;
                         
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -15895,19 +16070,19 @@ Item {
                             if (process.exitCode() === 0) {
                                 currentMonitor.resolution = resolution;
                                 resolutionText.text = resolution;
-                                showToast("تم تغيير الدقة بنجاح", "\uf00c");
+                                showToast("Resolution changed successfully", "\uf00c");
                             } else {
-                                showToast("فشل تغيير الدقة", "\uf071");
+                                showToast("Failed to change resolution", "\uf071");
                             }
-                        } catch (e) {
-                            console.error("فشل تغيير الدقة:", e);
-                            showToast("فشل تغيير الدقة", "\uf071");
+                        } catch(e) {
+                            console.error("Failed to change resolution:", e);
+                            showToast("Failed to change resolution", "\uf071");
                         }
                     }
                     
-                    
+                    // Function to change the refresh rate
                     function changeRefreshRate(rate) {
-                        if (!currentMonitor) return;
+                        if(!currentMonitor) return;
                         
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -15916,20 +16091,20 @@ Item {
                             
                             if (process.exitCode() === 0) {
                                 currentMonitor.refreshRate = rate;
-                                refreshRateText.text = rate + " هرتز";
-                                showToast("تم تغيير معدل التحديث بنجاح", "\uf00c");
+                                refreshRateText.text = rate + "Hz";
+                                showToast("Update rate changed successfully", "\uf00c");
                             } else {
-                                showToast("فشل تغيير معدل التحديث", "\uf071");
+                                showToast("Failed to change refresh rate", "\uf071");
                             }
-                        } catch (e) {
-                            console.error("فشل تغيير معدل التحديث:", e);
-                            showToast("فشل تغيير معدل التحديث", "\uf071");
+                        } catch(e) {
+                            console.error("Failed to change refresh rate:", e);
+                            showToast("Failed to change refresh rate", "\uf071");
                         }
                     }
                     
-                    
+                    // Function to adjust brightness
                     function setBrightness(value) {
-                        if (!currentMonitor) return;
+                        if(!currentMonitor) return;
                         
                         try {
                             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -15938,19 +16113,19 @@ Item {
                             
                             if (process.exitCode() === 0) {
                                 currentMonitor.brightness = value;
-                                showToast("تم تغيير السطوع", "\uf00c");
+                                showToast("Brightness changed", "\uf00c");
                             } else {
-                                showToast("فشل تغيير السطوع", "\uf071");
+                                showToast("Brightness change failed", "\uf071");
                             }
-                        } catch (e) {
-                            console.error("فشل تغيير السطوع:", e);
-                            showToast("فشل تغيير السطوع", "\uf071");
+                        } catch(e) {
+                            console.error("Failed to change brightness:", e);
+                            showToast("Brightness change failed", "\uf071");
                         }
                     }
                     
-                    
+                    // Function to activate/deactivate eye protection
                     function toggleEyeProtection() {
-                        eyeProtectionEnabled = !eyeProtectionEnabled;
+                        eyeProtectionEnabled=!eyeProtectionEnabled;
                         
                         try {
                             if (eyeProtectionEnabled) {
@@ -15964,14 +16139,14 @@ Item {
                             }
                             
                             eyeProtectionToggle.active = eyeProtectionEnabled;
-                            showToast(eyeProtectionEnabled ? "تم تفعيل حماية العينين" : "تم إلغاء تفعيل حماية العينين", "\uf00c");
-                        } catch (e) {
-                            console.error("فشل تغيير إعدادات حماية العينين:", e);
-                            showToast("فشل تغيير إعدادات حماية العينين", "\uf071");
+                            showToast(eyeProtectionEnabled ? "Eye protection activated": "Eye protection deactivated", "\uf00c");
+                        } catch(e) {
+                            console.error("Failed to change eye protection settings:", e);
+                            showToast("Failed to change eye protection settings", "\uf071");
                         }
                     }
                     
-                    
+                    // Function to adjust the eye protection level
                     function setEyeProtectionLevel(level) {
                         eyeProtectionLevel = level;
                         
@@ -15981,24 +16156,24 @@ Item {
                                 process.start("redshift", ["-O", (6500 - level * 200).toString()]);
                                 process.waitForFinished(500);
                             }
-                        } catch (e) {
-                            console.error("فشل تغيير مستوى حماية العينين:", e);
+                        } catch(e) {
+                            console.error("Failed to change eye protection level:", e);
                         }
                     }
                     
-                    
+                    // Data
                     property var monitors: []
                     property var currentMonitor: null
                     property bool eyeProtectionEnabled: false
                     property int eyeProtectionLevel: 5
                     
-                    
+                    // Screen settings content
                     ColumnLayout {
                         anchors.fill: parent
-                        spacing: 20
+                        Spacing: 20
                         anchors.margins: 20
                         
-                        
+                        // Current screen information
                         Rectangle {
                             id: currentDisplayInfo
                             width: parent.width
@@ -16009,9 +16184,9 @@ Item {
                             RowLayout {
                                 anchors.fill: parent
                                 anchors.margins: 15
-                                spacing: 15
+                                Spacing: 15
                                 
-                                
+                                // Screen icon
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "\uf108"
@@ -16020,20 +16195,20 @@ Item {
                                     color: pywalColors.colors[2]
                                 }
                                 
-                                
+                                // Screen information
                                 ColumnLayout {
-                                    spacing: 5
+                                    Spacing: 5
                                     
                                     Text {
                                         id: monitorNameText
-                                        text: "الشاشة الداخلية"
+                                        text: "Internal screen"
                                         font.family: "IBM Plex Sans Thin"
                                         font.pixelSize: 16
                                         color: pywalColors.colors[2]
                                     }
                                     
                                     Text {
-                                        text: "دقة الشاشة والسطوع"
+                                        text: "Screen Resolution and Brightness"
                                         font.family: "IBM Plex Sans Thin"
                                         font.pixelSize: 14
                                         color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
@@ -16042,61 +16217,61 @@ Item {
                             }
                         }
 
-                        
+                        // Screen settings tabs
                         RowLayout {
                             id: displayTabBar
                             width: parent.width
                             height: 40
-                            spacing: 10
+                            Spacing: 10
                             
-                            
+                            //Year tab
                             SubTabButton {
                                 icon: "\uf015"
-                                label: "العامة"
+                                label: "general"
                                 active: activeDisplayTab === "general"
                                 onClicked: activeDisplayTab = "general"
                             }
                             
-                            
+                            //Brightness tab
                             SubTabButton {
                                 icon: "\uf00d"
-                                label: "السطوع"
+                                label: "brightness"
                                 active: activeDisplayTab === "brightness"
                                 onClicked: activeDisplayTab = "brightness"
                             }
                             
-                            
+                            // Accuracy tab
                             SubTabButton {
                                 icon: "\uf120"
-                                label: "الدقة"
+                                label: "accuracy"
                                 active: activeDisplayTab === "resolution"
                                 onClicked: activeDisplayTab = "resolution"
                             }
                             
-                            
+                            // Screens tab
                             SubTabButton {
                                 icon: "\uf26c"
-                                label: "الشاشات"
+                                label: "Screens"
                                 active: activeDisplayTab === "displays"
                                 onClicked: activeDisplayTab = "displays"
                             }
                             
-                            
+                            //Animations tab
                             SubTabButton {
                                 icon: "\uf001"
-                                label: "الأنميشنات"
+                                label: "Animations"
                                 active: activeDisplayTab === "animations"
                                 onClicked: activeDisplayTab = "animations"
                             }
                         }
                         
-                        
+                        // Contents of tabs
                         Item {
                             id: displayTabContent
                             Layout.fillWidth: true
                             height: parent.height - 120
                             
-                            
+                            //Year tab
                             Item {
                                 id: generalTab
                                 anchors.fill: parent
@@ -16104,9 +16279,9 @@ Item {
                                 
                                 ColumnLayout {
                                     anchors.fill: parent
-                                    spacing: 20
+                                    Spacing: 20
                                     
-                                    
+                                    // Eye protection
                                     Rectangle {
                                         id: eyeProtectionSection
                                         width: parent.width
@@ -16117,24 +16292,24 @@ Item {
                                         ColumnLayout {
                                             anchors.fill: parent
                                             anchors.margins: 15
-                                            spacing: 5
+                                            Spacing: 5
                                             
                                             Text {
-                                                text: "حماية العينين"
+                                                text: "Eye protection"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 18
                                                 color: pywalColors.colors[2]
                                             }
                                             
                                             Text {
-                                                text: "تقليل الضوء الأزرق للحماية من إجهاد العين"
+                                                text: "Reduce blue light to protect against eye strain"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 14
                                                 color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
                                             }
                                             
                                             RowLayout {
-                                                spacing: 10
+                                                Spacing: 10
                                                 
                                                 ToggleSwitch {
                                                     id: eyeProtectionToggle
@@ -16154,7 +16329,7 @@ Item {
                                         }
                                     }
                                     
-                                    
+                                    // Crosire Recommendation
                                     Rectangle {
                                         id: crosireEyeProtectionRecommendation
                                         width: parent.width
@@ -16164,7 +16339,7 @@ Item {
                                         
                                         Text {
                                             anchors.centerIn: parent
-                                            text: "توصية Crosire: تم تفعيل حماية العينين تلقائياً لأنك تستخدم الجهاز بعد الساعة 8 مساءً"
+                                            Text: "Crosire Recommendation: Eye protection is automatically activated because you are using the device after 8pm"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 14
                                             color: pywalColors.colors[6]
@@ -16176,7 +16351,7 @@ Item {
                                 }
                             }
                             
-                            
+                            //Brightness tab
                             Item {
                                 id: brightnessTab
                                 anchors.fill: parent
@@ -16184,9 +16359,9 @@ Item {
                                 
                                 ColumnLayout {
                                     anchors.fill: parent
-                                    spacing: 20
+                                    Spacing: 20
                                     
-                                    
+                                    // Screen brightness
                                     Rectangle {
                                         id: brightnessControl
                                         width: parent.width
@@ -16197,10 +16372,10 @@ Item {
                                         ColumnLayout {
                                             anchors.fill: parent
                                             anchors.margins: 15
-                                            spacing: 15
+                                            Spacing: 15
                                             
                                             Text {
-                                                text: "سطوع الشاشة"
+                                                text: "Screen Brightness"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 18
                                                 color: pywalColors.colors[1]
@@ -16225,7 +16400,7 @@ Item {
                                         }
                                     }
                                     
-                                    
+                                    // Crosire Recommendation
                                     Rectangle {
                                         id: crosireBrightnessRecommendation
                                         width: parent.width
@@ -16235,7 +16410,7 @@ Item {
                                         
                                         Text {
                                             anchors.centerIn: parent
-                                            text: "توصية Crosire: تم ضبط السطوع تلقائياً بناءً على الإضاءة المحيطة"
+                                            Text: "Crosire Recommendation: Brightness is automatically adjusted based on ambient light"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 14
                                             color: pywalColors.colors[6]
@@ -16247,7 +16422,7 @@ Item {
                                 }
                             }
                             
-                            
+                            // Accuracy tab
                             Item {
                                 id: resolutionTab
                                 anchors.fill: parent
@@ -16255,9 +16430,9 @@ Item {
                                 
                                 ColumnLayout {
                                     anchors.fill: parent
-                                    spacing: 20
+                                    Spacing: 20
                                     
-                                    
+                                    // Screen information
                                     Rectangle {
                                         id: displayInfoResolution
                                         width: parent.width
@@ -16268,9 +16443,9 @@ Item {
                                         RowLayout {
                                             anchors.fill: parent
                                             anchors.margins: 15
-                                            spacing: 15
+                                            Spacing: 15
                                             
-                                            
+                                            // Screen icon
                                             Text {
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 text: "\uf108"
@@ -16279,9 +16454,9 @@ Item {
                                                 color: pywalColors.colors[2]
                                             }
                                             
-                                            
+                                            // Screen information
                                             ColumnLayout {
-                                                spacing: 5
+                                                Spacing: 5
                                                 
                                                 Text {
                                                     id: resolutionText
@@ -16292,7 +16467,7 @@ Item {
                                                 }
                                                 
                                                 Text {
-                                                    text: "الدقة الحالية للشاشة"
+                                                    text: "Current screen resolution"
                                                     font.family: "IBM Plex Sans Thin"
                                                     font.pixelSize: 14
                                                     color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
@@ -16301,7 +16476,7 @@ Item {
                                         }
                                     }
                                     
-                                    
+                                    // Accuracy options
                                     Rectangle {
                                         id: resolutionOptions
                                         width: parent.width
@@ -16312,10 +16487,10 @@ Item {
                                         ColumnLayout {
                                             anchors.fill: parent
                                             anchors.margins: 15
-                                            spacing: 10
+                                            Spacing: 10
                                             
                                             Text {
-                                                text: "خيارات الدقة"
+                                                text: "Resolution Options"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 18
                                                 color: pywalColors.colors[3]
@@ -16338,7 +16513,7 @@ Item {
                                         }
                                     }
                                     
-                                    
+                                    // Refresh rate
                                     Rectangle {
                                         id: refreshRateSection
                                         width: parent.width
@@ -16349,21 +16524,21 @@ Item {
                                         ColumnLayout {
                                             anchors.fill: parent
                                             anchors.margins: 15
-                                            spacing: 5
+                                            Spacing: 5
                                             
                                             Text {
-                                                text: "معدل التحديث"
+                                                text: "Refresh Rate"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 18
                                                 color: pywalColors.colors[4]
                                             }
                                             
                                             RowLayout {
-                                                spacing: 10
+                                                Spacing: 10
                                                 
                                                 Text {
                                                     id: refreshRateText
-                                                    text: "60 هرتز"
+                                                    text: "60 Hz"
                                                     font.family: "IBM Plex Sans Thin"
                                                     font.pixelSize: 16
                                                     color: pywalColors.colors[4]
@@ -16376,7 +16551,7 @@ Item {
                                                     color: Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1)
                                                     border.color: pywalColors.colors[4]
                                                     border.width: 1
-                                                    text: "120 هرتز"
+                                                    text: "120 Hz"
                                                     onClicked: changeRefreshRate(120)
                                                 }
                                                 
@@ -16387,7 +16562,7 @@ Item {
                                                     color: Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1)
                                                     border.color: pywalColors.colors[4]
                                                     border.width: 1
-                                                    text: "144 هرتز"
+                                                    text: "144 Hz"
                                                     onClicked: changeRefreshRate(144)
                                                 }
                                             }
@@ -16396,7 +16571,7 @@ Item {
                                 }
                             }
                             
-                            
+                            // Screens tab
                             Item {
                                 id: displaysTab
                                 anchors.fill: parent
@@ -16404,9 +16579,9 @@ Item {
                                 
                                 ColumnLayout {
                                     anchors.fill: parent
-                                    spacing: 20
+                                    Spacing: 20
                                     
-                                    
+                                    // List of screens
                                     ListView {
                                         id: displaysList
                                         Layout.fillWidth: true
@@ -16427,7 +16602,7 @@ Item {
                                         }
                                     }
                                     
-                                    
+                                    // Selected screen settings
                                     Rectangle {
                                         id: selectedDisplaySettings
                                         width: parent.width
@@ -16438,21 +16613,21 @@ Item {
                                         ColumnLayout {
                                             anchors.fill: parent
                                             anchors.margins: 15
-                                            spacing: 10
+                                            Spacing: 10
                                             
                                             Text {
-                                                text: "إعدادات الشاشة المحددة"
+                                                text: "Selected screen settings"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 18
                                                 color: pywalColors.colors[5]
                                             }
                                             
                                             RowLayout {
-                                                spacing: 10
+                                                Spacing: 10
                                                 
                                                 ToggleSwitch {
                                                     id: primaryDisplayToggle
-                                                    active: currentMonitor ? currentMonitor.isPrimary : false
+                                                    active: currentMonitor ? currentMonitor.isPrimary: false
                                                     onToggled: {
                                                         if (currentMonitor) {
                                                             currentMonitor.isPrimary = active;
@@ -16462,7 +16637,7 @@ Item {
                                                 }
                                                 
                                                 Text {
-                                                    text: "شاشة رئيسية"
+                                                    text: "Home Screen"
                                                     font.family: "IBM Plex Sans Thin"
                                                     font.pixelSize: 16
                                                     color: pywalColors.colors[5]
@@ -16474,7 +16649,7 @@ Item {
                                 }
                             }
                             
-                            
+                            //Animations tab
                             Item {
                                 id: animationsTab
                                 anchors.fill: parent
@@ -16482,9 +16657,9 @@ Item {
                                 
                                 ColumnLayout {
                                     anchors.fill: parent
-                                    spacing: 20
+                                    Spacing: 20
                                     
-                                    
+                                    //Animations speed
                                     Rectangle {
                                         id: animationSpeedSection
                                         width: parent.width
@@ -16495,10 +16670,10 @@ Item {
                                         ColumnLayout {
                                             anchors.fill: parent
                                             anchors.margins: 15
-                                            spacing: 15
+                                            Spacing: 15
                                             
                                             Text {
-                                                text: "سرعة الأنميشنات"
+                                                text: "Animation Speed"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 18
                                                 color: pywalColors.colors[5]
@@ -16514,7 +16689,7 @@ Item {
                                             }
                                             
                                             Text {
-                                                text: animationSpeedSlider.value + " مللي ثانية"
+                                                text: animationSpeedSlider.value + "ms"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 16
                                                 color: pywalColors.colors[5]
@@ -16523,7 +16698,7 @@ Item {
                                         }
                                     }
                                     
-                                    
+                                    // Crosire Recommendation
                                     Rectangle {
                                         id: crosireAnimationsRecommendation
                                         width: parent.width
@@ -16533,7 +16708,7 @@ Item {
                                         
                                         Text {
                                             anchors.centerIn: parent
-                                            text: "توصية Crosire: تم ضبط سرعة الأنميشنات تلقائياً بناءً على أداء جهازك"
+                                            Text: "Crosire Recommendation: Animations speed is automatically adjusted based on your device's performance"
                                             font.family: "IBM Plex Sans Thin"
                                             font.pixelSize: 14
                                             color: pywalColors.colors[6]
@@ -16543,7 +16718,7 @@ Item {
                                         }
                                     }
                                     
-                                    
+                                    //Animation options
                                     Rectangle {
                                         id: animationOptionsSection
                                         width: parent.width
@@ -16554,41 +16729,41 @@ Item {
                                         ColumnLayout {
                                             anchors.fill: parent
                                             anchors.margins: 15
-                                            spacing: 10
+                                            Spacing: 10
                                             
                                             Text {
-                                                text: "الأنميشنات المخصصة"
+                                                text: "Custom Animations"
                                                 font.family: "IBM Plex Sans Thin"
                                                 font.pixelSize: 18
                                                 color: pywalColors.colors[5]
                                             }
                                             
-                                            
+                                            //Animation options
                                             ColumnLayout {
-                                                spacing: 10
+                                                Spacing: 10
                                                 
                                                 AnimationOption {
-                                                    label: "أنميشن فتح/إغلاق الكبسولات"
+                                                    label: "Animation Open/Close Capsules"
                                                     isEnabled: true
                                                 }
                                                 
                                                 AnimationOption {
-                                                    label: "أنميشن فتح/إغلاق شاشة القفل"
+                                                    label: "Animation Open/Close Lock Screen"
                                                     isEnabled: true
                                                 }
                                                 
                                                 AnimationOption {
-                                                    label: "أنميشن التمرير بين مساحات العمل"
+                                                    label: "Animation scrolling between workspaces"
                                                     isEnabled: true
                                                 }
                                                 
                                                 AnimationOption {
-                                                    label: "أنميشن المؤشرات"
+                                                    label: "Animation Indicators"
                                                     isEnabled: true
                                                 }
                                                 
                                                 AnimationOption {
-                                                    label: "أنميشن الإشعارات"
+                                                    label: "Notification Animation"
                                                     isEnabled: true
                                                 }
                                             }
@@ -16601,7 +16776,7 @@ Item {
                 }
             }
             
-            
+            //Resources tab
             Item {
                 id: resourcesTab
                 anchors.fill: parent
@@ -16609,10 +16784,10 @@ Item {
                 
                 ColumnLayout {
                     anchors.fill: parent
-                    spacing: 20
+                    Spacing: 20
                     anchors.margins: 20
                     
-                    
+                    // Resource usage chart
                     Rectangle {
                         id: resourcesChart
                         width: parent.width
@@ -16620,19 +16795,19 @@ Item {
                         radius: 15
                         color: Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1)
                         
-                        
+                        // The chart drawing library will be used here
                         Text {
                             anchors.centerIn: parent
-                            text: "مخطط استخدام الموارد"
+                            text: "Resource Usage Chart"
                             font.family: "IBM Plex Sans Thin"
                             font.pixelSize: 18
                             color: pywalColors.colors[2]
                         }
                     }
                     
-                    
+                    // Memory usage
                     ResourceUsage {
-                        title: "الذاكرة"
+                        title: "Memory"
                         icon: "\uf2db"
                         current: 5.2
                         total: 16
@@ -16640,9 +16815,9 @@ Item {
                         colorIndex: 2
                     }
                     
-                    
+                    // Processor usage
                     ResourceUsage {
-                        title: "المعالج"
+                        title: "The Processor"
                         icon: "\uf2db"
                         current: 35
                         total: 100
@@ -16650,9 +16825,9 @@ Item {
                         colorIndex: 3
                     }
                     
-                    
+                    // Use graphics card
                     ResourceUsage {
-                        title: "الرسومات"
+                        title: "Graphics"
                         icon: "\uf26c"
                         current: 25
                         total: 100
@@ -16660,9 +16835,9 @@ Item {
                         colorIndex: 4
                     }
                     
-                    
+                    // Storage usage
                     ResourceUsage {
-                        title: "التخزين"
+                        title: "Storage"
                         icon: "\uf0a0"
                         current: 250
                         total: 512
@@ -16670,7 +16845,7 @@ Item {
                         colorIndex: 5
                     }
                     
-                    
+                    // Active operations
                     Rectangle {
                         id: activeProcesses
                         width: parent.width
@@ -16681,10 +16856,10 @@ Item {
                         ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: 15
-                            spacing: 10
+                            Spacing: 10
                             
                             Text {
-                                text: "العمليات النشطة"
+                                text: "Active processes"
                                 font.family: "IBM Plex Sans Thin"
                                 font.pixelSize: 18
                                 color: pywalColors.colors[6]
@@ -16709,12 +16884,12 @@ Item {
                 }
             }
             
-            
+            //Language tab
             Item {
                 id: languageTab
                 anchors.fill: parent
                 
-                
+                // Section title
                 Text {
                     anchors.top: parent.top
                     anchors.topMargin: 15
@@ -16726,7 +16901,7 @@ Item {
                     color: pywalColors.colors[2]
                 }
                 
-                
+                // Section description
                 Text {
                     anchors.top: sectionTitle.bottom
                     anchors.topMargin: 10
@@ -16741,7 +16916,7 @@ Item {
                     wrapMode: Text.Wrap
                 }
                 
-                
+                // Language options
                 Rectangle {
                     id: languageOptions
                     width: parent.width
@@ -16754,7 +16929,7 @@ Item {
                     border.color: Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.3)
                     border.width: 1
                     
-                    
+                    //Language Options Title
                     Text {
                         anchors.top: parent.top
                         anchors.topMargin: 15
@@ -16766,7 +16941,7 @@ Item {
                         color: pywalColors.colors[2]
                     }
                     
-                    
+                    // List of languages
                     GridView {
                         id: languageGrid
                         anchors.top: title.bottom
@@ -16782,12 +16957,12 @@ Item {
                             width: 160
                             height: 60
                             
-                            
+                            // Background
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 10
                                 color: modelData === translationSystem.currentLanguage ? 
-                                    Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.2) : 
+                                    Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.2): 
                                     "#000000"
                                 border.color: modelData === translationSystem.currentLanguage ? 
                                             pywalColors.colors[2] : 
@@ -16797,9 +16972,9 @@ Item {
                                 Row {
                                     anchors.fill: parent
                                     anchors.margins: 10
-                                    spacing: 10
+                                    Spacing: 10
                                     
-                                    
+                                    // Language code
                                     Text {
                                         text: translationSystem.languageFlags[modelData]
                                         font.family: faSolid.name
@@ -16807,7 +16982,7 @@ Item {
                                         color: pywalColors.colors[2]
                                     }
                                     
-                                    
+                                    // Language name
                                     Text {
                                         text: translationSystem.languageNames[modelData]
                                         font.family: "IBM Plex Sans Thin"
@@ -16819,7 +16994,7 @@ Item {
                                 }
                             }
                             
-                            
+                            // Animation of interaction with the mouse
                             ScaleAnimation on scale {
                                 duration: 50
                                 easing.type: Easing.OutQuart
@@ -16828,7 +17003,7 @@ Item {
                                 running: false
                             }
                             
-                            
+                            // Interaction area
                             MouseArea {
                                 anchors.fill: parent
                                 hoverEnabled: true
@@ -16850,7 +17025,7 @@ Item {
                     }
                 }
                 
-                
+                //Restart information
                 Rectangle {
                     id: restartInfo
                     width: parent.width
@@ -16875,12 +17050,12 @@ Item {
                     }
                 }
                 
-                
+                //Restart buttons
                 RowLayout {
                     anchors.top: restartInfo.bottom
                     anchors.topMargin: 20
                     anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 10
+                    Spacing: 10
                     
                     Button {
                         width: 150
@@ -16892,12 +17067,12 @@ Item {
                         text: translationSystem.tr("language_restart_button")
                         
                         onClicked: {
-                            
+                            //Restart the system
                             try {
                                 const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                                 process.start("systemctl", ["reboot"]);
-                            } catch (e) {
-                                console.error("فشل إعادة التشغيل:", e);
+                            } catch(e) {
+                                console.error("Restart Failed:", e);
                                 showToast(translationSystem.tr("language_change_error"), "\uf071");
                             }
                         }
@@ -16913,13 +17088,13 @@ Item {
                         text: translationSystem.tr("language_later_button")
                         
                         onClicked: {
-                            
+                            // Do nothing, just close the window
                         }
                     }
                 }
             }
 
-            
+            // Tab about the device
             Item {
                 id: aboutTab
                 anchors.fill: parent
@@ -16927,10 +17102,10 @@ Item {
                 
                 ColumnLayout {
                     anchors.fill: parent
-                    spacing: 20
+                    Spacing: 20
                     anchors.margins: 20
                     
-                    
+                    // System logo
                     Rectangle {
                         id: systemLogo
                         width: 150
@@ -16947,7 +17122,7 @@ Item {
                         }
                     }
                     
-                    
+                    // System information
                     Rectangle {
                         id: systemInfoSection
                         width: parent.width
@@ -16958,53 +17133,53 @@ Item {
                         ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: 15
-                            spacing: 15
+                            Spacing: 15
                             
                             Text {
-                                text: "معلومات النظام"
+                                text: "System Information"
                                 font.family: "IBM Plex Sans Thin"
                                 font.pixelSize: 24
                                 color: pywalColors.colors[2]
                             }
                             
                             SystemInfoItem {
-                                label: "اسم الجهاز"
+                                label: "Device Name"
                                 value: systemInfo.deviceName
                             }
                             
                             SystemInfoItem {
-                                label: "نظام التشغيل"
+                                label: "Operating System"
                                 value: systemInfo.os
                             }
                             
                             SystemInfoItem {
-                                label: "النواة"
+                                label: "nucleus"
                                 value: systemInfo.kernel
                             }
                             
                             SystemInfoItem {
-                                label: "المعالج"
+                                label: "processor"
                                 value: systemInfo.processor
                             }
                             
                             SystemInfoItem {
-                                label: "الذاكرة"
+                                label: "Memory"
                                 value: systemInfo.memory
                             }
                             
                             SystemInfoItem {
-                                label: "الرسومات"
+                                label: "graphics"
                                 value: systemInfo.graphics
                             }
                             
                             SystemInfoItem {
-                                label: "التخزين"
+                                label: "Storage"
                                 value: systemInfo.storage
                             }
                         }
                     }
                     
-                    
+                    //License information
                     Rectangle {
                         id: licenseInfo
                         width: parent.width
@@ -17014,7 +17189,7 @@ Item {
                         
                         Text {
                             anchors.centerIn: parent
-                            text: "Desind OS مفتوح المصدر مبني على Arch Linux\nمرخص بموجب رخصة GPL v3"
+                            text: "Desind OS is open source, built on Arch Linux\n, and licensed under the GPL v3."
                             font.family: "IBM Plex Sans Thin"
                             font.pixelSize: 14
                             color: pywalColors.colors[6]
@@ -17028,11 +17203,11 @@ Item {
         }
     }
     
+    //====================
+    // Auxiliary components
+    //====================
     
-    
-    
-    
-    
+    //Main tab component
     Component {
         id: tabButtonComponent
         
@@ -17043,13 +17218,13 @@ Item {
             width: 50
             height: 50
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 25
-                color: active ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1) : "#000000"
+                color: active ? Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1): "#000000"
                 
-                
+                // Icon
                 Text {
                     anchors.centerIn: parent
                     text: tabButton.icon
@@ -17059,7 +17234,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -17068,22 +17243,22 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
-                    if (tabButton.onClicked) {
+                    if(tabButton.onClicked) {
                         tabButton.onClicked();
                     }
                 }
                 onEntered: {
-                    if (!active) {
+                    if(!active) {
                         parent.scale = 1.05;
                     }
                 }
                 onExited: {
-                    if (!active) {
+                    if(!active) {
                         parent.scale = 1.0;
                     }
                 }
@@ -17091,7 +17266,7 @@ Item {
         }
     }
     
-    
+    //Subtab component
     Component {
         id: subTabButtonComponent
         
@@ -17103,13 +17278,13 @@ Item {
             width: 100
             height: 40
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 20
-                color: active ? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1) : "#000000"
+                color: active ? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1): "#000000"
                 
-                
+                // Icon
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 15
@@ -17120,7 +17295,7 @@ Item {
                     color: active ? pywalColors.colors[2] : pywalColors.colors[7]
                 }
                 
-                
+                // Text
                 Text {
                     anchors.left: iconText.right
                     anchors.leftMargin: 10
@@ -17132,7 +17307,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -17141,7 +17316,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -17151,12 +17326,12 @@ Item {
                     }
                 }
                 onEntered: {
-                    if (!active) {
+                    if(!active) {
                         parent.scale = 1.05;
                     }
                 }
                 onExited: {
-                    if (!active) {
+                    if(!active) {
                         parent.scale = 1.0;
                     }
                 }
@@ -17164,7 +17339,7 @@ Item {
         }
     }
     
-    
+    //Quick shortcut component
     Component {
         id: quickShortcutComponent
         
@@ -17176,13 +17351,13 @@ Item {
             width: parent.width / 2 - 7.5
             height: 150
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 15
                 color: Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1)
                 
-                
+                // Icon
                 Text {
                     anchors.top: parent.top
                     anchors.topMargin: 15
@@ -17193,7 +17368,7 @@ Item {
                     color: pywalColors.colors[2]
                 }
                 
-                
+                // Address
                 Text {
                     anchors.top: iconText.bottom
                     anchors.topMargin: 10
@@ -17204,7 +17379,7 @@ Item {
                     color: pywalColors.colors[2]
                 }
                 
-                
+                // Description
                 Text {
                     anchors.top: titleText.bottom
                     anchors.topMargin: 5
@@ -17219,7 +17394,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -17228,7 +17403,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -17247,7 +17422,7 @@ Item {
         }
     }
     
-    
+    //Group option component
     Component {
         id: optionGroupComponent
         
@@ -17260,7 +17435,7 @@ Item {
             width: parent.width
             height: 80
             
-            
+            // Address
             Text {
                 anchors.top: parent.top
                 anchors.topMargin: 5
@@ -17272,14 +17447,14 @@ Item {
                 color: pywalColors.colors[7]
             }
             
-            
+            // Options menu
             RowLayout {
                 anchors.top: titleText.bottom
                 anchors.topMargin: 10
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.margins: 15
-                spacing: 10
+                Spacing: 10
                 
                 Repeater {
                     model: optionGroup.options.length
@@ -17296,7 +17471,7 @@ Item {
         }
     }
     
-    
+    // Option component
     Component {
         id: optionItemComponent
         
@@ -17307,15 +17482,15 @@ Item {
             width: 100
             height: 40
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 20
-                color: active ? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1) : "#000000"
+                color: active ? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1): "#000000"
                 border.color: active ? pywalColors.colors[2] : Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 1
                 
-                
+                // Text
                 Text {
                     anchors.centerIn: parent
                     text: optionItem.text
@@ -17325,7 +17500,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -17334,7 +17509,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -17344,12 +17519,12 @@ Item {
                     }
                 }
                 onEntered: {
-                    if (!active) {
+                    if(!active) {
                         parent.scale = 1.05;
                     }
                 }
                 onExited: {
-                    if (!active) {
+                    if(!active) {
                         parent.scale = 1.0;
                     }
                 }
@@ -17357,7 +17532,7 @@ Item {
         }
     }
     
-    
+    // Switch control component
     Component {
         id: toggleControlComponent
         
@@ -17369,7 +17544,7 @@ Item {
             width: parent.width
             height: 40
             
-            
+            // Text
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
@@ -17380,7 +17555,7 @@ Item {
                 color: pywalColors.colors[7]
             }
             
-            
+            // Switch indicator
             ToggleSwitch {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
@@ -17394,7 +17569,7 @@ Item {
         }
     }
     
-    
+    // Chip control component
     Component {
         id: sliderControlComponent
         
@@ -17408,7 +17583,7 @@ Item {
             width: parent.width
             height: 60
             
-            
+            // Text
             Text {
                 anchors.top: parent.top
                 anchors.topMargin: 5
@@ -17420,7 +17595,7 @@ Item {
                 color: pywalColors.colors[7]
             }
             
-            
+            // Slide
             Slider {
                 anchors.top: titleText.bottom
                 anchors.topMargin: 5
@@ -17436,7 +17611,7 @@ Item {
                 }
             }
             
-            
+            // Text value
             Text {
                 anchors.top: slider.bottom
                 anchors.topMargin: 5
@@ -17449,7 +17624,7 @@ Item {
         }
     }
     
-    
+    // Font selection component
     Component {
         id: fontSelectorComponent
         
@@ -17459,7 +17634,7 @@ Item {
             width: parent.width
             height: 40
             
-            
+            // Font list
             ComboBox {
                 anchors.fill: parent
                 anchors.margins: 15
@@ -17480,7 +17655,7 @@ Item {
         }
     }
     
-    
+    // Theme element component
     Component {
         id: themeItemComponent
         
@@ -17491,19 +17666,19 @@ Item {
             width: parent.width
             height: 60
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 15
                 color: themeItem.isActive ? 
-                       Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1) : 
+                       Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1): 
                        "#000000"
                 border.color: themeItem.isActive ? 
                               pywalColors.colors[2] : 
                               Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 0
                 
-                
+                // Icon
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 15
@@ -17514,7 +17689,7 @@ Item {
                     color: themeItem.isActive ? pywalColors.colors[2] : pywalColors.colors[7]
                 }
                 
-                
+                // Theme name
                 Text {
                     anchors.left: iconText.right
                     anchors.leftMargin: 10
@@ -17525,7 +17700,7 @@ Item {
                     color: themeItem.isActive ? pywalColors.colors[2] : pywalColors.colors[7]
                 }
                 
-                
+                // Theme description
                 Text {
                     anchors.right: parent.right
                     anchors.rightMargin: 15
@@ -17537,7 +17712,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -17546,12 +17721,12 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
-                    if (themeItem.onClicked) {
+                    if(themeItem.onClicked) {
                         themeItem.onClicked();
                     }
                 }
@@ -17565,7 +17740,7 @@ Item {
         }
     }
     
-    
+    // Mouse pointer element component
     Component {
         id: mouseCursorItemComponent
         
@@ -17576,19 +17751,19 @@ Item {
             width: parent.width
             height: 60
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 15
                 color: mouseCursorItem.isActive ? 
-                       Qt.rgba(pywalColors.colors[3].r, pywalColors.colors[3].g, pywalColors.colors[3].b, 0.1) : 
+                       Qt.rgba(pywalColors.colors[3].r, pywalColors.colors[3].g, pywalColors.colors[3].b, 0.1): 
                        "#000000"
                 border.color: mouseCursorItem.isActive ? 
                               pywalColors.colors[3] : 
                               Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 0
                 
-                
+                // Icon
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 15
@@ -17599,7 +17774,7 @@ Item {
                     color: mouseCursorItem.isActive ? pywalColors.colors[3] : pywalColors.colors[7]
                 }
                 
-                
+                // Mouse pointer name
                 Text {
                     anchors.left: iconText.right
                     anchors.leftMargin: 10
@@ -17610,7 +17785,7 @@ Item {
                     color: mouseCursorItem.isActive ? pywalColors.colors[3] : pywalColors.colors[7]
                 }
                 
-                
+                // Mouse pointer description
                 Text {
                     anchors.right: parent.right
                     anchors.rightMargin: 15
@@ -17622,7 +17797,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -17631,7 +17806,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -17650,7 +17825,7 @@ Item {
         }
     }
     
-    
+    // Background element component
     Component {
         id: wallpaperItemComponent
         
@@ -17661,26 +17836,26 @@ Item {
             width: parent.width
             height: 100
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 10
                 color: wallpaperItem.isActive ? 
-                       Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1) : 
+                       Qt.rgba(pywalColors.colors[4].r, pywalColors.colors[4].g, pywalColors.colors[4].b, 0.1): 
                        "#000000"
                 border.color: wallpaperItem.isActive ? 
                               pywalColors.colors[4] : 
                               Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 0
                 
-                
+                // The picture
                 Image {
                     anchors.fill: parent
                     source: wallpaperItem.wallpaper.thumbnail
                     fillMode: Image.PreserveAspectCrop
                 }
                 
-                
+                // Background name
                 Text {
                     anchors.bottom: parent.bottom
                     anchors.bottomMargin: 5
@@ -17692,7 +17867,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -17701,7 +17876,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -17720,7 +17895,7 @@ Item {
         }
     }
     
-    
+    // Icon element component
     Component {
         id: iconItemComponent
         
@@ -17731,19 +17906,19 @@ Item {
             width: parent.width
             height: 40
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 20
                 color: iconItem.isActive ? 
-                       Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1) : 
+                       Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1): 
                        "#000000"
                 border.color: iconItem.isActive ? 
                               pywalColors.colors[2] : 
                               Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 0
                 
-                
+                // Icon
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 15
@@ -17754,7 +17929,7 @@ Item {
                     color: iconItem.isActive ? pywalColors.colors[2] : pywalColors.colors[7]
                 }
                 
-                
+                // Icon name
                 Text {
                     anchors.left: iconText.right
                     anchors.leftMargin: 10
@@ -17766,7 +17941,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -17775,7 +17950,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -17794,7 +17969,7 @@ Item {
         }
     }
     
-    
+    // Abbreviation element component
     Component {
         id: shortcutItemComponent
         
@@ -17804,7 +17979,7 @@ Item {
             width: parent.width
             height: 50
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 15
@@ -17812,7 +17987,7 @@ Item {
                 border.color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 0
                 
-                
+                // Name
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 15
@@ -17823,7 +17998,7 @@ Item {
                     color: pywalColors.colors[7]
                 }
                 
-                
+                // Abbreviation
                 Text {
                     anchors.right: parent.right
                     anchors.rightMargin: 15
@@ -17835,7 +18010,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -17844,7 +18019,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -17863,7 +18038,7 @@ Item {
         }
     }
     
-    
+    // Screen element component
     Component {
         id: displayItemComponent
         
@@ -17874,19 +18049,19 @@ Item {
             width: parent.width
             height: 60
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 15
                 color: displayItem.isSelected ? 
-                       Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1) : 
+                       Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1): 
                        "#000000"
                 border.color: displayItem.isSelected ? 
                               pywalColors.colors[2] : 
                               Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 0
                 
-                
+                // Icon
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 15
@@ -17897,7 +18072,7 @@ Item {
                     color: displayItem.isSelected ? pywalColors.colors[2] : pywalColors.colors[7]
                 }
                 
-                
+                // Screen name
                 Text {
                     anchors.left: iconText.right
                     anchors.leftMargin: 10
@@ -17908,7 +18083,7 @@ Item {
                     color: displayItem.isSelected ? pywalColors.colors[2] : pywalColors.colors[7]
                 }
                 
-                
+                // Screen information
                 Text {
                     anchors.right: parent.right
                     anchors.rightMargin: 15
@@ -17920,7 +18095,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -17929,22 +18104,22 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
-                    if (DisplayItem.onClicked) {
+                    if(DisplayItem.onClicked) {
                         DisplayItem.onClicked();
                     }
                 }
                 onEntered: {
-                    if (!DisplayItem.isSelected) {
+                    if(!DisplayItem.isSelected) {
                         parent.scale = 1.05;
                     }
                 }
                 onExited: {
-                    if (!DisplayItem.isSelected) {
+                    if(!DisplayItem.isSelected) {
                         parent.scale = 1.0;
                     }
                 }
@@ -17952,7 +18127,7 @@ Item {
         }
     }
     
-    
+    // Animation option component
     Component {
         id: animationOptionComponent
         
@@ -17963,7 +18138,7 @@ Item {
             width: parent.width
             height: 40
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 20
@@ -17971,7 +18146,7 @@ Item {
                 border.color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 0
                 
-                
+                // Text
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 15
@@ -17982,7 +18157,7 @@ Item {
                     color: pywalColors.colors[7]
                 }
                 
-                
+                // Activation indicator
                 ToggleSwitch {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
@@ -17997,7 +18172,7 @@ Item {
         }
     }
     
-    
+    // Resource usage component
     Component {
         id: resourceUsageComponent
         
@@ -18012,13 +18187,13 @@ Item {
             width: parent.width
             height: 80
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 15
                 color: Qt.rgba(pywalColors.colors[colorIndex].r, pywalColors.colors[colorIndex].g, pywalColors.colors[colorIndex].b, 0.1)
                 
-                
+                // Icon
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 15
@@ -18029,7 +18204,7 @@ Item {
                     color: pywalColors.colors[colorIndex]
                 }
                 
-                
+                // Name
                 Text {
                     anchors.left: iconText.right
                     anchors.leftMargin: 10
@@ -18041,7 +18216,7 @@ Item {
                     color: pywalColors.colors[colorIndex]
                 }
                 
-                
+                // Value
                 Text {
                     anchors.left: iconText.right
                     anchors.leftMargin: 10
@@ -18053,7 +18228,7 @@ Item {
                     color: pywalColors.colors[colorIndex]
                 }
                 
-                
+                // Progress bar
                 Rectangle {
                     anchors.left: nameText.right
                     anchors.leftMargin: 10
@@ -18075,7 +18250,7 @@ Item {
         }
     }
     
-    
+    // Process element component
     Component {
         id: processItemComponent
         
@@ -18085,7 +18260,7 @@ Item {
             width: parent.width
             height: 30
             
-            
+            // Name
             Text {
                 anchors.left: parent.left
                 anchors.leftMargin: 15
@@ -18096,7 +18271,7 @@ Item {
                 color: pywalColors.colors[7]
             }
             
-            
+            // Usage
             Text {
                 anchors.right: parent.right
                 anchors.rightMargin: 15
@@ -18109,7 +18284,7 @@ Item {
         }
     }
     
-    
+    // System information component
     Component {
         id: systemInfoItemComponent
         
@@ -18120,7 +18295,7 @@ Item {
             width: parent.width
             height: 30
             
-            
+            // Label
             Text {
                 anchors.left: parent.left
                 anchors.leftMargin: 15
@@ -18131,7 +18306,7 @@ Item {
                 color: pywalColors.colors[7]
             }
             
-            
+            // Value
             Text {
                 anchors.right: parent.right
                 anchors.rightMargin: 15
@@ -18144,7 +18319,7 @@ Item {
         }
     }
     
-    
+    //Theme Store Component
     Component {
         id: themeStoreComponent
         
@@ -18153,13 +18328,13 @@ Item {
             width: 600
             height: 400
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 30
                 color: "#000000"
                 
-                
+                // Transparent background with slight blur effect (without FastBlur)
                 Rectangle {
                     anchors.fill: parent
                     color: "#000000"
@@ -18176,7 +18351,7 @@ Item {
                 }
             }
             
-            
+            // Search bar
             Rectangle {
                 id: searchContainer
                 anchors.top: parent.top
@@ -18194,7 +18369,7 @@ Item {
                     font.family: "IBM Plex Sans Thin"
                     font.pixelSize: 16
                     color: pywalColors.colors[5]
-                    placeholderText: "البحث عن الثيمات..."
+                    placeholderText: "Find themes..."
                     placeholderColor: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.5)
                     selectByMouse: true
                     focus: true
@@ -18205,7 +18380,7 @@ Item {
                 }
             }
             
-            
+            // List of themes
             ListView {
                 id: storeThemesList
                 anchors.top: searchContainer.bottom
@@ -18226,7 +18401,7 @@ Item {
                     }
                 }
                 
-                
+                // Appearance animation
                 OpacityAnimation on opacity {
                     duration: 50
                     easing.type: Easing.OutQuart
@@ -18235,7 +18410,7 @@ Item {
                 }
             }
             
-            
+            // Install button
             Button {
                 id: installButton
                 anchors.bottom: parent.bottom
@@ -18247,8 +18422,8 @@ Item {
                 color: Qt.rgba(pywalColors.colors[5].r, pywalColors.colors[5].g, pywalColors.colors[5].b, 0.1)
                 border.color: pywalColors.colors[5]
                 border.width: 1
-                text: "تثبيت"
-                visible: themeStore.selectedTheme !== null
+                text: "install"
+                visible: themeStore.selectedTheme!== null
                 
                 onClicked: {
                     installTheme(themeStore.selectedTheme);
@@ -18257,7 +18432,7 @@ Item {
         }
     }
     
-    
+    //Theme Store Item Component
     Component {
         id: themeStoreItemComponent
         
@@ -18267,7 +18442,7 @@ Item {
             width: parent.width
             height: 70
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 15
@@ -18275,7 +18450,7 @@ Item {
                 border.color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 0
                 
-                
+                // Thumbnail
                 Image {
                     anchors.left: parent.left
                     anchors.leftMargin: 15
@@ -18286,7 +18461,7 @@ Item {
                     fillMode: Image.PreserveAspectCrop
                 }
                 
-                
+                // Name
                 Text {
                     anchors.left: thumbnail.right
                     anchors.leftMargin: 10
@@ -18298,7 +18473,7 @@ Item {
                     color: pywalColors.colors[7]
                 }
                 
-                
+                // Description
                 Text {
                     anchors.left: thumbnail.right
                     anchors.leftMargin: 10
@@ -18312,19 +18487,19 @@ Item {
                     elide: Text.ElideRight
                 }
                 
-                
+                // Evaluation
                 Text {
                     anchors.right: parent.right
                     anchors.rightMargin: 15
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "\uf005 " + themeStoreItem.theme.rating
+                    text: "\uf005" + themeStoreItem.theme.rating
                     font.family: faSolid.name
                     font.pixelSize: 16
                     color: pywalColors.colors[5]
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -18333,7 +18508,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -18352,10 +18527,10 @@ Item {
         }
     }
     
-    
-    
-    
-    
+    //====================
+    // System functions
+    //====================
+    // Open the Settings app
     function openSettings() {
         settingsContainer.visible = true;
         settingsContainer.opacity = 0;
@@ -18363,7 +18538,7 @@ Item {
         fadeInAnimation.restart();
     }
     
-    
+    // Close the Settings app
     function closeSettings() {
         fadeOutAnimation.target = settingsContainer;
         fadeOutAnimation.onCompleted = function() {
@@ -18372,10 +18547,10 @@ Item {
         fadeOutAnimation.restart();
     }
     
-    
+    // Load resource data
     function loadResourceData() {
         try {
-            
+            // Load memory usage
             const memProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             memProcess.start("free", ["-h"]);
             memProcess.waitForFinished(500);
@@ -18387,12 +18562,12 @@ Item {
                 const used = parseFloat(memLine[2].replace("Gi", ""));
                 const total = parseFloat(memLine[1].replace("Gi", ""));
                 
-                
+                // Update the user interface
                 memoryUsage.current = used;
                 memoryUsage.total = total;
             }
             
-            
+            // Load processor usage
             const cpuProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             cpuProcess.start("top", ["-bn1"]);
             cpuProcess.waitForFinished(500);
@@ -18403,25 +18578,25 @@ Item {
                 const cpuLine = lines[2];
                 const match = cpuLine.match(/Cpu\(s\):\s*([\d.]+)/);
                 
-                if (match) {
+                if(match) {
                     const cpuUsage = parseFloat(match[1]);
                     cpuUsage.current = cpuUsage;
                 }
             }
             
-            
+            // Load active processes
             const processProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             processProcess.start("ps", ["-eo", "comm,%cpu", "--sort=-%cpu"]);
             processProcess.waitForFinished(500);
             
             if (processProcess.exitCode() === 0) {
                 const output = processProcess.readAllStandardOutput().trim();
-                const lines = output.split('\n').slice(1, 6); 
+                const lines = output.split('\n').slice(1, 6); // Remove the address and display only 5 operations
                 
                 processList = [];
                 for (const line of lines) {
                     const parts = line.trim().split(/\s+/);
-                    if (parts.length >= 2) {
+                    if(parts.length >= 2) {
                         processList.push({
                             name: parts[0],
                             usage: parts[1]
@@ -18429,15 +18604,15 @@ Item {
                     }
                 }
                 
-                
+                // Update the user interface
                 processesList.model = processList;
             }
-        } catch (e) {
-            console.error("فشل تحميل بيانات الموارد:", e);
+        } catch(e) {
+            console.error("Failed to load resource data:", e);
         }
     }
     
-    
+    // Download themes
     function loadThemes() {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -18450,50 +18625,50 @@ Item {
                 
                 themeList = themes.map(theme => ({
                     name: theme,
-                    description: "ثيم مخصص لـ Desind",
+                    description: "Desind Custom Theme",
                     thumbnail: `~/.themes/${theme}/thumbnail.png`
                 }));
                 
-                
+                // Update the user interface
                 themesList.model = themeList;
             }
-        } catch (e) {
-            console.error("فشل تحميل الثيمات:", e);
-            
+        } catch(e) {
+            console.error("Failed to load themes:", e);
+            // Use default themes
             themeList = [
-                {name: "Desind Dark", description: "ثيم مظلم مع ألوان متناسقة", thumbnail: "qrc:/themes/desind_dark.png"},
-                {name: "Desind Light", description: "ثيم فاتح مع ألوان ناعمة", thumbnail: "qrc:/themes/desind_light.png"},
-                {name: "Solarized Dark", description: "ثيم مظلم كلاسيكي", thumbnail: "qrc:/themes/solarized_dark.png"}
+                {name: "Desind Dark", description: "Dark theme with matching colors", thumbnail: "qrc:/themes/desind_dark.png"},
+                {name: "Desind Light", description: "Light theme with soft colors", thumbnail: "qrc:/themes/desind_light.png"},
+                {name: "Solarized Dark", description: "Classic Dark Theme", thumbnail: "qrc:/themes/solarized_dark.png"}
             ];
             themesList.model = themeList;
         }
     }
     
-    
+    // Theme app
     function applyTheme(themeName) {
         try {
-            
+            // Theme app
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("gsettings", ["set", "org.gnome.desktop.interface", "gtk-theme", themeName]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
-                showToast("تم تطبيق الثيم بنجاح", "\uf00c");
+                showToast("The theme was applied successfully", "\uf00c");
             } else {
-                showToast("فشل تطبيق الثيم", "\uf071");
+                showToast("Theme application failed", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تطبيق الثيم:", e);
-            showToast("فشل تطبيق الثيم", "\uf071");
+        } catch(e) {
+            console.error("Theme application failed:", e);
+            showToast("Theme application failed", "\uf071");
         }
     }
     
-    
+    //Open theme store
     function openThemeStore() {
         try {
-            
+            // Download themes from the Internet
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
-            process.start("curl", ["https:
+            process.start("curl", ["https://www.gnome-look.org/"]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
@@ -18507,71 +18682,71 @@ Item {
                     thumbnail: theme.thumbnail_url
                 }));
             } else {
-                
+                // Use default themes
                 themeStore.themes = [
-                    {name: "Desind Dark", description: "ثيم مظلم مع ألوان متناسقة", rating: 4.8, thumbnail: "qrc:/themes/desind_dark.png"},
-                    {name: "Desind Light", description: "ثيم فاتح مع ألوان ناعمة", rating: 4.5, thumbnail: "qrc:/themes/desind_light.png"},
-                    {name: "Solarized Dark", description: "ثيم مظلم كلاسيكي", rating: 4.7, thumbnail: "qrc:/themes/solarized_dark.png"},
-                    {name: "Nord", description: "ثيم مظلم مع ألوان باردة", rating: 4.6, thumbnail: "qrc:/themes/nord.png"},
-                    {name: "Dracula", description: "ثيم مظلم مع ألوان زاهية", rating: 4.9, thumbnail: "qrc:/themes/dracula.png"}
+                    {name: "Desind Dark", description: "Dark theme with matching colors", rating: 4.8, thumbnail: "qrc:/themes/desind_dark.png"},
+                    {name: "Desind Light", description: "Light theme with soft colors", rating: 4.5, thumbnail: "qrc:/themes/desind_light.png"},
+                    {name: "Solarized Dark", description: "Classic Dark Theme", rating: 4.7, thumbnail: "qrc:/themes/solarized_dark.png"},
+                    {name: "Nord", description: "Dark theme with cool colors", rating: 4.6, thumbnail: "qrc:/themes/nord.png"},
+                    {name: "Dracula", description: "Dark theme with bright colors", rating: 4.9, thumbnail: "qrc:/themes/dracula.png"}
                 ];
             }
             
-            
+            // View Theme Store
             themeStore.visible = true;
             themeStore.opacity = 0;
             fadeInAnimation.target = themeStore;
             fadeInAnimation.restart();
-        } catch (e) {
-            console.error("فشل فتح متجر الثيمات:", e);
-            showToast("فشل فتح متجر الثيمات", "\uf071");
+        } catch(e) {
+            console.error("Failed to open theme store:", e);
+            showToast("Failed to open theme store", "\uf071");
         }
     }
     
-    
+    // Theme preview
     function previewTheme(theme) {
         themeStore.selectedTheme = theme;
-        
+        // Here you can add preview logic
     }
     
-    
+    // Install the theme
     function installTheme(theme) {
         try {
-            
+            // Download the theme
             const downloadProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             downloadProcess.start("wget", [theme.download_url, "-P", "/tmp"]);
-            downloadProcess.waitForFinished(5000); 
+            downloadProcess.waitForFinished(5000); // 5-second timeout
             
             if (downloadProcess.exitCode() === 0) {
-                
+                // Install the theme
                 const installProcess = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                 installProcess.start("tar", ["-xvf", `/tmp/${theme.name}.tar.gz`, "-C", "~/.themes"]);
                 installProcess.waitForFinished(5000);
                 
                 if (installProcess.exitCode() === 0) {
-                    
+                    // Update the theme list
                     loadThemes();
-                    showToast("تم تثبيت الثيم بنجاح", "\uf00c");
+                    showToast("The theme was installed successfully", "\uf00c");
                     
-                    
+                    //Close theme store
                     fadeOutAnimation.target = themeStore;
                     fadeOutAnimation.onCompleted = function() {
                         themeStore.visible = false;
                     };
                     fadeOutAnimation.restart();
                 } else {
-                    showToast("فشل تثبيت الثيم", "\uf071");
+                    showToast("Theme installation failed", "\uf071");
                 }
             } else {
-                showToast("فشل تنزيل الثيم", "\uf071");
+                showToast("Theme download failed", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تثبيت الثيم:", e);
-            showToast("فشل تثبيت الثيم", "\uf071");
+        } catch(e) {
+            console.error("Theme installation failed:", e);
+            showToast("Theme installation failed", "\uf071");
         }
     }
     
-    
+    // Download wallpapers
     function loadWallpapers() {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -18582,18 +18757,18 @@ Item {
                 const output = process.readAllStandardOutput().trim();
                 const wallpapers = output.split('\n');
                 
-                wallpaperList = wallpapers.map(wallpaper => ({
+                wallpaperList=wallpapers.map(wallpaper=>({
                     name: wallpaper,
                     path: `~/.wallpapers/${wallpaper}`,
                     thumbnail: `~/.wallpapers/${wallpaper}/thumbnail.jpg`
                 }));
                 
-                
+                // Update the user interface
                 wallpapersGrid.model = wallpaperList;
             }
-        } catch (e) {
-            console.error("فشل تحميل الخلفيات:", e);
-            
+        } catch(e) {
+            console.error("Failed to load wallpapers:", e);
+            // Use virtual backgrounds
             wallpaperList = [
                 {name: "Desind Default", path: "qrc:/wallpapers/wallpaper1.jpg", thumbnail: "qrc:/wallpapers/default_thumbnail.jpg"},
                 {name: "Nature", path: "qrc:/wallpapers/nature.jpg", thumbnail: "qrc:/wallpapers/nature_thumbnail.jpg"},
@@ -18605,31 +18780,31 @@ Item {
         }
     }
     
-    
+    // Background application
     function applyWallpaper(wallpaperPath) {
         try {
-            
+            // Background application
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
-            process.start("gsettings", ["set", "org.gnome.desktop.background", "picture-uri", `file:
+            process.start("gsettings", ["set", "org.gnome.desktop.background", "picture-uri", `file://${wallpaperPath}`]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
-                showToast("تم تغيير الخلفية بنجاح", "\uf00c");
+                showToast("Background changed successfully", "\uf00c");
             } else {
-                showToast("فشل تغيير الخلفية", "\uf071");
+                showToast("Background change failed", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تغيير الخلفية:", e);
-            showToast("فشل تغيير الخلفية", "\uf071");
+        } catch(e) {
+            console.error("Background change failed:", e);
+            showToast("Background change failed", "\uf071");
         }
     }
     
-    
+    //Open wallpaper store
     function openWallpaperStore() {
         try {
-            
+            // Download wallpapers from the Internet
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
-            process.start("curl", ["https:
+            process.start("curl", ["https://www.gnome-look.org/browse/cat/130/"]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
@@ -18643,28 +18818,28 @@ Item {
                     thumbnail: wallpaper.thumbnail_url
                 }));
             } else {
-                
-                wallpaperStore.wallpapers = [
-                    {name: "Nature", description: "مناظر طبيعية خلابة", rating: 4.8, thumbnail: "qrc:/wallpapers/nature_thumbnail.jpg"},
-                    {name: "Abstract", description: "تصاميم مجردة فنية", rating: 4.5, thumbnail: "qrc:/wallpapers/abstract_thumbnail.jpg"},
-                    {name: "Dark", description: "خلفيات مظلمة أنيقة", rating: 4.7, thumbnail: "qrc:/wallpapers/dark_thumbnail.jpg"},
-                    {name: "Light", description: "خلفيات فاتحة ناعمة", rating: 4.6, thumbnail: "qrc:/wallpapers/light_thumbnail.jpg"},
-                    {name: "Patterns", description: "أنماط هندسية", rating: 4.9, thumbnail: "qrc:/wallpapers/patterns_thumbnail.jpg"}
+                // Use virtual backgrounds
+                wallpaperStore.wallpapers=[
+                    {name: "Nature", description: "Scenic Landscape", rating: 4.8, thumbnail: "qrc:/wallpapers/nature_thumbnail.jpg"},
+                    {name: "Abstract", description: "Artistic Abstract Designs", rating: 4.5, thumbnail: "qrc:/wallpapers/abstract_thumbnail.jpg"},
+                    {name: "Dark", description: "Stylish Dark Wallpapers", rating: 4.7, thumbnail: "qrc:/wallpapers/dark_thumbnail.jpg"},
+                    {name: "Light", description: "Soft Light Backgrounds", rating: 4.6, thumbnail: "qrc:/wallpapers/light_thumbnail.jpg"},
+                    {name: "Patterns", description: "Geometric Patterns", rating: 4.9, thumbnail: "qrc:/wallpapers/patterns_thumbnail.jpg"}
                 ];
             }
             
-            
+            //View wallpaper store
             wallpaperStore.visible = true;
             wallpaperStore.opacity = 0;
             fadeInAnimation.target = wallpaperStore;
             fadeInAnimation.restart();
-        } catch (e) {
-            console.error("فشل فتح متجر الخلفيات:", e);
-            showToast("فشل فتح متجر الخلفيات", "\uf071");
+        } catch(e) {
+            console.error("Failed to open wallpaper store:", e);
+            showToast("Failed to open background store", "\uf071");
         }
     }
     
-    
+    // Load icons
     function loadIcons() {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -18677,17 +18852,17 @@ Item {
                 
                 iconList = icons.map(icon => ({
                     name: icon,
-                    type: "apps", 
+                    type: "apps", // Type can be specified based on location
                     thumbnail: `~/.icons/${icon}/thumbnail.png`
                 }));
                 
-                
+                // Update the user interface
                 systemIconsList.model = iconList.filter(i => i.type === "system");
                 appIconsList.model = iconList.filter(i => i.type === "apps");
             }
-        } catch (e) {
-            console.error("فشل تحميل الأيقونات:", e);
-            
+        } catch(e) {
+            console.error("Icon loading failed:", e);
+            // Use default icons
             iconList = [
                 {name: "Desind Icons", type: "system", thumbnail: "qrc:/icons/desind_system.png"},
                 {name: "Desind Apps", type: "apps", thumbnail: "qrc:/icons/desind_apps.png"},
@@ -18700,50 +18875,50 @@ Item {
         }
     }
     
-    
+    // Apply system icons
     function applySystemIcons(iconName) {
         try {
-            
+            // Apply system icons
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("gsettings", ["set", "org.gnome.desktop.interface", "icon-theme", iconName]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
-                showToast("تم تغيير أيقونات النظام بنجاح", "\uf00c");
+                showToast("System icons changed successfully", "\uf00c");
             } else {
-                showToast("فشل تغيير أيقونات النظام", "\uf071");
+                showToast("Failed to change system icons", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تغيير أيقونات النظام:", e);
-            showToast("فشل تغيير أيقونات النظام", "\uf071");
+        } catch(e) {
+            console.error("Failed to change system icons:", e);
+            showToast("Failed to change system icons", "\uf071");
         }
     }
     
-    
+    //Application of application icons
     function applyAppIcons(iconName) {
         try {
-            
+            //Application of application icons
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("gsettings", ["set", "org.gnome.desktop.interface", "icon-theme", iconName]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
-                showToast("تم تغيير أيقونات التطبيقات بنجاح", "\uf00c");
+                showToast("App icons changed successfully", "\uf00c");
             } else {
-                showToast("فشل تغيير أيقونات التطبيقات", "\uf071");
+                showToast("Failed to change app icons", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تغيير أيقونات التطبيقات:", e);
-            showToast("فشل تغيير أيقونات التطبيقات", "\uf071");
+        } catch(e) {
+            console.error("Failed to change application icons:", e);
+            showToast("Failed to change app icons", "\uf071");
         }
     }
     
-    
+    //Open icon store
     function openIconsStore() {
         try {
-            
+            // Download icons from the Internet
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
-            process.start("curl", ["https:
+            process.start("curl", ["https://api.desindos.com/icons"]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
@@ -18757,28 +18932,28 @@ Item {
                     thumbnail: icon.thumbnail_url
                 }));
             } else {
-                
+                // Use default icons
                 iconsStore.icons = [
-                    {name: "Desind Icons", description: "أيقونات مخصصة لـ Desind", rating: 4.8, thumbnail: "qrc:/icons/desind_system.png"},
-                    {name: "Papirus", description: "أيقونات بسيطة وأنيقة", rating: 4.5, thumbnail: "qrc:/icons/papirus.png"},
-                    {name: "Tela", description: "أيقونات حديثة", rating: 4.7, thumbnail: "qrc:/icons/tela.png"},
-                    {name: "Breeze", description: "أيقونات من نظام KDE", rating: 4.6, thumbnail: "qrc:/icons/breeze.png"},
-                    {name: "Fluent", description: "أيقونات متوافقة مع تصميم Microsoft", rating: 4.9, thumbnail: "qrc:/icons/fluent.png"}
+                    {name: "Desind Icons", description: "Custom icons for Desind", rating: 4.8, thumbnail: "qrc:/icons/desind_system.png"},
+                    {name: "Papirus", description: "Simple and elegant icons", rating: 4.5, thumbnail: "qrc:/icons/papirus.png"},
+                    {name: "Tela", description: "Recent Icons", rating: 4.7, thumbnail: "qrc:/icons/tela.png"},
+                    {name: "Breeze", description: "Icons from KDE", rating: 4.6, thumbnail: "qrc:/icons/breeze.png"},
+                    {name: "Fluent", description: "Microsoft Design Compatible Icons", rating: 4.9, thumbnail: "qrc:/icons/fluent.png"}
                 ];
             }
             
-            
+            // View icon store
             iconsStore.visible = true;
             iconsStore.opacity = 0;
             fadeInAnimation.target = iconsStore;
             fadeInAnimation.restart();
-        } catch (e) {
-            console.error("فشل فتح متجر الأيقونات:", e);
-            showToast("فشل فتح متجر الأيقونات", "\uf071");
+        } catch(e) {
+            console.error("Failed to open icon store:", e);
+            showToast("Failed to open icon store", "\uf071");
         }
     }
     
-    
+    // Load mouse pointers
     function loadMouseCursors() {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -18791,51 +18966,51 @@ Item {
                 
                 mouseCursorList = cursors.map(cursor => ({
                     name: cursor,
-                    description: "مؤشر ماوس مخصص",
+                    description: "Custom Mouse Pointer",
                     thumbnail: `~/.icons/${cursor}/cursor.png`
                 }));
                 
-                
+                // Update the user interface
                 mouseCursorList.model = mouseCursorList;
             }
-        } catch (e) {
-            console.error("فشل تحميل مؤشرات الماوس:", e);
-            
-            mouseCursorList = [
-                {name: "Desind Cursor", description: "مؤشر ماوس مخصص لـ Desind", thumbnail: "qrc:/cursors/desind.png"},
-                {name: "Breeze", description: "مؤشر ماوس من نظام KDE", thumbnail: "qrc:/cursors/breeze.png"},
-                {name: "DMZ-White", description: "مؤشر ماوس أبيض", thumbnail: "qrc:/cursors/dmz-white.png"},
-                {name: "DMZ-Black", description: "مؤشر ماوس أسود", thumbnail: "qrc:/cursors/dmz-black.png"}
+        } catch(e) {
+            console.error("Failed to load mouse pointers:", e);
+            // Use default pointers
+            mouseCursorList=[
+                {name: "Desind Cursor", description: "Custom mouse cursor for Desind", thumbnail: "qrc:/cursors/desind.png"},
+                {name: "Breeze", description: "KDE mouse cursor", thumbnail: "qrc:/cursors/breeze.png"},
+                {name: "DMZ-White", description: "White Mouse Pointer", thumbnail: "qrc:/cursors/dmz-white.png"},
+                {name: "DMZ-Black", description: "Black Mouse Pointer", thumbnail: "qrc:/cursors/dmz-black.png"}
             ];
             mouseCursorList.model = mouseCursorList;
         }
     }
     
-    
+    // Mouse pointer application
     function applyMouseCursor(cursorName) {
         try {
-            
+            // Mouse pointer application
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("gsettings", ["set", "org.gnome.desktop.interface", "cursor-theme", cursorName]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
-                showToast("تم تغيير مؤشر الماوس بنجاح", "\uf00c");
+                showToast("Mouse cursor changed successfully", "\uf00c");
             } else {
-                showToast("فشل تغيير مؤشر الماوس", "\uf071");
+                showToast("Mouse cursor change failed", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تغيير مؤشر الماوس:", e);
-            showToast("فشل تغيير مؤشر الماوس", "\uf071");
+        } catch(e) {
+            console.error("Mouse cursor change failed:", e);
+            showToast("Mouse cursor change failed", "\uf071");
         }
     }
     
-    
+    // Open the mouse pointer store
     function openMouseCursorStore() {
         try {
-            
+            // Download mouse pointers from the Internet
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
-            process.start("curl", ["https:
+            process.start("curl", ["https://api.desindos.com/cursors"]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
@@ -18849,28 +19024,28 @@ Item {
                     thumbnail: cursor.thumbnail_url
                 }));
             } else {
-                
-                mouseCursorStore.cursors = [
-                    {name: "Desind Cursor", description: "مؤشر ماوس مخصص لـ Desind", rating: 4.8, thumbnail: "qrc:/cursors/desind.png"},
-                    {name: "Breeze", description: "مؤشر ماوس من نظام KDE", rating: 4.5, thumbnail: "qrc:/cursors/breeze.png"},
-                    {name: "DMZ-White", description: "مؤشر ماوس أبيض", rating: 4.7, thumbnail: "qrc:/cursors/dmz-white.png"},
-                    {name: "DMZ-Black", description: "مؤشر ماوس أسود", rating: 4.6, thumbnail: "qrc:/cursors/dmz-black.png"},
-                    {name: "Fluent", description: "مؤشر ماوس متوافق مع تصميم Microsoft", rating: 4.9, thumbnail: "qrc:/cursors/fluent.png"}
+                // Use default pointers
+                mouseCursorStore.cursors=[
+                    {name: "Desind Cursor", description: "Custom mouse cursor for Desind", rating: 4.8, thumbnail: "qrc:/cursors/desind.png"},
+                    {name: "Breeze", description: "KDE Mouse Pointer", rating: 4.5, thumbnail: "qrc:/cursors/breeze.png"},
+                    {name: "DMZ-White", description: "White Mouse Pointer", rating: 4.7, thumbnail: "qrc:/cursors/dmz-white.png"},
+                    {name: "DMZ-Black", description: "Black Mouse Pointer", rating: 4.6, thumbnail: "qrc:/cursors/dmz-black.png"},
+                    {name: "Fluent", description: "Microsoft Design Compatible Mouse Pointer", rating: 4.9, thumbnail: "qrc:/cursors/fluent.png"}
                 ];
             }
             
-            
+            //View mouse cursor store
             mouseCursorStore.visible = true;
             mouseCursorStore.opacity = 0;
             fadeInAnimation.target = mouseCursorStore;
             fadeInAnimation.restart();
-        } catch (e) {
-            console.error("فشل فتح متجر مؤشرات الماوس:", e);
-            showToast("فشل فتح متجر مؤشرات الماوس", "\uf071");
+        } catch(e) {
+            console.error("Failed to open mouse pointer store:", e);
+            showToast("Failed to open mouse pointer store", "\uf071");
         }
     }
     
-    
+    // Download fonts
     function loadFonts() {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -18883,85 +19058,85 @@ Item {
                 
                 fontList = fonts.map(font => ({
                     name: font.split(':')[0],
-                    description: "خط متوفر في النظام"
+                    description: "Font available in the system"
                 }));
             }
-        } catch (e) {
-            console.error("فشل تحميل الخطوط:", e);
-            
+        } catch(e) {
+            console.error("Failed to load fonts:", e);
+            // Use virtual fonts
             fontList = [
-                {name: "IBM Plex Sans Thin", description: "خط خفيف وعصري"},
-                {name: "IBM Plex Sans", description: "خط قياسي وواضح"},
-                {name: "Fira Code", description: "خط مخصص للبرمجة"},
-                {name: "Noto Sans", description: "خط شامل للغات المتعددة"},
-                {name: "Roboto", description: "خط حديث من Google"}
+                {name: "IBM Plex Sans Thin", description: "Light and modern font"},
+                {name: "IBM Plex Sans", description: "Standard, clear font"},
+                {name: "Fira Code", description: "Custom programming font"},
+                {name: "Noto Sans", description: "Comprehensive multilingual font"},
+                {name: "Roboto", description: "Modern font from Google"}
             ];
         }
     }
     
-    
+    // Set system line
     function setSystemFont(font) {
         try {
-            
+            // Set system line
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("gsettings", ["set", "org.gnome.desktop.interface", "font-name", `"${font} 10"`]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
-                showToast("تم تغيير خط النظام بنجاح", "\uf00c");
+                showToast("System font changed successfully", "\uf00c");
             } else {
-                showToast("فشل تغيير خط النظام", "\uf071");
+                showToast("System font change failed", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تغيير خط النظام:", e);
-            showToast("فشل تغيير خط النظام", "\uf071");
+        } catch(e) {
+            console.error("System font change failed:", e);
+            showToast("System font change failed", "\uf071");
         }
     }
     
-    
+    // Set the application font
     function setAppFont(font) {
         try {
-            
+            // Set the application font
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("gsettings", ["set", "org.gnome.desktop.interface", "document-font-name", `"${font} 10"`]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
-                showToast("تم تغيير خط التطبيقات بنجاح", "\uf00c");
+                showToast("Application font changed successfully", "\uf00c");
             } else {
-                showToast("فشل تغيير خط التطبيقات", "\uf071");
+                showToast("Application font change failed", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تغيير خط التطبيقات:", e);
-            showToast("فشل تغيير خط التطبيقات", "\uf071");
+        } catch(e) {
+            console.error("Application font change failed:", e);
+            showToast("Application font change failed", "\uf071");
         }
     }
     
-    
+    // Set the API font
     function setCodeFont(font) {
         try {
-            
+            // Set the API font
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("gsettings", ["set", "org.gnome.desktop.interface", "monospace-font-name", `"${font} 10"`]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
-                showToast("تم تغيير خط الواجهة البرمجية بنجاح", "\uf00c");
+                showToast("API font changed successfully", "\uf00c");
             } else {
-                showToast("فشل تغيير خط الواجهة البرمجية", "\uf071");
+                showToast("Failed to change API font", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تغيير خط الواجهة البرمجية:", e);
-            showToast("فشل تغيير خط الواجهة البرمجية", "\uf071");
+        } catch(e) {
+            console.error("Failed to change API font:", e);
+            showToast("Failed to change API font", "\uf071");
         }
     }
     
-    
+    //Open font store
     function openFontStore() {
         try {
-            
+            // Download fonts from the Internet
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
-            process.start("curl", ["https:
+            process.start("curl", ["https://api.desindos.com/fonts"]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
@@ -18975,123 +19150,123 @@ Item {
                     thumbnail: font.thumbnail_url
                 }));
             } else {
-                
+                // Use virtual fonts
                 fontStore.fonts = [
-                    {name: "IBM Plex Sans", description: "خط حديث وواضح", rating: 4.8, thumbnail: "qrc:/fonts/ibm_plex.png"},
-                    {name: "Fira Code", description: "خط مخصص للبرمجة", rating: 4.5, thumbnail: "qrc:/fonts/fira_code.png"},
-                    {name: "Noto Sans", description: "خط شامل للغات المتعددة", rating: 4.7, thumbnail: "qrc:/fonts/noto_sans.png"},
-                    {name: "Roboto", description: "خط حديث من Google", rating: 4.6, thumbnail: "qrc:/fonts/roboto.png"},
-                    {name: "Open Sans", description: "خط قابل للقراءة", rating: 4.9, thumbnail: "qrc:/fonts/open_sans.png"}
+                    {name: "IBM Plex Sans", description: "Fresh and clear font", rating: 4.8, thumbnail: "qrc:/fonts/ibm_plex.png"},
+                    {name: "Fira Code", description: "Custom font for programming", rating: 4.5, thumbnail: "qrc:/fonts/fira_code.png"},
+                    {name: "Noto Sans", description: "Comprehensive Multilingual Font", rating: 4.7, thumbnail: "qrc:/fonts/noto_sans.png"},
+                    {name: "Roboto", description: "Google Modern Font", rating: 4.6, thumbnail: "qrc:/fonts/roboto.png"},
+                    {name: "Open Sans", description: "Readable font", rating: 4.9, thumbnail: "qrc:/fonts/open_sans.png"}
                 ];
             }
             
-            
+            // View font store
             fontStore.visible = true;
             fontStore.opacity = 0;
             fadeInAnimation.target = fontStore;
             fadeInAnimation.restart();
-        } catch (e) {
-            console.error("فشل فتح متجر الخطوط:", e);
-            showToast("فشل فتح متجر الخطوط", "\uf071");
+        } catch(e) {
+            console.error("Failed to open font store:", e);
+            showToast("Failed to open font store", "\uf071");
         }
     }
     
-    
+    // Change the speed of animations
     function setAnimationSpeed(speed) {
         try {
-            
+            // Apply animation speed
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("gsettings", ["set", "org.gnome.desktop.interface", "enable-animations", speed > 50 ? "true" : "false"]);
             process.waitForFinished(500);
             
-            
+            // Change the duration of animations in the system
             animationDuration = speed;
             
             if (process.exitCode() === 0) {
-                showToast(`تم تغيير سرعة الأنميشنات إلى ${speed} مللي ثانية`, "\uf00c");
+                showToast(`Animations speed changed to ${speed} ms`, "\uf00c");
             } else {
-                showToast("فشل تغيير سرعة الأنميشنات", "\uf071");
+                showToast("Animation speed change failed", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تغيير سرعة الأنميشنات:", e);
-            showToast("فشل تغيير سرعة الأنميشنات", "\uf071");
+        } catch(e) {
+            console.error("Failed to change animation speed:", e);
+            showToast("Animation speed change failed", "\uf071");
         }
     }
     
-    
+    //Activate/Deactivate Animation
     function toggleAnimation(animationName, active) {
         try {
-            
-            showToast(active ? `تم تفعيل ${animationName}` : `تم إلغاء تفعيل ${animationName}`, "\uf00c");
-        } catch (e) {
-            console.error("فشل تغيير إعدادات الأنميشن:", e);
-            showToast("فشل تغيير إعدادات الأنميشن", "\uf071");
+            // Here you can add logic to activate/deactivate a specific animation
+            showToast(active ? `${animationName}` activated: `${animationName}`, "\uf00c" has been deactivated);
+        } catch(e) {
+            console.error("Failed to change animation settings:", e);
+            showToast("Failed to change animation settings", "\uf071");
         }
     }
     
-    
+    // Change the shape of the edges
     function setWindowCorners(index) {
         try {
-            
+            // Here you can add logic to change the shape of the edges
             const corners = ["square", "slightlyRounded", "fullyRounded"];
-            showToast(`تم تغيير شكل الحواف إلى ${corners[index]}`, "\uf00c");
-        } catch (e) {
-            console.error("فشل تغيير شكل الحواف:", e);
-            showToast("فشل تغيير شكل الحواف", "\uf071");
+            showToast(`The shape of the edges has been changed to ${corners[index]}`, "\uf00c");
+        } catch(e) {
+            console.error("Failed to change edge shape:", e);
+            showToast("Failed to change edge shape", "\uf071");
         }
     }
     
-    
+    // Resize edges
     function setWindowRadius(index) {
         try {
-            
+            // Here you can add logic to resize edges
             const sizes = ["small", "medium", "large"];
-            showToast(`تم تغيير حجم الحواف إلى ${sizes[index]}`, "\uf00c");
-        } catch (e) {
-            console.error("فشل تغيير حجم الحواف:", e);
-            showToast("فشل تغيير حجم الحواف", "\uf071");
+            showToast(`Edges resized to ${sizes[index]}`, "\uf00c");
+        } catch(e) {
+            console.error("Failed to resize edges:", e);
+            showToast("Failed to resize edges", "\uf071");
         }
     }
     
-    
+    // Change mouse speed
     function setMouseSpeed(speed) {
         try {
-            
+            // Change mouse speed
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("xset", ["m", speed * 10, "5"]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
-                showToast(`تم تغيير سرعة الماوس إلى ${speed}`, "\uf00c");
+                showToast(`Mouse speed changed to ${speed}`, "\uf00c");
             } else {
-                showToast("فشل تغيير سرعة الماوس", "\uf071");
+                showToast("Mouse speed change failed", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تغيير سرعة الماوس:", e);
-            showToast("فشل تغيير سرعة الماوس", "\uf071");
+        } catch(e) {
+            console.error("Mouse speed change failed:", e);
+            showToast("Mouse speed change failed", "\uf071");
         }
     }
     
-    
+    // Change the scroll direction
     function setMouseScrollDirection(inverted) {
         try {
-            
+            // Change the scroll direction
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("gsettings", ["set", "org.gnome.desktop.peripherals.touchpad", "natural-scroll", inverted ? "true" : "false"]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
-                showToast(inverted ? "تم تفعيل عكس اتجاه التمرير" : "تم إلغاء عكس اتجاه التمرير", "\uf00c");
+                showToast(inverted? "Reverse scroll direction activated": "Reverse scroll direction cancelled", "\uf00c");
             } else {
-                showToast("فشل تغيير اتجاه التمرير", "\uf071");
+                showToast("Failed to change scroll direction", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تغيير اتجاه التمرير:", e);
-            showToast("فشل تغيير اتجاه التمرير", "\uf071");
+        } catch(e) {
+            console.error("Failed to change scroll direction:", e);
+            showToast("Failed to change scroll direction", "\uf071");
         }
     }
     
-    
+    // Change background display mode
     function setWallpaperMode(modeIndex) {
         try {
             const modes = ["zoom", "scaled", "stretched", "wallpaper"];
@@ -19100,120 +19275,120 @@ Item {
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
-                showToast(`تم تغيير وضع العرض إلى ${modes[modeIndex]}`, "\uf00c");
+                showToast(`Display mode changed to ${modes[modeIndex]}`, "\uf00c");
             } else {
-                showToast("فشل تغيير وضع العرض", "\uf071");
+                showToast("Failed to change display mode", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تغيير وضع العرض:", e);
-            showToast("فشل تغيير وضع العرض", "\uf071");
+        } catch(e) {
+            console.error("Failed to change display mode:", e);
+            showToast("Failed to change display mode", "\uf071");
         }
     }
     
-    
+    //Activate/Deactivate animated wallpapers
     function setAnimatedWallpaper(active) {
         try {
-            
-            showToast(active ? "تم تفعيل الخلفيات المتحركة" : "تم إلغاء تفعيل الخلفيات المتحركة", "\uf00c");
-        } catch (e) {
-            console.error("فشل تغيير إعدادات الخلفيات المتحركة:", e);
-            showToast("فشل تغيير إعدادات الخلفيات المتحركة", "\uf071");
+            // Here you can add logic to activate/deactivate animated backgrounds
+            showToast(active ? "Animated wallpapers activated": "Animated wallpapers deactivated", "\uf00c");
+        } catch(e) {
+            console.error("Failed to change animated background settings:", e);
+            showToast("Failed to change animated background settings", "\uf071");
         }
     }
     
-    
+    // Change the lock screen clock size
     function setLockscreenClockSize(sizeIndex) {
         try {
             const sizes = ["small", "medium", "large"];
-            
-            showToast(`تم تغيير حجم الساعة إلى ${sizes[sizeIndex]}`, "\uf00c");
-        } catch (e) {
-            console.error("فشل تغيير حجم ساعة شاشة القفل:", e);
-            showToast("فشل تغيير حجم ساعة شاشة القفل", "\uf071");
+            // Here you can add logic to change the clock size
+            showToast(`The clock has been resized to ${sizes[sizeIndex]}`, "\uf00c");
+        } catch(e) {
+            console.error("Failed to resize lock screen clock:", e);
+            showToast("Failed to resize lock screen clock", "\uf071");
         }
     }
     
-    
+    // Change the location of the lock screen clock
     function setLockscreenClockPosition(positionIndex) {
         try {
             const positions = ["top", "center", "bottom"];
-            
-            showToast(`تم تغيير مكان الساعة إلى ${positions[positionIndex]}`, "\uf00c");
-        } catch (e) {
-            console.error("فشل تغيير مكان ساعة شاشة القفل:", e);
-            showToast("فشل تغيير مكان ساعة شاشة القفل", "\uf071");
+            // Here you can add logic to change the location of the clock
+            showToast(`The clock location has been changed to ${positions[positionIndex]}`, "\uf00c");
+        } catch(e) {
+            console.error("Failed to relocate lock screen clock:", e);
+            showToast("Failed to relocate lock screen clock", "\uf071");
         }
     }
     
-    
+    // Change the lock screen clock font
     function setLockscreenClockFont(fontIndex) {
         try {
             const fonts = ["Thin", "Light", "Regular", "Bold"];
-            
-            showToast(`تم تغيير خط الساعة إلى ${fonts[fontIndex]}`, "\uf00c");
-        } catch (e) {
-            console.error("فشل تغيير خط ساعة شاشة القفل:", e);
-            showToast("فشل تغيير خط ساعة شاشة القفل", "\uf071");
+            // Here you can add logic to change the clock line
+            showToast(`The clock font has been changed to ${fonts[fontIndex]}`, "\uf00c");
+        } catch(e) {
+            console.error("Failed to change lock screen clock font:", e);
+            showToast("Failed to change lock screen clock font", "\uf071");
         }
     }
     
-    
+    // Change the lock screen background
     function setLockscreenWallpaper(wallpaperIndex) {
         try {
             const wallpapers = ["current", "dark", "custom"];
-            
-            showToast(`تم تغيير خلفية شاشة القفل إلى ${wallpapers[wallpaperIndex]}`, "\uf00c");
-        } catch (e) {
-            console.error("فشل تغيير خلفية شاشة القفل:", e);
-            showToast("فشل تغيير خلفية شاشة القفل", "\uf071");
+            // Here logic can be added to change the background of the lock screen
+            showToast(`The lock screen background has been changed to ${wallpapers[wallpaperIndex]}`, "\uf00c");
+        } catch(e) {
+            console.error("Failed to change lock screen background:", e);
+            showToast("Failed to change lock screen background", "\uf071");
         }
     }
     
-    
+    // Set the home screen
     function setPrimaryDisplay(displayName) {
         try {
-            
+            // Set the home screen
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("hyprctl", ["keyword", "monitor", displayName + ", preferred, auto, 1"]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
-                showToast(`تم تعيين ${displayName} كشاشة رئيسية`, "\uf00c");
+                showToast(`${displayName} is set as the home screen`, "\uf00c");
             } else {
-                showToast("فشل تعيين الشاشة الرئيسية", "\uf071");
+                showToast("Home screen mapping failed", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل تعيين الشاشة الرئيسية:", e);
-            showToast("فشل تعيين الشاشة الرئيسية", "\uf071");
+        } catch(e) {
+            console.error("Home screen mapping failed:", e);
+            showToast("Home screen mapping failed", "\uf071");
         }
     }
     
-    
+    // Display notification
     function showToast(message, icon) {
-        
+        // Here you can add logic to display a notification
         console.log(`Toast: ${message}`);
     }
 
-    
+    // Function to open the settings application with the desired partition selected
     function openSettingsApp(section) {
-        
+        // If the application is already open, just change the partition
         if (isSettingsAppOpen) {
             navigateSettingsApp(section)
             return
         }
         
-        
+        //Very fast appearance effect (maximum MCX)
         settingsAppOpenEffect.start()
         
-        
+        // Open the Settings app
         isSettingsAppOpen = true
         settingsAppSection = section
         
-        
+        // Fast transition effect to open the application
         settingsAppAnimation.start()
     }
 
-    
+    // Effect of opening the Settings app (MCX max)
     Rectangle {
         id: settingsAppOpenEffect
         anchors.centerIn: parent
@@ -19262,15 +19437,15 @@ Item {
         }
     }
 
-    
+    // Function to navigate within the Settings app
     function navigateSettingsApp(section) {
         settingsAppSection = section
         
-        
+        // Fast transition effect between sections
         settingsSectionTransition.start()
     }
 
-    
+    // Effect of moving between settings sections (max MCX)
     Rectangle {
         id: settingsSectionTransition
         anchors.fill: parent
@@ -19296,10 +19471,10 @@ Item {
         }
     }
 
-    
-    
-    
-    
+    //=========================
+    // Appearance and disappearance animations
+    //=========================
+    // Appearance animation
     OpacityAnimation {
         id: fadeInAnimation
         from: 0
@@ -19308,7 +19483,7 @@ Item {
         easing.type: Easing.OutQuart
     }
     
-    
+    //Disappearance Animation
     OpacityAnimation {
         id: fadeOutAnimation
         from: 1
@@ -19317,18 +19492,18 @@ Item {
         easing.type: Easing.OutQuart
     }
     
-    
-    
-    
+    //==========================
+    // Load default data
+    //==========================
     Component.onCompleted: {
-        
+        // Load default data
         loadThemes();
         loadWallpapers();
         loadIcons();
         loadMouseCursors();
         loadFonts();
         
-        
+        // Download system information
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
             process.start("hostname");
@@ -19336,19 +19511,22 @@ Item {
             if (process.exitCode() === 0) {
                 systemInfo.deviceName = process.readAllStandardOutput().trim();
             }
-        } catch (e) {
-            console.error("فشل جلب اسم الجهاز:", e);
+        } catch(e) {
+            console.error("Failed to fetch device name:", e);
         }
     }
 }
 EOL
 
-echo "----------------------------"
-echo "(3/5) انشاء مدير الملفات..."
+# ===============
+# Preparing Drile
+# ===============
+echo "---------------------------
+echo "(3/5) Create a file manager..."
 cat <<EOL > ~/.config/Drile/Drile.qml
-
-
-
+//=====================
+//Drile - File Manager
+//=====================
 import QtQuick 6.8
 import QtQuick.Controls 6.8
 import QtQuick.Layouts 6.8
@@ -19361,40 +19539,40 @@ import QtQuick.Extras 6.8
 import QtMultimedia 6.8
 
 Item {
-    id: drile
+    id: drele
     width: 1000
     height: 650
     
-    
+    // Application properties
     property string currentPath: "/home/" + Qt.application.arguments[2]
     property string selectedPath: ""
-    property int viewMode: 0 
+    property int viewMode: 0 // 0: list, 1: grid, 2: detail
     property int animationduration: 50
     property int debounceTime: 50
     property bool showHiddenFiles: false
     property var clipboard: null
-    property string clipboardAction: "" 
+    property string clipboardAction: "" // "cut" or "copy"
     
-    
+    // File form
     property var files: []
     property var selectedFiles: []
     property var bookmarks: [
-        {name: "المنزل", path: "/home/" + Qt.application.arguments[2]},
-        {name: "الصور", path: "/home/" + Qt.application.arguments[2] + "/Pictures"},
-        {name: "الوثائق", path: "/home/" + Qt.application.arguments[2] + "/Documents"},
-        {name: "التنزيلات", path: "/home/" + Qt.application.arguments[2] + "/Downloads"},
-        {name: "الفيديو", path: "/home/" + Qt.application.arguments[2] + "/Videos"}
+        {name: "Home", path: "/home/" + Qt.application.arguments[2]},
+        {name: "Images", path: "/home/" + Qt.application.arguments[2] + "/Pictures"},
+        {name: "Documents", path: "/home/" + Qt.application.arguments[2] + "/Documents"},
+        {name: "Downloads", path: "/home/" + Qt.application.arguments[2] + "/Downloads"},
+        {name: "Video", path: "/home/" + Qt.application.arguments[2] + "/Videos"}
     ]
     
-    
+    // Application status
     property bool isSearching: false
     property string searchQuery: ""
-    property var tabs: [{id: "tab1", title: "المنزل", path: "/home/" + Qt.application.arguments[2]}]
+    property var tabs: [{id: "tab1", title: "Home", path: "/home/" + Qt.application.arguments[2]}]
     property int activeTabIndex: 0
     property bool contextMenuVisible: false
     property point contextMenuPos: ({x: 0, y: 0})
     
-    
+    // Configure the user interface
     Rectangle {
         id: container
         anchors.fill: parent
@@ -19402,7 +19580,7 @@ Item {
         opacity: 0
         visible: false
         
-        
+        // Transparent background with slight blur effect (without FastBlur)
         Rectangle {
             anchors.fill: parent
             color: "#000000"
@@ -19418,7 +19596,7 @@ Item {
             }
         }
         
-        
+        // Top tab bar (dynamic island)
         Item {
             id: islandContainer
             width: parent.width * 0.9
@@ -19427,7 +19605,7 @@ Item {
             anchors.topMargin: 20
             anchors.horizontalCenter: parent.horizontalCenter
             
-            
+            //Full oval background (without FastBlur)
             Rectangle {
                 id: islandBackground
                 anchors.fill: parent
@@ -19435,7 +19613,7 @@ Item {
                 color: Qt.rgba(0, 0, 0, 0.85)
                 border.width: 0
                 
-                
+                // Improve blur (without FastBlur)
                 layer.enabled: true
                 layer.effect: OpacityMask {
                     maskSource: Rectangle {
@@ -19447,14 +19625,14 @@ Item {
                 }
             }
             
-            
+            // Tab bar
             RowLayout {
                 id: tabBar
                 anchors.fill: parent
                 anchors.margins: 10
-                spacing: 5
+                Spacing: 5
                 
-                
+                // Tab buttons
                 Repeater {
                     model: drile.tabs
                     delegate: TabButton {
@@ -19472,7 +19650,7 @@ Item {
                     }
                 }
                 
-                
+                // Add new tab button
                 Button {
                     width: 40
                     height: 40
@@ -19489,7 +19667,7 @@ Item {
             }
         }
         
-        
+        // Application content
         Item {
             id: content
             anchors.top: islandContainer.bottom
@@ -19498,7 +19676,7 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             
-            
+            // Navigation bar
             RowLayout {
                 id: navigationBar
                 anchors.top: parent.top
@@ -19508,9 +19686,9 @@ Item {
                 anchors.right: parent.right
                 anchors.rightMargin: 20
                 height: 40
-                spacing: 10
+                Spacing: 10
                 
-                
+                // Navigation buttons
                 Button {
                     width: 40
                     height: 40
@@ -19518,7 +19696,7 @@ Item {
                     color: Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1)
                     border.color: pywalColors.colors[2]
                     border.width: 1
-                    text: "\uf060" 
+                    text: "\uf060" // Return code
                     
                     onClicked: {
                         goBack();
@@ -19532,7 +19710,7 @@ Item {
                     color: Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1)
                     border.color: pywalColors.colors[2]
                     border.width: 1
-                    text: "\uf061" 
+                    text: "\uf061" // Progress code
                     
                     onClicked: {
                         goForward();
@@ -19546,16 +19724,16 @@ Item {
                     color: Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1)
                     border.color: pywalColors.colors[2]
                     border.width: 1
-                    text: "\uf0e2" 
+                    text: "\uf0e2" // Update code
                     
                     onClicked: {
                         loadDirectory(currentPath);
                     }
                 }
                 
-                
+                // Path bar
                 Rectangle {
-                    id: pathBar
+                    id:pathBar
                     Layout.fillWidth: true
                     height: 40
                     radius: 20
@@ -19564,14 +19742,14 @@ Item {
                     RowLayout {
                         anchors.fill: parent
                         anchors.margins: 10
-                        spacing: 5
+                        Spacing: 5
                         
-                        
+                        // Folder path
                         Repeater {
-                            model: currentPath.split("/").filter(p => p !== "").length + 1
+                            model: currentPath.split("/").filter(p => p!== "").length + 1
                             delegate: PathSegment {
-                                text: index === 0 ? "المنزل" : currentPath.split("/")[index]
-                                isLast: index === currentPath.split("/").filter(p => p !== "").length
+                                text: index === 0? "Home": currentPath.split("/")[index]
+                                isLast: index === currentPath.split("/").filter(p => p!== "").length
                                 onClicked: {
                                     let newPath = "/";
                                     for (let i = 1; i <= index; i++) {
@@ -19588,7 +19766,7 @@ Item {
                     }
                 }
                 
-                
+                // Search bar
                 Rectangle {
                     id: searchContainer
                     width: 300
@@ -19603,7 +19781,7 @@ Item {
                         font.family: "IBM Plex Sans Thin"
                         font.pixelSize: 16
                         color: pywalColors.colors[5]
-                        placeholderText: "البحث في هذا المجلد..."
+                        placeholderText: "Search this folder..."
                         placeholderColor: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.5)
                         selectByMouse: true
                         focus: false
@@ -19614,7 +19792,7 @@ Item {
                                 clearTimeout(searchTimer);
                             }
                             
-                            if (text.length > 0) {
+                            if(text.length > 0) {
                                 searchTimer = setTimeout(function() {
                                     searchQuery = text;
                                     performSearch(text);
@@ -19638,7 +19816,7 @@ Item {
                 }
             }
             
-            
+            // File manager content
             Item {
                 id: fileManagerContent
                 anchors.top: navigationBar.bottom
@@ -19647,7 +19825,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 
-                
+                // Favorites sidebar
                 Rectangle {
                     id: sidebar
                     width: 250
@@ -19661,17 +19839,17 @@ Item {
                     ColumnLayout {
                         anchors.fill: parent
                         anchors.margins: 15
-                        spacing: 10
+                        Spacing: 10
                         
-                        
+                        //Favorite titles
                         Text {
-                            text: "المفضلات"
+                            text: "Favorites"
                             font.family: "IBM Plex Sans Thin"
                             font.pixelSize: 18
                             color: pywalColors.colors[7]
                         }
                         
-                        
+                        // Favorites List
                         ListView {
                             id: bookmarksList
                             Layout.fillWidth: true
@@ -19691,23 +19869,23 @@ Item {
                             }
                         }
                         
-                        
+                        // Website addresses
                         Text {
-                            text: "المواقع"
+                            text: "Locations"
                             font.family: "IBM Plex Sans Thin"
                             font.pixelSize: 18
                             color: pywalColors.colors[7]
                         }
                         
-                        
+                        // List of sites
                         ListView {
                             id: locationsList
                             Layout.fillWidth: true
                             height: 200
                             model: [
-                                {name: "الكمبيوتر", icon: "\uf109"},
-                                {name: "الشبكة", icon: "\uf1eb"},
-                                {name: "المحركات", icon: "\uf0a0"}
+                                {name: "Computer", icon: "\uf109"},
+                                {name: "Network", icon: "\uf1eb"},
+                                {name: "Engines", icon: "\uf0a0"}
                             ]
                             clip: true
                             interactive: false
@@ -19717,7 +19895,7 @@ Item {
                                 height: 40
                                 location: modelData
                                 onClicked: {
-                                    if (location.name === "الكمبيوتر") {
+                                    if(location.name === "computer") {
                                         currentPath = "/";
                                         loadDirectory(currentPath);
                                     }
@@ -19725,15 +19903,15 @@ Item {
                             }
                         }
                         
-                        
+                        // Device addresses
                         Text {
-                            text: "الأجهزة"
+                            text: "Devices"
                             font.family: "IBM Plex Sans Thin"
                             font.pixelSize: 18
                             color: pywalColors.colors[7]
                         }
                         
-                        
+                        // Device List
                         ListView {
                             id: devicesList
                             Layout.fillWidth: true
@@ -19755,7 +19933,7 @@ Item {
                     }
                 }
                 
-                
+                // File display area
                 Item {
                     id: filesArea
                     anchors.top: parent.top
@@ -19764,7 +19942,7 @@ Item {
                     anchors.right: parent.right
                     anchors.margins: 10
                     
-                    
+                    // Toolbar
                     RowLayout {
                         id: toolbar
                         anchors.top: parent.top
@@ -19772,17 +19950,17 @@ Item {
                         anchors.right: parent.right
                         anchors.rightMargin: 10
                         height: 40
-                        spacing: 10
+                        Spacing: 10
                         
-                        
+                        // Display buttons
                         Button {
                             width: 40
                             height: 40
                             radius: 20
-                            color: viewMode === 0 ? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1) : Qt.rgba(0, 0, 0, 0.85)
+                            color: viewMode === 0? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1): Qt.rgba(0, 0, 0, 0.85)
                             border.color: pywalColors.colors[2]
-                            border.width: viewMode === 0 ? 1 : 0
-                            text: "\uf00b" 
+                            border.width: viewMode=== 0? 1 : 0
+                            text: "\uf00b" // List code
                             
                             onClicked: {
                                 viewMode = 0;
@@ -19793,10 +19971,10 @@ Item {
                             width: 40
                             height: 40
                             radius: 20
-                            color: viewMode === 1 ? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1) : Qt.rgba(0, 0, 0, 0.85)
+                            color: viewMode===1? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1): Qt.rgba(0, 0, 0, 0.85)
                             border.color: pywalColors.colors[2]
-                            border.width: viewMode === 1 ? 1 : 0
-                            text: "\uf009" 
+                            border.width: viewMode===1? 1 : 0
+                            text: "\uf009" // Network code
                             
                             onClicked: {
                                 viewMode = 1;
@@ -19807,34 +19985,34 @@ Item {
                             width: 40
                             height: 40
                             radius: 20
-                            color: viewMode === 2 ? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1) : Qt.rgba(0, 0, 0, 0.85)
+                            color: viewMode === 2? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1): Qt.rgba(0, 0, 0, 0.85)
                             border.color: pywalColors.colors[2]
-                            border.width: viewMode === 2 ? 1 : 0
-                            text: "\uf0ae" 
+                            border.width: viewMode===2? 1 : 0
+                            text: "\uf0ae" // Detail code
                             
                             onClicked: {
                                 viewMode = 2;
                             }
                         }
                         
-                        
+                        // Show hidden files button
                         Button {
                             width: 40
                             height: 40
                             radius: 20
-                            color: showHiddenFiles ? Qt.rgba(pywalColors.colors[5].r, pywalColors.colors[5].g, pywalColors.colors[5].b, 0.1) : Qt.rgba(0, 0, 0, 0.85)
+                            color: showHiddenFiles ? Qt.rgba(pywalColors.colors[5].r, pywalColors.colors[5].g, pywalColors.colors[5].b, 0.1): Qt.rgba(0, 0, 0, 0.85)
                             border.color: showHiddenFiles ? pywalColors.colors[5] : Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                             border.width: showHiddenFiles ? 1 : 0
-                            text: "\uf06e" 
+                            text: "\uf06e" // Hidden file code
                             
                             onClicked: {
-                                showHiddenFiles = !showHiddenFiles;
+                                showHiddenFiles=!showHiddenFiles;
                                 loadDirectory(currentPath);
                             }
                         }
                     }
                     
-                    
+                    // Display elements by mode
                     Item {
                         id: viewContainer
                         anchors.top: toolbar.bottom
@@ -19843,11 +20021,11 @@ Item {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         
-                        
+                        // Display list
                         Item {
-                            id: listView
+                            id:listView
                             anchors.fill: parent
-                            visible: viewMode === 0
+                            visible: viewMode===0
                             
                             ListView {
                                 id: listFilesView
@@ -19874,7 +20052,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // Appearance animation
                                 OpacityAnimation on opacity {
                                     duration: 50
                                     easing.type: Easing.OutQuart
@@ -19884,11 +20062,11 @@ Item {
                             }
                         }
                         
-                        
+                        // Network view
                         Item {
                             id: gridView
                             anchors.fill: parent
-                            visible: viewMode === 1
+                            visible: viewMode===1
                             
                             GridView {
                                 id: gridFilesView
@@ -19917,7 +20095,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // Appearance animation
                                 OpacityAnimation on opacity {
                                     duration: 50
                                     easing.type: Easing.OutQuart
@@ -19927,11 +20105,11 @@ Item {
                             }
                         }
                         
-                        
+                        // View details
                         Item {
                             id: detailsView
                             anchors.fill: parent
-                            visible: viewMode === 2
+                            visible: viewMode===2
                             
                             ListView {
                                 id: detailsFilesView
@@ -19958,7 +20136,7 @@ Item {
                                     }
                                 }
                                 
-                                
+                                // Appearance animation
                                 OpacityAnimation on opacity {
                                     duration: 50
                                     easing.type: Easing.OutQuart
@@ -19972,7 +20150,7 @@ Item {
             }
         }
         
-        
+        // Context menu (right mouse button)
         Rectangle {
             id: contextMenu
             width: 250
@@ -20011,11 +20189,11 @@ Item {
         }
     }
     
+    //====================
+    // Auxiliary components
+    //====================
     
-    
-    
-    
-    
+    // Tab component
     Component {
         id: tabButtonComponent
         
@@ -20026,15 +20204,15 @@ Item {
             width: 120
             height: 40
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 20
-                color: active ? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1) : "#000000"
+                color: active ? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1): "#000000"
                 border.color: active ? pywalColors.colors[2] : Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 1
                 
-                
+                // Text
                 Text {
                     anchors.centerIn: parent
                     text: tabButton.text
@@ -20044,7 +20222,7 @@ Item {
                 }
             }
             
-            
+            //Close button
             Rectangle {
                 anchors.right: parent.right
                 anchors.rightMargin: 10
@@ -20052,8 +20230,8 @@ Item {
                 width: 20
                 height: 20
                 radius: 10
-                color: active ? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.3) : Qt.rgba(0, 0, 0, 0.5)
-                visible: drile.tabs.length > 1
+                color: active ? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.3): Qt.rgba(0, 0, 0, 0.5)
+                visible: drill.tabs.length > 1
                 
                 Text {
                     anchors.centerIn: parent
@@ -20067,20 +20245,20 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
-                        if (tabButton.onCloseRequested) {
+                        if(tabButton.onCloseRequested) {
                             tabButton.onCloseRequested();
                         }
                     }
                     onEntered: {
-                        parent.color = active ? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.5) : Qt.rgba(0, 0, 0, 0.7);
+                        parent.color=active? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.5): Qt.rgba(0, 0, 0, 0.7);
                     }
                     onExited: {
-                        parent.color = active ? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.3) : Qt.rgba(0, 0, 0, 0.5);
+                        parent.color=active? Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.3): Qt.rgba(0, 0, 0, 0.5);
                     }
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -20089,22 +20267,22 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
-                    if (tabButton.onClicked) {
+                    if(tabButton.onClicked) {
                         tabButton.onClicked();
                     }
                 }
                 onEntered: {
-                    if (!active) {
+                    if(!active) {
                         parent.scale = 1.05;
                     }
                 }
                 onExited: {
-                    if (!active) {
+                    if(!active) {
                         parent.scale = 1.0;
                     }
                 }
@@ -20112,7 +20290,7 @@ Item {
         }
     }
     
-    
+    // Path slice component
     Component {
         id: pathSegmentComponent
         
@@ -20123,7 +20301,7 @@ Item {
             width: 80
             height: 30
             
-            
+            // Text
             Text {
                 anchors.centerIn: parent
                 text: pathSegment.text
@@ -20134,18 +20312,18 @@ Item {
                 width: parent.width * 0.8
             }
             
-            
+            // separator
             Text {
                 anchors.left: parent.right
                 anchors.leftMargin: 5
                 anchors.verticalCenter: parent.verticalCenter
-                text: isLast ? "" : "/"
+                text: isLast? "": "/"
                 font.family: "IBM Plex Sans Thin"
                 font.pixelSize: 14
                 color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.5)
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -20154,7 +20332,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -20173,7 +20351,7 @@ Item {
         }
     }
     
-    
+    // Favorites component
     Component {
         id: bookmarkItemComponent
         
@@ -20183,7 +20361,7 @@ Item {
             width: parent.width
             height: 40
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 10
@@ -20191,22 +20369,22 @@ Item {
                 border.color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 0
                 
-                
+                // Icon
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
-                    text: bookmarkItem.bookmark.name === "المنزل" ? "\uf015" : 
-                          (bookmarkItem.bookmark.name === "الصور" ? "\uf03e" : 
-                          (bookmarkItem.bookmark.name === "الوثائق" ? "\uf15c" : 
-                          (bookmarkItem.bookmark.name === "التنزيلات" ? "\uf019" : 
-                          (bookmarkItem.bookmark.name === "الفيديو" ? "\uf03d" : "\uf15b"))))
+                    text: bookmarkItem.bookmark.name === "Home" ? "\uf015" : 
+                          (bookmarkItem.bookmark.name === "Photos"? "\uf03e": 
+                          (bookmarkItem.bookmark.name === "Documents"? "\uf15c": 
+                          (bookmarkItem.bookmark.name === "Downloads" ? "\uf019" : 
+                          (bookmarkItem.bookmark.name === "Video"? "\uf03d" : "\uf15b"))))
                     font.family: faSolid.name
                     font.pixelSize: 16
                     color: pywalColors.colors[7]
                 }
                 
-                
+                // Text
                 Text {
                     anchors.left: iconText.right
                     anchors.leftMargin: 10
@@ -20218,7 +20396,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -20227,7 +20405,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -20246,7 +20424,7 @@ Item {
         }
     }
     
-    
+    // Site component
     Component {
         id: locationItemComponent
         
@@ -20256,7 +20434,7 @@ Item {
             width: parent.width
             height: 40
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 10
@@ -20264,7 +20442,7 @@ Item {
                 border.color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 0
                 
-                
+                // Icon
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 10
@@ -20275,7 +20453,7 @@ Item {
                     color: pywalColors.colors[7]
                 }
                 
-                
+                // Text
                 Text {
                     anchors.left: iconText.right
                     anchors.leftMargin: 10
@@ -20287,7 +20465,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -20296,7 +20474,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -20315,7 +20493,7 @@ Item {
         }
     }
     
-    
+    // Device component
     Component {
         id: deviceItemComponent
         
@@ -20325,7 +20503,7 @@ Item {
             width: parent.width
             height: 40
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 10
@@ -20333,7 +20511,7 @@ Item {
                 border.color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 0
                 
-                
+                // Icon
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 10
@@ -20344,7 +20522,7 @@ Item {
                     color: pywalColors.colors[7]
                 }
                 
-                
+                // Text
                 Text {
                     anchors.left: iconText.right
                     anchors.leftMargin: 10
@@ -20356,7 +20534,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -20365,7 +20543,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -20384,7 +20562,7 @@ Item {
         }
     }
     
-    
+    // File element component (list view)
     Component {
         id: fileItemComponent
         
@@ -20395,27 +20573,27 @@ Item {
             width: parent.width
             height: 40
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 10
-                color: fileItem.isSelected ? 
-                       Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1) : 
+                color: fileItem.isSelected? 
+                       Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1): 
                        "#000000"
                 border.color: fileItem.isSelected ? 
                               pywalColors.colors[2] : 
                               Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 0
                 
-                
+                // Icon
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
                     text: fileItem.file.isDirectory ? "\uf07b" : 
                           (fileItem.file.extension === "pdf" ? "\uf1c1" :
-                          (fileItem.file.extension === "txt" ? "\uf15c" :
-                          (fileItem.file.extension === "jpg" || fileItem.file.extension === "png" ? "\uf03e" :
+                          (fileItem.file.extension === "txt" ? "\uf15c":
+                          (fileItem.file.extension === "jpg" || fileItem.file.extension === "png" ? "\uf03e":
                           (fileItem.file.extension === "mp3" || fileItem.file.extension === "wav" ? "\uf001" :
                           (fileItem.file.extension === "mp4" || fileItem.file.extension === "avi" ? "\uf03d" : "\uf15b")))))
                     font.family: faSolid.name
@@ -20428,7 +20606,7 @@ Item {
                            (fileItem.file.extension === "mp4" || fileItem.file.extension === "avi" ? pywalColors.colors[1] : pywalColors.colors[7])))))
                 }
                 
-                
+                // Name
                 Text {
                     anchors.left: iconText.right
                     anchors.leftMargin: 10
@@ -20441,29 +20619,29 @@ Item {
                     width: 200
                 }
                 
-                
+                // Type
                 Text {
                     anchors.left: nameText.right
                     anchors.leftMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
-                    text: fileItem.file.isDirectory ? "مجلد" : fileItem.file.extension.toUpperCase()
+                    text: fileItem.file.isDirectory ? "folder": fileItem.file.extension.toUpperCase()
                     font.family: "IBM Plex Sans Thin"
                     font.pixelSize: 14
                     color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
                 }
                 
-                
+                // Size
                 Text {
                     anchors.right: parent.right
                     anchors.rightMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
-                    text: fileItem.file.isDirectory ? "" : formatFileSize(fileItem.file.size)
+                    text: fileItem.file.isDirectory ? "": formatFileSize(fileItem.file.size)
                     font.family: "IBM Plex Sans Thin"
                     font.pixelSize: 14
                     color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
                 }
                 
-                
+                //History
                 Text {
                     anchors.right: sizeText.left
                     anchors.rightMargin: 10
@@ -20475,7 +20653,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -20484,7 +20662,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -20513,7 +20691,7 @@ Item {
         }
     }
     
-    
+    // File element component (grid view)
     Component {
         id: gridFileItemComponent
         
@@ -20524,12 +20702,12 @@ Item {
             width: parent.width
             height: parent.height
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 10
                 color: gridFileItem.isSelected ? 
-                       Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1) : 
+                       Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1): 
                        "#000000"
                 border.color: gridFileItem.isSelected ? 
                               pywalColors.colors[2] : 
@@ -20539,15 +20717,15 @@ Item {
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 10
-                    spacing: 5
+                    Spacing: 5
                     
-                    
+                    // Icon
                     Text {
                         Layout.alignment: Qt.AlignHCenter
                         text: gridFileItem.file.isDirectory ? "\uf07b" : 
                               (gridFileItem.file.extension === "pdf" ? "\uf1c1" :
-                              (gridFileItem.file.extension === "txt" ? "\uf15c" :
-                              (gridFileItem.file.extension === "jpg" || gridFileItem.file.extension === "png" ? "\uf03e" :
+                              (gridFileItem.file.extension === "txt" ? "\uf15c":
+                              (gridFileItem.file.extension === "jpg" || gridFileItem.file.extension === "png" ? "\uf03e":
                               (gridFileItem.file.extension === "mp3" || gridFileItem.file.extension === "wav" ? "\uf001" :
                               (gridFileItem.file.extension === "mp4" || gridFileItem.file.extension === "avi" ? "\uf03d" : "\uf15b")))))
                         font.family: faSolid.name
@@ -20560,7 +20738,7 @@ Item {
                                (gridFileItem.file.extension === "mp4" || gridFileItem.file.extension === "avi" ? pywalColors.colors[1] : pywalColors.colors[7])))))
                     }
                     
-                    
+                    // Name
                     Text {
                         Layout.alignment: Qt.AlignHCenter
                         text: gridFileItem.file.name
@@ -20573,7 +20751,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -20582,7 +20760,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -20611,7 +20789,7 @@ Item {
         }
     }
     
-    
+    // File element component (view details)
     Component {
         id: detailFileItemComponent
         
@@ -20622,14 +20800,14 @@ Item {
             width: parent.width
             height: 30
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 5
-                color: detailFileItem.isSelected ? 
-                       Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1) : 
+                color: detailFileItem.isSelected? 
+                       Qt.rgba(pywalColors.colors[2].r, pywalColors.colors[2].g, pywalColors.colors[2].b, 0.1): 
                        "#000000"
-                border.color: detailFileItem.isSelected ? 
+                border.color: detailFileItem.isSelected? 
                               pywalColors.colors[2] : 
                               Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.2)
                 border.width: 0
@@ -20637,15 +20815,15 @@ Item {
                 RowLayout {
                     anchors.fill: parent
                     anchors.margins: 5
-                    spacing: 10
+                    Spacing: 10
                     
-                    
+                    // Icon
                     Text {
                         Layout.alignment: Qt.AlignVCenter
                         text: detailFileItem.file.isDirectory ? "\uf07b" : 
                               (detailFileItem.file.extension === "pdf" ? "\uf1c1" :
-                              (detailFileItem.file.extension === "txt" ? "\uf15c" :
-                              (detailFileItem.file.extension === "jpg" || detailFileItem.file.extension === "png" ? "\uf03e" :
+                              (detailFileItem.file.extension === "txt" ? "\uf15c":
+                              (detailFileItem.file.extension === "jpg" || detailFileItem.file.extension === "png" ? "\uf03e":
                               (detailFileItem.file.extension === "mp3" || detailFileItem.file.extension === "wav" ? "\uf001" :
                               (detailFileItem.file.extension === "mp4" || detailFileItem.file.extension === "avi" ? "\uf03d" : "\uf15b")))))
                         font.family: faSolid.name
@@ -20658,7 +20836,7 @@ Item {
                                (detailFileItem.file.extension === "mp4" || detailFileItem.file.extension === "avi" ? pywalColors.colors[1] : pywalColors.colors[7])))))
                     }
                     
-                    
+                    // Name
                     Text {
                         Layout.fillWidth: true
                         text: detailFileItem.file.name
@@ -20668,25 +20846,25 @@ Item {
                         elide: Text.ElideRight
                     }
                     
-                    
+                    // Type
                     Text {
                         width: 100
-                        text: detailFileItem.file.isDirectory ? "مجلد" : detailFileItem.file.extension.toUpperCase()
+                        text: detailFileItem.file.isDirectory ? "folder": detailFileItem.file.extension.toUpperCase()
                         font.family: "IBM Plex Sans Thin"
                         font.pixelSize: 14
                         color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
                     }
                     
-                    
+                    // Size
                     Text {
                         width: 100
-                        text: detailFileItem.file.isDirectory ? "" : formatFileSize(detailFileItem.file.size)
+                        text: detailFileItem.file.isDirectory ? "": formatFileSize(detailFileItem.file.size)
                         font.family: "IBM Plex Sans Thin"
                         font.pixelSize: 14
                         color: Qt.rgba(pywalColors.colors[7].r, pywalColors.colors[7].g, pywalColors.colors[7].b, 0.7)
                     }
                     
-                    
+                    //History
                     Text {
                         width: 150
                         text: formatDate(detailFileItem.file.modified)
@@ -20697,7 +20875,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -20706,7 +20884,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -20735,7 +20913,7 @@ Item {
         }
     }
     
-    
+    // Context menu item component
     Component {
         id: contextMenuItemComponent
         
@@ -20745,14 +20923,14 @@ Item {
             width: parent.width
             height: 40
             
-            
+            // Background
             Rectangle {
                 anchors.fill: parent
                 radius: 5
                 color: "#000000"
                 border.width: 0
                 
-                
+                // Icon
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 15
@@ -20763,7 +20941,7 @@ Item {
                     color: pywalColors.colors[7]
                 }
                 
-                
+                // Text
                 Text {
                     anchors.left: iconText.right
                     anchors.leftMargin: 15
@@ -20775,7 +20953,7 @@ Item {
                 }
             }
             
-            
+            // Animation of interaction with the mouse
             ScaleAnimation on scale {
                 duration: 50
                 easing.type: Easing.OutQuart
@@ -20784,7 +20962,7 @@ Item {
                 running: false
             }
             
-            
+            // Interaction area
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -20803,22 +20981,22 @@ Item {
         }
     }
     
+    //====================
+    // System functions
+    //====================
     
-    
-    
-    
-    
+    // Open the file manager
     function openDrile() {
         container.visible = true;
         container.opacity = 0;
         fadeInAnimation.target = container;
         fadeInAnimation.restart();
         
-        
+        // Download the current directory
         loadDirectory(currentPath);
     }
     
-    
+    // Close the file manager
     function closeDrile() {
         fadeOutAnimation.target = container;
         fadeOutAnimation.onCompleted = function() {
@@ -20827,7 +21005,7 @@ Item {
         fadeOutAnimation.restart();
     }
     
-    
+    // Download the contents of the directory
     function loadDirectory(path) {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -20851,8 +21029,8 @@ Item {
                     const size = isDirectory ? 0 : parseInt(parts[4]);
                     const modified = line.substring(line.indexOf(":") - 3, line.indexOf(":") + 5);
                     
-                    
-                    if (!showHiddenFiles && name.startsWith(".")) continue;
+                    // Skip hidden files if view is not enabled
+                    if(!showHiddenFiles && name.startsWith(".")) continue;
                     
                     drile.files.push({
                         name: name,
@@ -20860,20 +21038,20 @@ Item {
                         isDirectory: isDirectory,
                         size: size,
                         modified: modified,
-                        extension: isDirectory ? "" : name.split(".").pop().toLowerCase()
+                        extension: isDirectory? "": name.split(".").pop().toLowerCase()
                     });
                 }
                 
-                
+                // Update the user interface
                 updateUI();
             }
-        } catch (e) {
-            console.error("فشل تحميل الدليل:", e);
-            showToast("فشل تحميل الدليل", "\uf071");
+        } catch(e) {
+            console.error("Failed to load directory:", e);
+            showToast("Failed to load directory", "\uf071");
         }
     }
     
-    
+    // Search the directory
     function performSearch(query) {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -20887,7 +21065,7 @@ Item {
                 drile.files = [];
                 
                 for (const path of paths) {
-                    if (!path || path === currentPath) continue;
+                    if(!path || path === currentPath) continue;
                     
                     const name = path.substring(path.lastIndexOf("/") + 1);
                     const isDirectory = path.endsWith("/");
@@ -20896,24 +21074,24 @@ Item {
                         name: name,
                         path: path,
                         isDirectory: isDirectory,
-                        size: 0, 
+                        size: 0, // Size will be updated later
                         modified: "",
-                        extension: isDirectory ? "" : name.split(".").pop().toLowerCase()
+                        extension: isDirectory? "": name.split(".").pop().toLowerCase()
                     });
                 }
                 
-                
+                // Update the user interface
                 updateUI();
             }
-        } catch (e) {
-            console.error("فشل البحث:", e);
-            showToast("فشل البحث", "\uf071");
+        } catch(e) {
+            console.error("Search failed:", e);
+            showToast("Search Failed", "\uf071");
         }
     }
     
-    
+    // Update the user interface
     function updateUI() {
-        
+        // Update file list
         if (viewMode === 0) {
             listFilesView.model = filteredFiles;
         } else if (viewMode === 1) {
@@ -20923,7 +21101,7 @@ Item {
         }
     }
     
-    
+    // Open a file
     function openFile(path) {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
@@ -20931,35 +21109,35 @@ Item {
             process.waitForFinished(500);
             
             if (process.exitCode() !== 0) {
-                showToast("فشل فتح الملف", "\uf071");
+                showToast("Failed to open file", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل فتح الملف:", e);
-            showToast("فشل فتح الملف", "\uf071");
+        } catch(e) {
+            console.error("Failed to open file:", e);
+            showToast("Failed to open file", "\uf071");
         }
     }
     
-    
+    // Return to the previous directory
     function goBack() {
         const parts = currentPath.split("/");
-        if (parts.length > 2) {
+        if(parts.length > 2) {
             parts.pop();
-            currentPath = parts.join("/");
+            currentPath = parts. join("/");
             loadDirectory(currentPath);
         }
     }
     
-    
+    // Progress to the next directory
     function goForward() {
-        
-        showToast("لا يوجد دليل سابق ليعاد التقدم إليه", "\uf071");
+        // In this simple version, progress will not be supported
+        showToast("No previous directory to reapply to", "\uf071");
     }
     
-    
+    // Add a new tab
     function addNewTab() {
         const newTab = {
             id: "tab" + (drile.tabs.length + 1),
-            title: "جديد",
+            title: "New",
             path: "/home/" + Qt.application.arguments[2]
         };
         
@@ -20969,7 +21147,7 @@ Item {
         loadDirectory(drile.currentPath);
     }
     
-    
+    // Close tab
     function closeTab(index) {
         if (drile.tabs.length === 1) return;
         
@@ -20978,14 +21156,14 @@ Item {
         
         drile.tabs = newTabs;
         
-        if (index <= drile.activeTabIndex) {
+        if (index <= drill.activeTabIndex) {
             drile.activeTabIndex = Math.min(drile.activeTabIndex, drile.tabs.length - 1);
             drile.currentPath = drile.tabs[drile.activeTabIndex].path;
             loadDirectory(drile.currentPath);
         }
     }
     
-    
+    // Handling file clicks
     function handleFileClick(file, mouse) {
         if (mouse.button === Qt.RightButton) {
             showContextMenu(mouse.x, mouse.y);
@@ -20993,16 +21171,16 @@ Item {
         }
         
         if (mouse.modifiers & Qt.ControlModifier || mouse.modifiers & Qt.ShiftModifier) {
-            
+            //Multiple choice
             if (selectedFiles.some(f => f.path === file.path)) {
-                selectedFiles = selectedFiles.filter(f => f.path !== file.path);
+                selectedFiles = selectedFiles.filter(f => f.path!== file.path);
             } else {
                 selectedFiles = [...selectedFiles, file];
             }
         } else {
-            
+            // One choice
             if (selectedFiles.length === 1 && selectedFiles[0].path === file.path) {
-                
+                // Click on an already selected file
                 if (file.isDirectory) {
                     currentPath = file.path;
                     loadDirectory(currentPath);
@@ -21017,51 +21195,51 @@ Item {
         updateUI();
     }
     
-    
+    // Display context menu
     function showContextMenu(x, y) {
         contextMenuPos = ({x: x, y: y});
         contextMenuVisible = true;
         
-        
+        // Update list items based on selection
         updateContextMenuItems();
     }
     
-    
+    // Update context menu items
     function updateContextMenuItems() {
-        if (selectedFiles.length === 0) {
+        if(selectedFiles.length === 0) {
             contextMenuItems = [
-                {icon: "\uf067", text: "لصق", action: "paste"},
-                {icon: "\uf07b", text: "مجلد جديد", action: "new_folder"},
-                {icon: "\uf0c2", text: "التنقيب في الملفات", action: "search"}
+                {icon: "\uf067", text: "paste", action: "paste"},
+                {icon: "\uf07b", text: "new folder", action: "new_folder"},
+                {icon: "\uf0c2", text: "file mining", action: "search"}
             ];
         } else if (selectedFiles.length === 1) {
             const file = selectedFiles[0];
             contextMenuItems = [
-                {icon: "\uf0c5", text: "Open", action: "open"},
-                {icon: "\uf07c", text: "Open مع...", action: "open_with"},
+                {icon: "\uf0c5", text: "open", action: "open"},
+                {icon: "\uf07c", text: "Open with...", action: "open_with"},
                 {icon: "\uf0c5", text: "Open in new window", action: "open_in_new_window"},
-                {icon: "\uf0c8", text: "Cut", action: "cut"},
-                {icon: "\uf0ea", text: "Copy", action: "copy"},
-                {icon: "\uf24d", text: "Rename", action: "rename"},
-                {icon: "\uf0c4", text: "Properties", action: "properties"},
+                {icon: "\uf0c8", text: "cut", action: "cut"},
+                {icon: "\uf0ea", text: "copy", action: "copy"},
+                {icon: "\uf24d", text: "rename", action: "rename"},
+                {icon: "\uf0c4", text: "properties", action: "properties"},
                 {icon: "\uf1f8", text: "Send to", action: "send_to"},
                 {icon: "\uf1f6", text: "Create shortcut", action: "create_shortcut"},
-                {icon: "\uf1f8", text: "Move to trash", action: "move_to_trash"}
+                {icon: "\uf1f8", text: "Send to Recycle Bin", action: "move_to_trash"}
             ];
         } else {
             contextMenuItems = [
-                {icon: "\uf0c8", text: "Cut", action: "cut"},
-                {icon: "\uf0ea", text: "Copy", action: "copy"},
-                {icon: "\uf1f8", text: "Move to trash", action: "move_to_trash"}
+                {icon: "\uf0c8", text: "cut", action: "cut"},
+                {icon: "\uf0ea", text: "copy", action: "copy"},
+                {icon: "\uf1f8", text: "Send to Recycle Bin", action: "move_to_trash"}
             ];
         }
     }
     
-    
+    // Implement the context menu item
     function executeContextMenuItem(item) {
         switch (item.action) {
             case "open":
-                if (selectedFiles.length === 1) {
+                if(selectedFiles.length === 1) {
                     if (selectedFiles[0].isDirectory) {
                         currentPath = selectedFiles[0].path;
                         loadDirectory(currentPath);
@@ -21072,25 +21250,25 @@ Item {
                 break;
                 
             case "open_with":
-                
-                showToast("ميزة 'Open مع...' قيد التطوير", "\uf071");
+                //will be applied in future versions
+                showToast("'Open with...' feature Under development", "\uf071");
                 break;
                 
             case "open_in_new_window":
-                
-                showToast("ميزة 'Open in new window' قيد التطوير", "\uf071");
+                //will be applied in future versions
+                showToast("The 'Open in New Window' feature is under development", "\uf071");
                 break;
                 
             case "cut":
                 clipboard = [...selectedFiles];
                 clipboardAction = "cut";
-                showToast(`تم قص ${selectedFiles.length} عنصر(عناصر)`, "\uf0c8");
+                showToast(`Cut ${selectedFiles.length} element(s)`, "\uf0c8");
                 break;
                 
             case "copy":
                 clipboard = [...selectedFiles];
                 clipboardAction = "copy";
-                showToast(`تم نسخ ${selectedFiles.length} عنصر(عناصر)`, "\uf0ea");
+                showToast(`Copy ${selectedFiles.length} element(s)`, "\uf0ea");
                 break;
                 
             case "paste":
@@ -21100,27 +21278,27 @@ Item {
                 break;
                 
             case "rename":
-                if (selectedFiles.length === 1) {
-                    
-                    showToast("ميزة 'إعادة التسمية' قيد التطوير", "\uf071");
+                if(selectedFiles.length === 1) {
+                    //will be applied in future versions
+                    showToast("The 'rename' feature is under development", "\uf071");
                 }
                 break;
                 
             case "properties":
-                if (selectedFiles.length === 1) {
-                    
-                    showToast("ميزة 'الخصائص' قيد التطوير", "\uf071");
+                if(selectedFiles.length === 1) {
+                    //will be applied in future versions
+                    showToast("The 'Properties' feature is under development", "\uf071");
                 }
                 break;
                 
             case "send_to":
-                
-                showToast("ميزة 'Send to' قيد التطوير", "\uf071");
+                //will be applied in future versions
+                showToast("'Send to' feature under development", "\uf071");
                 break;
                 
             case "create_shortcut":
-                
-                showToast("ميزة 'Create shortcut' قيد التطوير", "\uf071");
+                //will be applied in future versions
+                showToast("The 'Create Shortcut' feature is under development", "\uf071");
                 break;
                 
             case "move_to_trash":
@@ -21132,17 +21310,17 @@ Item {
                 break;
                 
             case "search":
-                
-                showToast("ميزة 'التنقيب في الملفات' قيد التطوير", "\uf071");
+                //will be applied in future versions
+                showToast("'File mining' feature under development", "\uf071");
                 break;
         }
     }
     
-    
+    // Paste files
     function pasteFiles() {
         try {
             for (const file of clipboard) {
-                if (clipboardAction === "cut") {
+                if(clipboardAction === "cut") {
                     const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
                     process.start("mv", [file.path, currentPath + "/" + file.name]);
                     process.waitForFinished(500);
@@ -21156,14 +21334,14 @@ Item {
             clipboard = null;
             clipboardAction = "";
             loadDirectory(currentPath);
-            showToast(`تم ${clipboardAction === "cut" ? "نقل" : "Copy"} العناصر بنجاح`, "\uf00c");
-        } catch (e) {
-            console.error("فشل لصق الملفات:", e);
-            showToast("فشل لصق الملفات", "\uf071");
+            showToast(`Done ${clipboardAction === "cut" ? "transfer": "copy"} items successfully`, "\uf00c");
+        } catch(e) {
+            console.error("Failed to paste files:", e);
+            showToast("Failed to paste files", "\uf071");
         }
     }
     
-    
+    // Move files to the Recycle Bin
     function moveToTrash() {
         try {
             for (const file of selectedFiles) {
@@ -21174,21 +21352,21 @@ Item {
             
             selectedFiles = [];
             loadDirectory(currentPath);
-            showToast(`تم نقل ${selectedFiles.length} عنصر(عناصر) إلى سلة المحذوفات`, "\uf1f8");
-        } catch (e) {
-            console.error("فشل نقل الملفات إلى سلة المحذوفات:", e);
-            showToast("فشل نقل الملفات إلى سلة المحذوفات", "\uf071");
+            showToast(`${selectedFiles.length} item(s) moved to Recycle Bin`, "\uf1f8");
+        } catch(e) {
+            console.error("Failed to transfer files to Recycle Bin:", e);
+            showToast("Failed to move files to Recycle Bin", "\uf071");
         }
     }
     
-    
+    // Create a new folder
     function createNewFolder() {
         try {
-            const folderName = "مجلد جديد";
+            const folderName = "New Folder";
             let counter = 2;
             let name = folderName;
             
-            
+            // Ensure the name is unique
             while (files.some(f => f.name === name)) {
                 name = `${folderName} ${counter}`;
                 counter++;
@@ -21200,21 +21378,21 @@ Item {
             
             if (process.exitCode() === 0) {
                 loadDirectory(currentPath);
-                showToast(`تم إنشاء "${name}" بنجاح`, "\uf07b");
+                showToast(`${name}" was created successfully`, "\uf07b");
             } else {
-                showToast("فشل إنشاء المجلد", "\uf071");
+                showToast("Failed to create folder", "\uf071");
             }
-        } catch (e) {
-            console.error("فشل إنشاء المجلد:", e);
-            showToast("فشل إنشاء المجلد", "\uf071");
+        } catch(e) {
+            console.error("Failed to create folder:", e);
+            showToast("Failed to create folder", "\uf071");
         }
     }
     
-    
+    // Get the device list
     function getDevices() {
         try {
             const process = Qt.createQmlObject('import Qt.labs.processes 6.8; Process', root, "Process");
-            process.start("lsblk", ["-o", "NAME,SIZE,MOUNTPOINT", "-b", "-J"]);
+            process.start("lsblk", ["-o", "NAME, SIZE,MOUNTPOINT", "-b", "-J"]);
             process.waitForFinished(500);
             
             if (process.exitCode() === 0) {
@@ -21235,14 +21413,14 @@ Item {
                 
                 return devices;
             }
-        } catch (e) {
-            console.error("فشل جلب الأجهزة:", e);
+        } catch(e) {
+            console.error("Failed to fetch devices:", e);
         }
         
         return [];
     }
     
-    
+    // Format file size
     function formatFileSize(bytes) {
         if (bytes === 0) return "0 B";
         
@@ -21253,23 +21431,23 @@ Item {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
     }
     
-    
+    // Date format
     function formatDate(dateString) {
-        
+        // In this simple version, we will return the string as is
         return dateString;
     }
     
-    
+    // Display notification
     function showToast(message, icon) {
-        
+        //will be applied in future versions
         console.log(`Toast: ${message}`);
     }
     
+    //====================
+    // Appearance and disappearance animations
+    //====================
     
-    
-    
-    
-    
+    // Appearance animation
     OpacityAnimation {
         id: fadeInAnimation
         from: 0
@@ -21278,7 +21456,7 @@ Item {
         easing.type: Easing.OutQuart
     }
     
-    
+    //Disappearance Animation
     OpacityAnimation {
         id: fadeOutAnimation
         from: 1
@@ -21287,15 +21465,15 @@ Item {
         easing.type: Easing.OutQuart
     }
     
-    
-    
-    
-    
+    //====================
+    // Data and calculations
+    //====================
+    // List of context menu items
     property var contextMenuItems: []
     
-    
+    // Filtered files
     property var filteredFiles: {
-        if (searchQuery) {
+        if(searchQuery) {
             return files.filter(file => 
                 file.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
@@ -21303,37 +21481,37 @@ Item {
         return files;
     }
     
-    
-    
-    
+    //====================
+    // Handling shortcuts
+    //====================
     Keys.onPressed: {
-        
+        // Shortcut Ctrl+N to create a new folder
         if (event.key === Qt.Key_N && event.modifiers & Qt.ControlModifier) {
             createNewFolder();
             event.accepted = true;
         }
         
-        
+        // Abbreviation Ctrl + C to copy
         if (event.key === Qt.Key_C && event.modifiers & Qt.ControlModifier) {
             if (selectedFiles.length > 0) {
                 clipboard = [...selectedFiles];
                 clipboardAction = "copy";
-                showToast(`تم نسخ ${selectedFiles.length} عنصر(عناصر)`, "\uf0ea");
+                showToast(`Copy ${selectedFiles.length} element(s)`, "\uf0ea");
             }
             event.accepted = true;
         }
         
-        
+        //Ctrl+X shortcut to cut
         if (event.key === Qt.Key_X && event.modifiers & Qt.ControlModifier) {
             if (selectedFiles.length > 0) {
                 clipboard = [...selectedFiles];
                 clipboardAction = "cut";
-                showToast(`تم قص ${selectedFiles.length} عنصر(عناصر)`, "\uf0c8");
+                showToast(`Cut ${selectedFiles.length} element(s)`, "\uf0c8");
             }
             event.accepted = true;
         }
         
-        
+        // Ctrl+V shortcut to paste
         if (event.key === Qt.Key_V && event.modifiers & Qt.ControlModifier) {
             if (clipboard) {
                 pasteFiles();
@@ -21341,7 +21519,7 @@ Item {
             event.accepted = true;
         }
         
-        
+        // Delete shortcut to delete
         if (event.key === Qt.Key_Delete) {
             if (selectedFiles.length > 0) {
                 moveToTrash();
@@ -21349,69 +21527,72 @@ Item {
             event.accepted = true;
         }
         
-        
+        // F2 shortcut for renaming
         if (event.key === Qt.Key_F2) {
-            if (selectedFiles.length === 1) {
-                
-                showToast("ميزة 'إعادة التسمية' قيد التطوير", "\uf071");
+            if(selectedFiles.length === 1) {
+                //will be applied in future versions
+                showToast("The 'rename' feature is under development", "\uf071");
             }
             event.accepted = true;
         }
         
-        
+        // F5 shortcut to update
         if (event.key === Qt.Key_F5) {
             loadDirectory(currentPath);
             event.accepted = true;
         }
         
-        
+        // Shortcut Alt + ← to return
         if (event.key === Qt.Key_Left && event.modifiers & Qt.AltModifier) {
             goBack();
             event.accepted = true;
         }
         
-        
+        // Abbreviation Alt + → for progress
         if (event.key === Qt.Key_Right && event.modifiers & Qt.AltModifier) {
             goForward();
             event.accepted = true;
         }
         
-        
+        // Shortcut Ctrl+T to open a new tab
         if (event.key === Qt.Key_T && event.modifiers & Qt.ControlModifier) {
             addNewTab();
             event.accepted = true;
         }
         
-        
+        // Ctrl+W shortcut to close the tab
         if (event.key === Qt.Key_W && event.modifiers & Qt.ControlModifier) {
-            if (tabs.length > 1) {
+            if(tabs.length > 1) {
                 closeTab(activeTabIndex);
             }
             event.accepted = true;
         }
         
-        
+        // Ctrl+Q shortcut to close the file manager
         if (event.key === Qt.Key_Q && event.modifiers & Qt.ControlModifier) {
             closeDrile();
             event.accepted = true;
         }
     }
     
-    
-    
-    
+    //=======
+    // Configuration
+    //=======
     Component.onCompleted: {
-        
+        // Download the current directory
         loadDirectory(currentPath);
         
-        
+        // Set default context menu items
         updateContextMenuItems();
     }
 }
 EOL
 
-echo "---------------------------"
-echo "(4/5) تكوين الموارد..."
+# =========================
+# QuickShell Resource File
+# =========================
+echo "--------------------------
+echo "(4/5) Configure resources..."
 cat <<EOL > ~/.config/QuickShell/resources.qrc
 <RCC>
     <qresource prefix="/">
@@ -21450,11 +21631,23 @@ cat <<EOL > ~/.config/QuickShell/resources.qrc
 </RCC>
 EOL
 
-echo "------------------------------"
-echo "(5/5) بناء النظام باستخدام C++..."
+# =============================
+# Building the System with C++
+# =============================
+echo "-----------------------------
+echo "(5/5) Building a system using C++..."
 
 cat <<EOL > ~/src/quickshell/main.cpp
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
+#include <QQuickStyle>
+#include <QtQuickControls2>
 
+#include "cpp/GlassMorphismEffect.h"
+#include "cpp/QuickShellAnimation.h"
+#include "cpp/QuickShellEffects.h"
+#include "cpp/QuickShellSystem.h"
 
 int main(int argc, char *argv[])
 {
@@ -21522,9 +21715,30 @@ install(TARGETS QuickShellPlugins
 EOL
 
 cat <<EOL > ~/src/quickshell/animation/QuickShellAnimation.h
+#ifndef QUICKSHELLANIMATION_H
+#define QUICKSHELLANIMATION_H
 
+#include <QObject>
+#include <QQuickItem>
+#include <QElapsedTimer>
+#include <QVariantAnimation>
+#include <QQuickWindow>
+#include <QOpenGLFunctions>
+#include <QVector>
+#include <memory>
+#include <atomic>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <functional>
+#include <unordered_map>
+#include <QQuickWindow>
+#include <QOpenGLContext>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
 
-class QuickShellAnimation : public QObject, protected QOpenGLFunctions {
+class QuickShellAnimation: public QObject, protected QOpenGLFunctions {
     Q_OBJECT
     Q_PROPERTY(qreal animationDuration READ animationDuration WRITE setAnimationDuration NOTIFY animationDurationChanged)
     Q_PROPERTY(qreal animationEasing READ animationEasing WRITE setAnimationEasing NOTIFY animationEasingChanged)
@@ -21534,13 +21748,13 @@ public:
     explicit QuickShellAnimation(QObject *parent = nullptr);
     ~QuickShellAnimation();
     
-    
+    // Management functions
     Q_INVOKABLE void startAnimation(QObject *target, const QString &property, qreal from, qreal to, int duration = -1);
     Q_INVOKABLE void stopAnimation(QObject *target, const QString &property);
     Q_INVOKABLE void stopAllAnimations();
     Q_INVOKABLE bool isAnimating(QObject *target, const QString &property) const;
     
-    
+    //Animation settings
     qreal animationDuration() const { return m_animationDuration; }
     void setAnimationDuration(qreal duration);
     
@@ -21550,13 +21764,13 @@ public:
     bool enabled() const { return m_enabled; }
     void setEnabled(bool enabled);
     
-    
+    // Performance improvement functions
     Q_INVOKABLE void setHighPerformanceMode(bool enabled);
     Q_INVOKABLE void setVSyncEnabled(bool enabled);
-    Q_INVOKABLE void setAnimationQuality(int quality); 
+    Q_INVOKABLE void setAnimationQuality(int quality); // 0-100
     
-    
-    Q_INVOKABLE void registerCustomEasing(const QString &name, std::function<qreal(qreal)> easingFunction);
+    // Advanced Jobs
+    Q_INVOKABLE void registerCustomEasing(const QString &name, std::function<qreal(qreal)> evaluatingFunction);
     Q_INVOKABLE void animateWithCustomEasing(QObject *target, const QString &property, qreal from, qreal to, int duration, const QString &easingName);
     
 signals:
@@ -21586,7 +21800,7 @@ private:
     void cleanupOpenGL();
     void renderAnimations();
     void processAnimations();
-    qreal calculateEasing(qreal progress, int easingType) const;
+    qreal calculateEasing(qreal progress, int evaluatingType) const;
     void updateTargetProperty(Animation &anim, qreal value);
     
     qreal m_animationDuration;
@@ -21600,7 +21814,7 @@ private:
     std::vector<Animation> m_animations;
     std::unordered_map<QString, std::function<qreal(qreal)>> m_customEasings;
     
-    
+    // OpenGL resources
     QOpenGLShaderProgram *m_shaderProgram;
     QOpenGLBuffer *m_vertexBuffer;
     QOpenGLVertexArrayObject *m_vao;
@@ -21611,14 +21825,29 @@ private:
     std::condition_variable m_condition;
 };
 
+#endif // QUICKSHELLANIMATION_H
 EOL
 
 cat <<EOL > ~/src/quickshell/animation/QuickShellAnimation.cpp
+#include "QuickShellAnimation.h"
+#include <QQuickItem>
+#include <QQuickWindow>
+#include <QOpenGLContext>
+#include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
+#include <QElapsedTimer>
+#include <QDebug>
+#include <cmath>
+#include <algorithm>
+#include <chrono>
+#include <thread>
 
 QuickShellAnimation::QuickShellAnimation(QObject *parent)
     : QObject(parent),
       m_animationDuration(100),
-      m_animationEasing(2), 
+      m_animationEasing(2), //Easing.OutQuart
       m_enabled(true),
       m_highPerformanceMode(false),
       m_vSyncEnabled(true),
@@ -21629,7 +21858,7 @@ QuickShellAnimation::QuickShellAnimation(QObject *parent)
       m_vao(nullptr),
       m_running(false)
 {
-    
+    // Detect the main QML window
     for (QWindow *window : QGuiApplication::topLevelWindows()) {
         if (QQuickWindow *quickWindow = qobject_cast<QQuickWindow*>(window)) {
             m_window = quickWindow;
@@ -21637,11 +21866,11 @@ QuickShellAnimation::QuickShellAnimation(QObject *parent)
         }
     }
     
-    if (m_window) {
+    if(m_window) {
         m_window->beforeRendering.connect(this, &QuickShellAnimation::handleWindowBeforeRendering, Qt::DirectConnection);
     }
     
-    
+    // Register default facilitation functions
     registerCustomEasing("linear", [](qreal t) { return t; });
     registerCustomEasing("easeInQuad", [](qreal t) { return t * t; });
     registerCustomEasing("easeOutQuad", [](qreal t) { return t * (2 - t); });
@@ -21652,10 +21881,10 @@ QuickShellAnimation::QuickShellAnimation(QObject *parent)
     registerCustomEasing("easeInQuart", [](qreal t) { return t * t * t * t; });
     registerCustomEasing("easeOutQuart", [](qreal t) { return 1 - (--t) * t * t * t; });
     registerCustomEasing("easeInOutQuart", [](qreal t) { 
-        return t < 0.5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t; 
+        return t < 0.5 ? 8 * t * t * t * t: 1 - 8 * (--t) * t * t * t; 
     });
     
-    
+    // Start the processing thread
     m_running = true;
     m_animationThread = std::thread([this]() {
         QElapsedTimer timer;
@@ -21669,7 +21898,7 @@ QuickShellAnimation::QuickShellAnimation(QObject *parent)
             
             processAnimations();
             
-            
+            // Maintain 5ms refresh cycle (200 fps)
             int elapsed = timer.elapsed();
             if (elapsed < 5 && m_highPerformanceMode) {
                 QThread::usleep((5 - elapsed) * 1000);
@@ -21685,7 +21914,7 @@ QuickShellAnimation::~QuickShellAnimation() {
         m_animationThread.join();
     }
     
-    if (m_window) {
+    if(m_window) {
         m_window->beforeRendering.disconnect(this);
     }
     
@@ -21722,7 +21951,7 @@ void QuickShellAnimation::setHighPerformanceMode(bool enabled) {
 
 void QuickShellAnimation::setVSyncEnabled(bool enabled) {
     m_vSyncEnabled = enabled;
-    if (m_window) {
+    if(m_window) {
         m_window->setVSyncEnabled(enabled);
     }
 }
@@ -21732,13 +21961,13 @@ void QuickShellAnimation::setAnimationQuality(int quality) {
 }
 
 void QuickShellAnimation::startAnimation(QObject *target, const QString &property, qreal from, qreal to, int duration) {
-    if (!m_enabled || !target)
+    if(!m_enabled || !target)
         return;
     
     if (duration == -1)
         duration = m_animationDuration;
     
-    
+    // Stop any animation based on the same property
     stopAnimation(target, property);
     
     Animation anim;
@@ -21761,7 +21990,7 @@ void QuickShellAnimation::startAnimation(QObject *target, const QString &propert
     emit animationStarted(target, property);
 }
 
-void QuickShellAnimation::stopAnimation(QObject *target, const QString &property) {
+void QuickShellAnimation::stopAnimation(QObject*target, const QString&property) {
     std::lock_guard<std::mutex> lock(m_mutex);
     
     auto it = std::remove_if(m_animations.begin(), m_animations.end(),
@@ -21769,7 +21998,7 @@ void QuickShellAnimation::stopAnimation(QObject *target, const QString &property
             return anim.target == target && anim.property == property;
         });
     
-    if (it != m_animations.end()) {
+    if(it!= m_animations.end()) {
         m_animations.erase(it, m_animations.end());
         emit animationStopped(target, property);
     }
@@ -21783,7 +22012,7 @@ void QuickShellAnimation::stopAllAnimations() {
 bool QuickShellAnimation::isAnimating(QObject *target, const QString &property) const {
     std::lock_guard<std::mutex> lock(m_mutex);
     
-    for (const auto &anim : m_animations) {
+    for (const auto &anim: m_animations) {
         if (anim.target == target && anim.property == property && anim.active) {
             return true;
         }
@@ -21792,12 +22021,12 @@ bool QuickShellAnimation::isAnimating(QObject *target, const QString &property) 
     return false;
 }
 
-void QuickShellAnimation::registerCustomEasing(const QString &name, std::function<qreal(qreal)> easingFunction) {
+void QuickShellAnimation::registerCustomEasing(const QString &name, std::function<qreal(qreal)> evaluatingFunction) {
     m_customEasings[name] = easingFunction;
 }
 
 void QuickShellAnimation::animateWithCustomEasing(QObject *target, const QString &property, qreal from, qreal to, int duration, const QString &easingName) {
-    if (!m_enabled || !target || m_customEasings.find(easingName) == m_customEasings.end())
+    if(!m_enabled || !target || m_customEasings.find(easingName) == m_customEasings.end())
         return;
     
     Animation anim;
@@ -21819,13 +22048,13 @@ void QuickShellAnimation::animateWithCustomEasing(QObject *target, const QString
 }
 
 void QuickShellAnimation::handleWindowBeforeRendering() {
-    if (!m_enabled)
+    if(!m_enabled)
         return;
     
-    
+    // Processing animations in this context
     processAnimations();
     
-    
+    // If the quality is less than 100, we use OpenGL for effects
     if (m_animationQuality < 100 && m_window && m_window->openglContext()) {
         initializeOpenGL();
         renderAnimations();
@@ -21838,22 +22067,22 @@ void QuickShellAnimation::initializeOpenGL() {
     
     m_window->openglContext()->functions()->initializeOpenGLFunctions();
     
-    
+    // Create a shader program
     m_shaderProgram = new QOpenGLShaderProgram();
     m_shaderProgram->addShaderFromSourceCode(QOpenGLShader::Vertex,
         "attribute vec4 vertices;\n"
-        "varying vec2 coords;\n"
+        "variing vec2 chords;\n"
         "void main() {\n"
         "    gl_Position = vertices;\n"
-        "    coords = vertices.xy * 0.5 + 0.5;\n"
+        "    words = vertices.xy * 0.5 + 0.5;\n"
         "}\n");
     
     m_shaderProgram->addShaderFromSourceCode(QOpenGLShader::Fragment,
         "uniform sampler2D source;\n"
         "uniform float opacity;\n"
-        "varying vec2 coords;\n"
+        "variing vec2 chords;\n"
         "void main() {\n"
-        "    vec4 color = texture2D(source, coords);\n"
+        "    vec4 color = texture2D(source, chords);\n"
         "    gl_FragColor = vec4(color.rgb, color.a * opacity);\n"
         "}\n");
     
@@ -21861,19 +22090,19 @@ void QuickShellAnimation::initializeOpenGL() {
     m_shaderProgram->link();
     m_shaderProgram->bind();
     
-    
+    // Create stores
     m_vertexBuffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     m_vertexBuffer->create();
     m_vertexBuffer->bind();
     
-    
+    // Create a list array object
     m_vao = new QOpenGLVertexArrayObject();
     if (m_vao->create())
         m_vao->bind();
 }
 
 void QuickShellAnimation::cleanupOpenGL() {
-    if (m_vao) {
+    if(m_vao) {
         m_vao->destroy();
         delete m_vao;
         m_vao = nullptr;
@@ -21885,37 +22114,37 @@ void QuickShellAnimation::cleanupOpenGL() {
         m_vertexBuffer = nullptr;
     }
     
-    if (m_shaderProgram) {
+    if(m_shaderProgram) {
         delete m_shaderProgram;
         m_shaderProgram = nullptr;
     }
 }
 
 void QuickShellAnimation::renderAnimations() {
-    if (!m_shaderProgram || !m_window || !m_window->openglContext())
+    if(!m_shaderProgram || !m_window || !m_window->openglContext())
         return;
     
     m_window->openglContext()->functions()->initializeOpenGLFunctions();
     
-    
+    // Calculate visual effects
     float opacity = m_animationQuality / 100.0f;
     
-    
+    // Apply effects
     m_shaderProgram->bind();
     m_shaderProgram->setUniformValue("opacity", opacity);
     
-    
+    //Draw effects
     m_window->openglContext()->functions()->glEnable(GL_BLEND);
     m_window->openglContext()->functions()->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
-    
+    // ... Implementation details of drawing effects
     
     m_window->openglContext()->functions()->glDisable(GL_BLEND);
     m_shaderProgram->release();
 }
 
 void QuickShellAnimation::processAnimations() {
-    if (!m_enabled)
+    if(!m_enabled)
         return;
     
     qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
@@ -21924,72 +22153,72 @@ void QuickShellAnimation::processAnimations() {
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         
-        for (auto &anim : m_animations) {
-            if (!anim.active)
+        for (auto &anim: m_animations) {
+            if(!anim.active)
                 continue;
             
             qint64 elapsed = currentTime - anim.startTime;
             if (elapsed >= anim.duration) {
-                
+                //Animation completed
                 updateTargetProperty(anim, anim.to);
                 anim.active = false;
                 completedAnimations.push_back(anim);
                 continue;
             }
             
+            //Progress account
+            qreal progress = static_cast<qreal>(elapsed)/anim.duration;
+            qreal evaluatedProgress = anim.easingFunction ? anim.easingFunction(progress) : progress;
+            qreal value = anim.from + (anim.to - anim.from) * evaluatedProgress;
             
-            qreal progress = static_cast<qreal>(elapsed) / anim.duration;
-            qreal easedProgress = anim.easingFunction ? anim.easingFunction(progress) : progress;
-            qreal value = anim.from + (anim.to - anim.from) * easedProgress;
-            
-            
+            // Update property
             updateTargetProperty(anim, value);
             
-            emit animationProgress(anim.target, anim.property, easedProgress);
+            emit animationProgress(anim.target, anim.property, evaluatedProgress);
         }
         
-        
+        // Clean up completed animations
         m_animations.erase(
             std::remove_if(m_animations.begin(), m_animations.end(),
-                [](const Animation &anim) { return !anim.active; }),
+                [](const Animation &anim) { return!anim.active; }),
             m_animations.end()
         );
     }
     
-    
-    for (const auto &anim : completedAnimations) {
+    // Send signals to complete animations
+    for (const auto &anim: completedAnimations) {
         emit animationStopped(anim.target, anim.property);
     }
 }
 
 qreal QuickShellAnimation::calculateEasing(qreal progress, int easingType) const {
     switch (easingType) {
-    case 0: 
+    case 0: // Linear
         return progress;
-    case 1: 
+    case 1: // EaseInQuad
         return progress * progress;
-    case 2: 
+    case 2: // EaseOutQuad
         return progress * (2 - progress);
-    case 3: 
+    case 3: // EaseInOutQuad
         return progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
-    case 4: 
+    case 4: // EaseInCubic
         return progress * progress * progress;
-    case 5: 
+    case 5: // EaseOutCubic
         return (--progress) * progress * progress + 1;
-    case 6: 
+    case 6: // EaseInOutCubic
         return progress < 0.5 ? 4 * progress * progress * progress : (progress - 1) * (2 * progress - 2) * (2 * progress - 2) + 1;
-    case 7: 
+    case 7: // EaseInQuart
         return progress * progress * progress * progress;
-    case 8: 
+    case 8: // EaseOutQuart
         return 1 - (--progress) * progress * progress * progress;
-    case 9: 
-        return progress < 0.5 ? 8 * progress * progress * progress * progress : 1 - 8 * (--progress) * progress * progress * progress;
+    case 9: // EaseInOutQuart
+        return progress < 0.5 ? 8 * progress * progress * progress * progress: 1 - 8 * (--progress) * progress * progress * progress;
     default:
         return progress;
     }
 }
 
-void QuickShellAnimation::updateTargetProperty(Animation &anim, qreal value) {
+void QuickShellAnimation::updateTargetProperty(Animation&anim, qreal value) {
     if (QQuickItem *item = qobject_cast<QQuickItem*>(anim.target)) {
         if (anim.property == "x") {
             item->setX(value);
@@ -22013,7 +22242,23 @@ void QuickShellAnimation::updateTargetProperty(Animation &anim, qreal value) {
 EOL
 
 cat <<EOL > ~/src/quickshell/effects/QuickShellEffects.h
+#ifndef QUICKSHELLEFFECTS_H
+#define QUICKSHELLEFFECTS_H
 
+#include <QObject>
+#include <QQuickItem>
+#include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
+#include <QVector2D>
+#include <QVector3D>
+#include <QVector4D>
+#include <QColor>
+#include <QElapsedTimer>
+#include <QTimer>
+#include <QVariant>
+#include <QJSValue>
 
 class QuickShellEffects : public QObject, protected QOpenGLFunctions {
     Q_OBJECT
@@ -22026,7 +22271,7 @@ public:
     explicit QuickShellEffects(QObject *parent = nullptr);
     ~QuickShellEffects();
     
-    
+    // Effects properties
     qreal blurRadius() const { return m_blurRadius; }
     void setBlurRadius(qreal radius);
     
@@ -22039,19 +22284,19 @@ public:
     QColor backgroundColor() const { return m_backgroundColor; }
     void setBackgroundColor(const QColor &color);
     
-    
+    //Special effects
     Q_INVOKABLE void applySmoothBlur(QQuickItem *item, qreal radius = -1, qreal opacity = -1);
     Q_INVOKABLE void applyEyeFriendlyGlow(QQuickItem *item, const QColor &color, qreal intensity = 1.0);
     Q_INVOKABLE void applyDynamicIslandEffect(QQuickItem *item, bool isExpanded = false);
-    Q_INVOKABLE void applyWaterRippleEffect(QQuickItem *item, const QPointF &center, qreal maxRadius = 100);
+    Q_INVOKABLE void applyWaterRippleEffect(QQuickItem *item, const QPointF & center, qreal maxRadius = 100);
     Q_INVOKABLE void applySmoothTransition(QQuickItem *source, QQuickItem *target, qreal duration = 300);
     
-    
+    // Resource management
     Q_INVOKABLE void optimizeEffectsForPerformance();
     Q_INVOKABLE void optimizeEffectsForQuality();
-    Q_INVOKABLE void setEffectQuality(int quality); 
+    Q_INVOKABLE void setEffectQuality(int quality); // 0-100
     
-    
+    //Advanced effects
     Q_INVOKABLE void startPulseAnimation(QQuickItem *item, const QColor &color, int duration = 1000, int interval = 2000);
     Q_INVOKABLE void stopPulseAnimation(QQuickItem *item);
     Q_INVOKABLE void startBreathingAnimation(QQuickItem *item, qreal minScale = 0.95, qreal maxScale = 1.05, int duration = 3000);
@@ -22113,7 +22358,7 @@ private:
     std::vector<PulseEffect> m_pulseEffects;
     std::vector<BreathingEffect> m_breathingEffects;
     
-    
+    // OpenGL resources
     QOpenGLShaderProgram *m_blurProgram;
     QOpenGLShaderProgram *m_pulseProgram;
     QOpenGLShaderProgram *m_breathingProgram;
@@ -22124,9 +22369,23 @@ private:
     QTimer m_breathingTimer;
 };
 
+#endif // QUICKSHELLEFFECTS_H
 EOL
 
 cat <<EOL > ~/src/quickshell/effects/QuickShellEffects.cpp
+#include "QuickShellEffects.h"
+#include <QQuickItem>
+#include <QQuickWindow>
+#include <QOpenGLContext>
+#include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
+#include <QElapsedTimer>
+#include <QDebug>
+#include <cmath>
+#include <algorithm>
+#include <QTimer>
 
 QuickShellEffects::QuickShellEffects(QObject *parent)
     : QObject(parent),
@@ -22142,7 +22401,7 @@ QuickShellEffects::QuickShellEffects(QObject *parent)
       m_vertexBuffer(nullptr),
       m_vao(nullptr)
 {
-    
+    // Detect the main QML window
     for (QWindow *window : QGuiApplication::topLevelWindows()) {
         if (QQuickWindow *quickWindow = qobject_cast<QQuickWindow*>(window)) {
             m_window = quickWindow;
@@ -22150,12 +22409,12 @@ QuickShellEffects::QuickShellEffects(QObject *parent)
         }
     }
     
-    if (m_window) {
+    if(m_window) {
         m_window->beforeRendering.connect(this, &QuickShellEffects::handleWindowBeforeRendering, Qt::DirectConnection);
     }
     
-    
-    m_pulseTimer.setInterval(16); 
+    //Set timers
+    m_pulseTimer.setInterval(16); // 60 frames per second
     m_pulseTimer.setSingleShot(false);
     connect(&m_pulseTimer, &QTimer::timeout, this, &QuickShellEffects::handlePulseAnimations);
     
@@ -22165,7 +22424,7 @@ QuickShellEffects::QuickShellEffects(QObject *parent)
 }
 
 QuickShellEffects::~QuickShellEffects() {
-    if (m_window) {
+    if(m_window) {
         m_window->beforeRendering.disconnect(this);
     }
     
@@ -22193,7 +22452,7 @@ void QuickShellEffects::setEnabled(bool enabled) {
         return;
     
     m_enabled = enabled;
-    if (!m_enabled) {
+    if(!m_enabled) {
         m_blurEffects.clear();
         m_pulseEffects.clear();
         m_breathingEffects.clear();
@@ -22210,14 +22469,14 @@ void QuickShellEffects::setBackgroundColor(const QColor &color) {
 }
 
 void QuickShellEffects::applySmoothBlur(QQuickItem *item, qreal radius, qreal opacity) {
-    if (!m_enabled || !item)
+    if(!m_enabled || !item)
         return;
     
     if (radius < 0) radius = m_blurRadius;
     if (opacity < 0) opacity = m_opacity;
     
-    
-    for (auto &effect : m_blurEffects) {
+    // Remove any existing blur effect
+    for (auto &effect: m_blurEffects) {
         if (effect.item == item) {
             effect.radius = radius;
             effect.opacity = opacity;
@@ -22226,7 +22485,7 @@ void QuickShellEffects::applySmoothBlur(QQuickItem *item, qreal radius, qreal op
         }
     }
     
-    
+    // Add a new blur effect
     BlurEffect effect;
     effect.item = item;
     effect.radius = radius;
@@ -22238,20 +22497,20 @@ void QuickShellEffects::applySmoothBlur(QQuickItem *item, qreal radius, qreal op
 }
 
 void QuickShellEffects::applyEyeFriendlyGlow(QQuickItem *item, const QColor &color, qreal intensity) {
-    if (!m_enabled || !item)
+    if(!m_enabled || !item)
         return;
     
-    
-    
+    // Here you can add logic for the eye-pleasing visible light effect
+    // A light blur effect with a custom gradient can be used
     
     applySmoothBlur(item, 16.0, intensity * 0.3);
 }
 
 void QuickShellEffects::applyDynamicIslandEffect(QQuickItem *item, bool isExpanded) {
-    if (!m_enabled || !item)
+    if(!m_enabled || !item)
         return;
     
-    
+    //Dynamic island effect
     if (isExpanded) {
         applySmoothBlur(item, 24.0, 0.7);
     } else {
@@ -22259,35 +22518,35 @@ void QuickShellEffects::applyDynamicIslandEffect(QQuickItem *item, bool isExpand
     }
 }
 
-void QuickShellEffects::applyWaterRippleEffect(QQuickItem *item, const QPointF &center, qreal maxRadius) {
-    if (!m_enabled || !item)
+void QuickShellEffects::applyWaterRippleEffect(QQuickItem *item, const QPointF & center, qreal maxRadius) {
+    if(!m_enabled || !item)
         return;
     
-    
-    
+    // Here you can add logic for the effect of water waves
+    // A dynamic blur effect can be used with the center moving
     
     applySmoothBlur(item, 8.0, 0.5);
 }
 
 void QuickShellEffects::applySmoothTransition(QQuickItem *source, QQuickItem *target, qreal duration) {
-    if (!m_enabled || !source || !target)
+    if(!m_enabled || !source || !target)
         return;
     
-    
+    // Smooth transition effect between elements
     applySmoothBlur(source, 16.0, 0.5);
     applySmoothBlur(target, 16.0, 0.5);
     
-    
+    // Here logic can be added for gradual transition
 }
 
 void QuickShellEffects::optimizeEffectsForPerformance() {
-    m_effectQuality = 70; 
-    m_blurRadius = 16.0;  
+    m_effectQuality = 70; // Average quality for better performance
+    m_blurRadius = 16.0;  // Reduce blur radius
 }
 
 void QuickShellEffects::optimizeEffectsForQuality() {
-    m_effectQuality = 100; 
-    m_blurRadius = 32.0;   
+    m_effectQuality = 100; // High quality
+    m_blurRadius = 32.0;   //Increase blur radius
 }
 
 void QuickShellEffects::setEffectQuality(int quality) {
@@ -22295,11 +22554,11 @@ void QuickShellEffects::setEffectQuality(int quality) {
 }
 
 void QuickShellEffects::startPulseAnimation(QQuickItem *item, const QColor &color, int duration, int interval) {
-    if (!m_enabled || !item)
+    if(!m_enabled || !item)
         return;
     
-    
-    for (auto &effect : m_pulseEffects) {
+    // Stop any pulse effect based on the same element
+    for (auto &effect: m_pulseEffects) {
         if (effect.item == item) {
             effect.color = color;
             effect.duration = duration;
@@ -22310,7 +22569,7 @@ void QuickShellEffects::startPulseAnimation(QQuickItem *item, const QColor &colo
         }
     }
     
-    
+    // Add a new pulse effect
     PulseEffect effect;
     effect.item = item;
     effect.color = color;
@@ -22320,14 +22579,14 @@ void QuickShellEffects::startPulseAnimation(QQuickItem *item, const QColor &colo
     effect.active = true;
     m_pulseEffects.push_back(effect);
     
-    
+    // Start the timer if it is not running
     if (m_pulseEffects.size() == 1) {
         m_pulseTimer.start();
     }
 }
 
 void QuickShellEffects::stopPulseAnimation(QQuickItem *item) {
-    for (auto &effect : m_pulseEffects) {
+    for (auto &effect: m_pulseEffects) {
         if (effect.item == item) {
             effect.active = false;
         }
@@ -22335,11 +22594,11 @@ void QuickShellEffects::stopPulseAnimation(QQuickItem *item) {
 }
 
 void QuickShellEffects::startBreathingAnimation(QQuickItem *item, qreal minScale, qreal maxScale, int duration) {
-    if (!m_enabled || !item)
+    if(!m_enabled || !item)
         return;
     
-    
-    for (auto &effect : m_breathingEffects) {
+    // Stop any breathing effect based on the same element
+    for (auto &effect: m_breathingEffects) {
         if (effect.item == item) {
             effect.minScale = minScale;
             effect.maxScale = maxScale;
@@ -22350,7 +22609,7 @@ void QuickShellEffects::startBreathingAnimation(QQuickItem *item, qreal minScale
         }
     }
     
-    
+    // Add a new breathing effect
     BreathingEffect effect;
     effect.item = item;
     effect.minScale = minScale;
@@ -22360,14 +22619,14 @@ void QuickShellEffects::startBreathingAnimation(QQuickItem *item, qreal minScale
     effect.active = true;
     m_breathingEffects.push_back(effect);
     
-    
+    // Start the timer if it is not running
     if (m_breathingEffects.size() == 1) {
         m_breathingTimer.start();
     }
 }
 
 void QuickShellEffects::stopBreathingAnimation(QQuickItem *item) {
-    for (auto &effect : m_breathingEffects) {
+    for (auto &effect: m_breathingEffects) {
         if (effect.item == item) {
             effect.active = false;
         }
@@ -22375,10 +22634,10 @@ void QuickShellEffects::stopBreathingAnimation(QQuickItem *item) {
 }
 
 void QuickShellEffects::handleWindowBeforeRendering() {
-    if (!m_enabled)
+    if(!m_enabled)
         return;
     
-    
+    //address effects in this context
     renderEffects();
 }
 
@@ -22388,19 +22647,19 @@ void QuickShellEffects::handlePulseAnimations() {
     
     qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     
-    for (auto &effect : m_pulseEffects) {
-        if (!effect.active)
+    for (auto &effect: m_pulseEffects) {
+        if(!effect.active)
             continue;
         
         qreal elapsed = fmod(effect.timer.elapsed(), effect.interval);
         qreal progress = elapsed / effect.interval;
         
         if (progress < 0.5) {
-            
+            // Increase transparency
             qreal opacity = progress * 2.0;
             applyEyeFriendlyGlow(effect.item, effect.color, opacity);
         } else {
-            
+            // Reduce transparency
             qreal opacity = 2.0 - progress * 2.0;
             applyEyeFriendlyGlow(effect.item, effect.color, opacity);
         }
@@ -22413,14 +22672,14 @@ void QuickShellEffects::handleBreathingAnimations() {
     
     qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     
-    for (auto &effect : m_breathingEffects) {
-        if (!effect.active)
+    for (auto &effect: m_breathingEffects) {
+        if(!effect.active)
             continue;
         
         qreal elapsed = fmod(effect.timer.elapsed(), effect.duration);
         qreal progress = elapsed / effect.duration;
         
-        
+        //calculate the scale of the element using a sine function for a normal breathing effect
         qreal scale = effect.minScale + (effect.maxScale - effect.minScale) * (0.5 + 0.5 * qSin(progress * 2 * M_PI));
         effect.item->setScale(scale);
     }
@@ -22432,31 +22691,31 @@ void QuickShellEffects::initializeOpenGL() {
     
     m_window->openglContext()->functions()->initializeOpenGLFunctions();
     
-    
+    // Create a shader program for blur
     m_blurProgram = new QOpenGLShaderProgram();
     m_blurProgram->addShaderFromSourceCode(QOpenGLShader::Vertex,
         "attribute vec4 vertices;\n"
-        "varying vec2 coords;\n"
+        "variing vec2 chords;\n"
         "void main() {\n"
         "    gl_Position = vertices;\n"
-        "    coords = vertices.xy * 0.5 + 0.5;\n"
+        "    words = vertices.xy * 0.5 + 0.5;\n"
         "}\n");
     
     m_blurProgram->addShaderFromSourceCode(QOpenGLShader::Fragment,
         "uniform sampler2D source;\n"
         "uniform float radius;\n"
         "uniform float opacity;\n"
-        "varying vec2 coords;\n"
+        "variing vec2 chords;\n"
         "void main() {\n"
         "    vec4 color = vec4(0.0);\n"
-        "    float total = 0.0;\n"
+        "    float total=0.0;\n"
         "    vec2 size = vec2(1.0, 1.0);\n"
         "    \n"
-        "    
+        "    // Calculate the blur effect using a circular sample\n
         "    for (int i = -4; i <= 4; i++) {\n"
         "        for (int j = -4; j <= 4; j++) {\n"
-        "            float weight = 1.0 - length(vec2(i, j)) / 5.0;\n"
-        "            color += texture2D(source, coords + vec2(i, j) * radius / 500.0) * weight;\n"
+        "            float weight = 1.0 - length(vec2(i, j))/5.0;\n"
+        "            color += texture2D(source, chords + vec2(i, j) * radius / 500.0) * weight;\n"
         "            total += weight;\n"
         "        }\n"
         "    }\n"
@@ -22468,23 +22727,23 @@ void QuickShellEffects::initializeOpenGL() {
     m_blurProgram->link();
     m_blurProgram->bind();
     
-    
+    // Create a shader program for pulsating effect
     m_pulseProgram = new QOpenGLShaderProgram();
     m_pulseProgram->addShaderFromSourceCode(QOpenGLShader::Vertex,
         "attribute vec4 vertices;\n"
-        "varying vec2 coords;\n"
+        "variing vec2 chords;\n"
         "void main() {\n"
         "    gl_Position = vertices;\n"
-        "    coords = vertices.xy * 0.5 + 0.5;\n"
+        "    words = vertices.xy * 0.5 + 0.5;\n"
         "}\n");
     
     m_pulseProgram->addShaderFromSourceCode(QOpenGLShader::Fragment,
         "uniform sampler2D source;\n"
         "uniform vec4 glowColor;\n"
         "uniform float intensity;\n"
-        "varying vec2 coords;\n"
+        "variing vec2 chords;\n"
         "void main() {\n"
-        "    vec4 color = texture2D(source, coords);\n"
+        "    vec4 color = texture2D(source, chords);\n"
         "    vec4 glow = glowColor * intensity;\n"
         "    gl_FragColor = vec4(mix(color.rgb, glow.rgb, glow.a), color.a);\n"
         "}\n");
@@ -22492,19 +22751,19 @@ void QuickShellEffects::initializeOpenGL() {
     m_pulseProgram->bindAttributeLocation("vertices", 0);
     m_pulseProgram->link();
     
-    
+    // Create stores
     m_vertexBuffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     m_vertexBuffer->create();
     m_vertexBuffer->bind();
     
-    
+    // Create a list array object
     m_vao = new QOpenGLVertexArrayObject();
     if (m_vao->create())
         m_vao->bind();
 }
 
 void QuickShellEffects::cleanupOpenGL() {
-    if (m_vao) {
+    if(m_vao) {
         m_vao->destroy();
         delete m_vao;
         m_vao = nullptr;
@@ -22516,94 +22775,99 @@ void QuickShellEffects::cleanupOpenGL() {
         m_vertexBuffer = nullptr;
     }
     
-    if (m_blurProgram) {
+    if(m_blurProgram) {
         delete m_blurProgram;
         m_blurProgram = nullptr;
     }
     
-    if (m_pulseProgram) {
+    if(m_pulseProgram) {
         delete m_pulseProgram;
         m_pulseProgram = nullptr;
     }
     
-    if (m_breathingProgram) {
+    if(m_breathingProgram) {
         delete m_breathingProgram;
         m_breathingProgram = nullptr;
     }
 }
 
 void QuickShellEffects::renderEffects() {
-    if (!m_enabled || !m_window || !m_window->openglContext())
+    if(!m_enabled || !m_window || !m_window->openglContext())
         return;
     
     m_window->openglContext()->functions()->initializeOpenGLFunctions();
     
-    
+    //Activate effects
     m_window->openglContext()->functions()->glEnable(GL_BLEND);
     m_window->openglContext()->functions()->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
-    
-    for (const auto &effect : m_blurEffects) {
-        if (effect.active) {
+    //Draw blur effects
+    for (const auto &effect: m_blurEffects) {
+        if(effect.active) {
             renderBlurEffect(effect);
         }
     }
     
-    
-    for (const auto &effect : m_pulseEffects) {
-        if (effect.active) {
+    //Draw pulse effects
+    for (const auto &effect: m_pulseEffects) {
+        if(effect.active) {
             renderPulseEffect(effect);
         }
     }
     
-    
-    for (const auto &effect : m_breathingEffects) {
-        if (effect.active) {
+    //Draw breathing effects
+    for (const auto &effect: m_breathingEffects) {
+        if(effect.active) {
             renderBreathingEffect(effect);
         }
     }
     
-    
+    //Disable effects
     m_window->openglContext()->functions()->glDisable(GL_BLEND);
 }
 
 void QuickShellEffects::renderBlurEffect(const BlurEffect &effect) {
-    if (!m_blurProgram || !m_window || !m_window->openglContext())
+    if(!m_blurProgram || !m_window || !m_window->openglContext())
         return;
     
     m_blurProgram->bind();
     m_blurProgram->setUniformValue("radius", static_cast<float>(effect.radius));
     m_blurProgram->setUniformValue("opacity", static_cast<float>(effect.opacity));
     
-    
+    // Effect drawing
     m_window->openglContext()->functions()->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     
     m_blurProgram->release();
 }
 
 void QuickShellEffects::renderPulseEffect(const PulseEffect &effect) {
-    if (!m_pulseProgram || !m_window || !m_window->openglContext())
+    if(!m_pulseProgram || !m_window || !m_window->openglContext())
         return;
     
     m_pulseProgram->bind();
     m_pulseProgram->setUniformValue("glowColor", effect.color);
     m_pulseProgram->setUniformValue("intensity", 1.0f);
     
-    
+    // Effect drawing
     m_window->openglContext()->functions()->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     
     m_pulseProgram->release();
 }
 
 void QuickShellEffects::renderBreathingEffect(const BreathingEffect &effect) {
-    
+    // No special drawing is needed for this effect, which is implemented by changing the element's scale
 }
 EOL
 
 cat <<EOL > ~/src/quickshell/effects/GlassMorphismEffect.h
+#ifndef GLASSMORPHISMEFFECT_H
+#define GLASSMORPHISMEFFECT_H
 
+#include <QImage>
+#include <QObject>
+#include <QElapsedTimer>
 
-
+// GlassMorphismEffect class
 class GlassMorphismEffect : public QObject
 {
     Q_OBJECT
@@ -22612,23 +22876,27 @@ public:
     explicit GlassMorphismEffect(QObject *parent = nullptr);
     ~GlassMorphismEffect();
 
-    
+    // Apply the effect to the image
     void applyEffect(QImage &input, QImage &output, int radius, float intensity);
 
 private:
-    
+    //Gaussian camouflage application
     QImage applyGaussianBlur(const QRgb *bits, int width, int height, int radius);
 
-    
+    // Horizontal camouflage stage
     void horizontalBlur(const QRgb *source, QRgb *target, int width, int height, int radius);
 
-    
+    //Vertical camouflage phase
     void verticalBlur(const QRgb *source, QRgb *target, int width, int height, int radius);
 };
 
+#endif // GLASSMORPHISMEFFECT_H
 EOL
 
 cat <<EOL > ~/src/quickshell/system/GlassMorphismEffect.h
+#include "GlassMorphismEffect.h"
+#include <QElapsedTimer>
+#include <QtMath>
 
 GlassMorphismEffect::GlassMorphismEffect(QObject *parent)
     : QObject(parent)
@@ -22644,14 +22912,14 @@ void GlassMorphismEffect::applyEffect(QImage &input, QImage &output, int radius,
     QElapsedTimer timer;
     timer.start();
 
-    if (input.isNull() || input.format() != QImage::Format_ARGB32) {
+    if (input.isNull() || input.format()!= QImage::Format_ARGB32) {
         output = input;
         return;
     }
 
     QRgb *bits = (QRgb *)input.bits();
     const int width = input.width();
-    const int height = input.height();
+    const int height = input. height();
 
     QImage blurred = applyGaussianBlur(bits, width, height, radius);
 
@@ -22676,7 +22944,7 @@ void GlassMorphismEffect::applyEffect(QImage &input, QImage &output, int radius,
 
     qint64 elapsed = timer.elapsed();
     if (elapsed > 2) {
-        qDebug() << "GlassMorphismEffect: Processing took" << elapsed << "ms";
+        qDebug() << "GlassMorphismEffect: Processing take" << elapsed << "ms";
     }
 }
 
@@ -22693,13 +22961,13 @@ QImage GlassMorphismEffect::applyGaussianBlur(const QRgb *bits, int width, int h
 
 void GlassMorphismEffect::horizontalBlur(const QRgb *source, QRgb *target, int width, int height, int radius)
 {
-    const int diameter = radius * 2 + 1;
-    const float scale = 1.0f / diameter;
+    const int diamond = radius * 2 + 1;
+    const float scale = 1.0f / diamond;
 
     for (int y = 0; y < height; ++y) {
         int sumR = 0, sumG = 0, sumB = 0;
 
-        for (int x = 0; x < diameter && x < width; ++x) {
+        for (int x = 0; x < diamond && x < width; ++x) {
             QRgb pixel = source[y * width + x];
             sumR += qRed(pixel);
             sumG += qGreen(pixel);
@@ -22736,13 +23004,13 @@ void GlassMorphismEffect::horizontalBlur(const QRgb *source, QRgb *target, int w
 
 void GlassMorphismEffect::verticalBlur(const QRgb *source, QRgb *target, int width, int height, int radius)
 {
-    const int diameter = radius * 2 + 1;
-    const float scale = 1.0f / diameter;
+    const int diamond = radius * 2 + 1;
+    const float scale = 1.0f / diamond;
 
     for (int x = 0; x < width; ++x) {
         int sumR = 0, sumG = 0, sumB = 0;
 
-        for (int y = 0; y < diameter && y < height; ++y) {
+        for (int y = 0; y < diamond && y < height; ++y) {
             QRgb pixel = source[y * width + x];
             sumR += qRed(pixel);
             sumG += qGreen(pixel);
@@ -22779,9 +23047,24 @@ void GlassMorphismEffect::verticalBlur(const QRgb *source, QRgb *target, int wid
 EOL
 
 cat <<EOL > ~/src/quickshell/system/QuickShellSystem.h
+#ifndef QUICKSHELLSYSTEM_H
+#define QUICKSHELLSYSTEM_H
 
+#include <QObject>
+#include <QVariant>
+#include <QMap>
+#include <QVector>
+#include <QTimer>
+#include <QProcess>
+#include <QFile>
+#include <QDir>
+#include <QSettings>
+#include <QStandardPaths>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
-class QuickShellSystem : public QObject {
+class QuickShellSystem: public QObject {
     Q_OBJECT
     Q_PROPERTY(qint64 totalMemory READ totalMemory NOTIFY systemInfoChanged)
     Q_PROPERTY(qint64 usedMemory READ usedMemory NOTIFY systemInfoChanged)
@@ -22797,7 +23080,7 @@ public:
     explicit QuickShellSystem(QObject *parent = nullptr);
     ~QuickShellSystem();
     
-    
+    // System information
     qint64 totalMemory() const;
     qint64 usedMemory() const;
     qint64 freeMemory() const;
@@ -22808,13 +23091,13 @@ public:
     QString kernelVersion() const;
     QString architecture() const;
     
-    
+    // System functions
     Q_INVOKABLE void restartSystem();
     Q_INVOKABLE void shutdownSystem();
-    Q_INVOKABLE void suspendSystem();
+    Q_INVOKABLE void suspensionSystem();
     Q_INVOKABLE void lockScreen();
     
-    
+    // File management
     Q_INVOKABLE bool fileExists(const QString &path) const;
     Q_INVOKABLE bool directoryExists(const QString &path) const;
     Q_INVOKABLE bool createDirectory(const QString &path) const;
@@ -22822,16 +23105,16 @@ public:
     Q_INVOKABLE bool copyFile(const QString &source, const QString &destination) const;
     Q_INVOKABLE bool moveFile(const QString &source, const QString &destination) const;
     
-    
+    // Execute commands
     Q_INVOKABLE QString executeCommand(const QString &command, const QStringList &arguments = QStringList(), int timeout = 5000);
     Q_INVOKABLE bool executeTerminalCommand(const QString &command);
     
-    
+    // Manage settings
     Q_INVOKABLE QVariant getSetting(const QString &group, const QString &key, const QVariant &defaultValue = QVariant());
     Q_INVOKABLE void setSetting(const QString &group, const QString &key, const QVariant &value);
     Q_INVOKABLE void removeSetting(const QString &group, const QString &key);
     
-    
+    // Network Management
     Q_INVOKABLE QString getIpAddress() const;
     Q_INVOKABLE QString getHostName() const;
     Q_INVOKABLE bool isNetworkConnected() const;
@@ -22862,15 +23145,35 @@ private:
     QProcess *m_process;
 };
 
+#endif // QUICKSHELLSYSTEM_H
 EOL
 
 cat <<EOL > ~/src/quickshell/system/QuickShellSystem.cpp
+#include "QuickShellSystem.h"
+#include <QProcess>
+#include <QFile>
+#include <QDir>
+#include <QSettings>
+#include <QStandardPaths>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QDebug>
+#include <QThread>
+#include <QElapsedTimer>
+#include <QTimer>
+#include <QDirIterator>
+#include <QFileInfo>
+#include <QDateTime>
+#include <QNetworkInterface>
+#include <QHostInfo>
+#include <QNetworkConfigurationManager>
 
 QuickShellSystem::QuickShellSystem(QObject *parent)
     : QObject(parent),
       m_process(nullptr)
 {
-    
+    // Initial information configuration
     m_systemInfo.totalMemory = 0;
     m_systemInfo.usedMemory = 0;
     m_systemInfo.freeMemory = 0;
@@ -22881,10 +23184,10 @@ QuickShellSystem::QuickShellSystem(QObject *parent)
     m_systemInfo.kernelVersion = "Unknown";
     m_systemInfo.architecture = "Unknown";
     
-    
+    // Update system information immediately
     updateSystemInfo();
     
-    
+    // Update system information every 2 seconds
     m_updateTimer.setInterval(2000);
     m_updateTimer.setSingleShot(false);
     connect(&m_updateTimer, &QTimer::timeout, this, &QuickShellSystem::updateSystemInfo);
@@ -22892,7 +23195,7 @@ QuickShellSystem::QuickShellSystem(QObject *parent)
 }
 
 QuickShellSystem::~QuickShellSystem() {
-    if (m_process) {
+    if(m_process) {
         m_process->kill();
         m_process->waitForFinished();
         delete m_process;
@@ -22975,16 +23278,16 @@ bool QuickShellSystem::moveFile(const QString &source, const QString &destinatio
     return QFile::rename(source, destination);
 }
 
-QString QuickShellSystem::executeCommand(const QString &command, const QStringList &arguments, int timeout) {
+QString QuickShellSystem::executeCommand(const QString&command, const QStringList&arguments, inttimeout) {
     QProcess process;
     process.start(command, arguments);
     
-    if (!process.waitForStarted()) {
+    if(!process.waitForStarted()) {
         emit errorOccurred("Failed to start process: " + command);
         return QString();
     }
     
-    if (!process.waitForFinished(timeout)) {
+    if(!process.waitForFinished(timeout)) {
         process.kill();
         emit errorOccurred("Process timed out: " + command);
         return QString();
@@ -22993,7 +23296,7 @@ QString QuickShellSystem::executeCommand(const QString &command, const QStringLi
     QString output = QString::fromUtf8(process.readAllStandardOutput());
     QString error = QString::fromUtf8(process.readAllStandardError());
     
-    if (!error.isEmpty()) {
+    if(!error.isEmpty()) {
         emit errorOccurred(error);
     }
     
@@ -23005,7 +23308,7 @@ bool QuickShellSystem::executeTerminalCommand(const QString &command) {
     return executeCommand("alacritty", QStringList() << "-e" << command) != QString();
 }
 
-QVariant QuickShellSystem::getSetting(const QString &group, const QString &key, const QVariant &defaultValue) {
+QVariant QuickShellSystem::getSetting(const QString&group, const QString&key, const QVariant&defaultValue) {
     QSettings settings("Desind", "DesindOS");
     settings.beginGroup(group);
     QVariant value = settings.value(key, defaultValue);
@@ -23013,14 +23316,14 @@ QVariant QuickShellSystem::getSetting(const QString &group, const QString &key, 
     return value;
 }
 
-void QuickShellSystem::setSetting(const QString &group, const QString &key, const QVariant &value) {
+void QuickShellSystem::setSetting(const QString&group, const QString&key, const QVariant&value) {
     QSettings settings("Desind", "DesindOS");
     settings.beginGroup(group);
     settings.setValue(key, value);
     settings.endGroup();
 }
 
-void QuickShellSystem::removeSetting(const QString &group, const QString &key) {
+void QuickShellSystem::removeSetting(const QString&group, const QString&key) {
     QSettings settings("Desind", "DesindOS");
     settings.beginGroup(group);
     settings.remove(key);
@@ -23054,7 +23357,7 @@ bool QuickShellSystem::isNetworkConnected() const {
 }
 
 void QuickShellSystem::updateSystemInfo() {
-    
+    // Update memory information
     QFile memInfo("/proc/meminfo");
     if (memInfo.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream in(&memInfo);
@@ -23077,7 +23380,7 @@ void QuickShellSystem::updateSystemInfo() {
         m_systemInfo.usedMemory = m_systemInfo.totalMemory - m_systemInfo.freeMemory;
     }
     
-    
+    // Processor usage update
     static qint64 prevIdleTime = 0;
     static qint64 prevTotalTime = 0;
     
@@ -23085,7 +23388,7 @@ void QuickShellSystem::updateSystemInfo() {
     if (statFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream in(&statFile);
         QString line = in.readLine();
-        if (line.startsWith("cpu ")) {
+        if (line.startsWith("cpu")) {
             QStringList values = line.split(" ", Qt::SkipEmptyParts);
             if (values.size() >= 5) {
                 qint64 user = values[1].toLongLong();
@@ -23112,11 +23415,11 @@ void QuickShellSystem::updateSystemInfo() {
         statFile.close();
     }
     
-    
+    // Update battery level
     QDir batteryDir("/sys/class/power_supply");
     if (batteryDir.exists()) {
         QStringList batteries = batteryDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-        for (const QString &battery : batteries) {
+        for (const QString &battery:batteries) {
             QFile statusFile(batteryDir.absoluteFilePath(battery + "/status"));
             QFile capacityFile(batteryDir.absoluteFilePath(battery + "/capacity"));
             
@@ -23139,7 +23442,7 @@ void QuickShellSystem::updateSystemInfo() {
         }
     }
     
-    
+    // System Information Update
     QFile osRelease("/etc/os-release");
     if (osRelease.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream in(&osRelease);
@@ -23152,12 +23455,12 @@ void QuickShellSystem::updateSystemInfo() {
         osRelease.close();
     }
     
-    
+    // Kernel version update
     QFile kernelVersion("/proc/version");
     if (kernelVersion.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream in(&kernelVersion);
         QString line = in.readLine();
-        if (!line.isEmpty()) {
+        if(!line.isEmpty()) {
             QStringList parts = line.split(" ");
             if (parts.size() > 2) {
                 m_systemInfo.kernelVersion = parts[2];
@@ -23166,15 +23469,19 @@ void QuickShellSystem::updateSystemInfo() {
         kernelVersion.close();
     }
     
-    
+    // Update structure
     m_systemInfo.architecture = QSysInfo::buildCpuArchitecture();
     
-    
+    // Send a signal to change system information
     emit systemInfoChanged();
 }
 EOL
 
 cat <<EOL > ~/src/quickshell/QuickShellPlugin.cpp
+#include <qqml.h>
+#include "QuickShellAnimation.h"
+#include "QuickShellEffects.h"
+#include "QuickShellSystem.h"
 
 static void registerQuickShellTypes() {
     qmlRegisterType<QuickShellAnimation>("QuickShell.Animation", 1, 0, "Animation");
@@ -23185,22 +23492,28 @@ static void registerQuickShellTypes() {
 Q_COREAPP_STARTUP_FUNCTION(registerQuickShellTypes)
 EOL
 
-echo "================="
-echo "تثبيت Snapd..."
-echo "================="
-if ! command -v snap &> /dev/null; then
+# ============================
+# Install additional settings
+# ============================
+# -------
+# 1. Install Snapd if it is not installed
+# -------
+echo "=================
+echo "Install Snapd..."
+echo "=================
+if! command -v snap &> /dev/null; then
     sudo pacman -Sy --noconfirm snapd
     sudo systemctl enable --now snapd.socket
 fi
 
-echo "تثبيت تطبيقات سطح المكتب..."
-echo "=============================="
-echo "(1/7) تثبيت YouTube..."
+echo "Install desktop applications..."
+echo "==============================
+echo "(1/7) Install YouTube..."
 cat <<EOL > ~/.local/share/applications/youtube.desktop
 [Desktop Entry]
 Name=YouTube
-Comment=فيديوهاتك المفضلة في أي وقت وأي مكان!
-Exec=chromium --app=https:
+Comment=Your favorite videos anytime, anywhere!
+Exec=chromium --app=https://www.youtube.com/
 Icon=youtube
 Terminal=false
 Type=Application
@@ -23208,12 +23521,12 @@ Categories=Multimedia;Video;Network;
 StartupWMClass=youtube-pwa
 EOL
 
-echo "(2/7) تثبيت Gmail..."
+echo "(2/7) Install Gmail..."
 cat <<EOL > ~/.local/share/applications/gmail.desktop
 [Desktop Entry]
 Name=Gmail
-Comment=تطبيق البريد الالكتروني المفضل من الجميع!
-Exec=chromium --app=https:
+Comment=Everyone's favorite email app!
+Exec=chromium --app=https://mail.google.com/mail/u/0/
 Icon=gmail
 Terminal=false
 Type=Application
@@ -23222,12 +23535,12 @@ StartupWMClass=gmail-pwa
 MimeType=x-scheme-handler/mailto;
 EOL
 
-echo "(3/7) تثبيت Google Drive..."
+echo "(3/7) Install Google Drive..."
 cat <<EOL > ~/.local/share/applications/google-drive.desktop
 [Desktop Entry]
 Name=Google Drive
-Comment=ملفاتك مزامنة على أجهزتك.
-Exec=chromium --app=https:
+Comment=Your files are synced on your devices.
+Exec=chromium --app=https://drive.google.com/drive/my-drive
 Icon=google-drive
 Terminal=false
 Type=Application
@@ -23235,12 +23548,12 @@ Categories=Network;Office;Utility;
 StartupWMClass=google-drive-pwa
 EOL
 
-echo "(4/7) تثبيت Google Photos..."
+echo "(4/7) Install Google Photos..."
 cat <<EOL > ~/.local/share/applications/google-photos.desktop
 [Desktop Entry]
 Name=Google Photos
-Comment=شارك صورك مع جميع أجهزتك أينما كنت!
-Exec=chromium --app=https:
+Comment=Share your photos with all your devices wherever you are!
+Exec=chromium --app=https://photos.google.com/
 Icon=google-photos
 Terminal=false
 Type=Application
@@ -23248,12 +23561,12 @@ Categories=Multimedia;Graphics;Photography;Network;
 StartupWMClass=google-photos-pwa
 EOL
 
-echo "(5/7) تثبيت GitHub..."
+echo "(5/7) Install GitHub..."
 cat <<EOL > ~/.local/share/applications/github.desktop
 [Desktop Entry]
 Name=GitHub
-Comment=مستودعاتك معك طوال الوقت!
-Exec=chromium --app=https:
+Comment=Your warehouses are with you all the time!
+Exec=chromium --app=https://github.com/
 Icon=github
 Terminal=false
 Type=Application
@@ -23261,12 +23574,12 @@ Categories=Development;Network;
 StartupWMClass=github-pwa
 EOL
 
-echo "(6/7) تثبيت Reddit..."
+echo "(6/7) Install Reddit..."
 cat <<EOL > ~/.local/share/applications/reddit.desktop
 [Desktop Entry]
 Name=Reddit
-Comment=فتح Reddit كواجهة تطبيق سطح المكتب
-Exec=chromium --app=https:
+Comment=Open Reddit as a desktop application interface
+Exec=chromium --app=https://www.reddit.com/
 Icon=reddit
 Terminal=false
 Type=Application
@@ -23274,12 +23587,12 @@ Categories=Network;Social;
 StartupWMClass=reddit-pwa
 EOL
 
-echo "(7/7) تثبيت Pinterest..."
+echo "(7/7) Install Pinterest..."
 cat <<EOL > ~/.local/share/applications/pinterest.desktop
 [Desktop Entry]
 Name=Pinterest
-Comment=أفضل تطبيق لسرقة أفكار الأخرين!
-Exec=chromium --app=https:
+Comment=The best app to steal other people's ideas!
+Exec=chromium --app=https://www.pinterest.com/
 Icon=pinterest
 Terminal=false
 Type=Application
@@ -23289,7 +23602,10 @@ EOL
 
 update-desktop-database ~/.local/share/applications/
 
-echo "انهاء إعداد النظام، يرجى الانتظار..."
+# ========================
+# QuickShell service file
+# ========================
+echo "System setup finished, please wait..."
 cat <<EOL > ~/etc/systemd/system/desind.service
 [Unit]
 Description=Desind Shell Desktop (DSD)
@@ -23297,7 +23613,7 @@ After=graphical.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/quickshell -p /home/$USER/.config/quickshell/shell.qml
+ExecStart=/usr/bin/quickshell -p/home/$USER/.config/quickshell/shell.qml
 Restart=always
 User=$USER
 Environment=DISPLAY=:0
@@ -23312,21 +23628,28 @@ SYSTEM_CONFIG_DIR="/etc/desind"
 IMAGE_DIR="/usr/share/desind/images"
 DOC_DIR="/usr/share/doc/desind"
 
+# Create folders if they don't exist
 mkdir -p "$SYSTEM_CONFIG_DIR"
 mkdir -p "$IMAGE_DIR"
 
-echo "نقل الصور..."
+# Transfer photos
+echo "Transfer images..."
 cp "$PROJECT_ROOT/resources/images/"* "$IMAGE_DIR/"
 
-echo "نقل ملفات الإعدادات..."
+# Transfer JSON files (Settings)
+echo "Move settings files..."
 cp "$PROJECT_ROOT/resources/data/"*.json "$SYSTEM_CONFIG_DIR/"
 
-cp "$PROJECT_ROOT/docs/"*.{md,LICENSE} "$DOC_DIR/"
+# Document transfer
+cp "$PROJECT_ROOT/docs/"*.{md, LICENSE} "$DOC_DIR/"
 
+# ==========================
+# Finishing the preparation
+# ==========================
 echo "----------"
-echo "=============="
-echo "تم الانتهاء!"
-echo "=============="
+echo "==============
+echo "Done!"
+echo "==============
 echo "----------"
 
 systemctl enable desind.service
