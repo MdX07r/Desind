@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="150" height="32" viewBox="0 0 150 32" role="img" aria-label="Discord 15">
   <!-- outer rounded black with white border -->
-  <rect x="0" y="0" width="150" height="32" rx="16" fill="#000000" stroke="#ffffff" stroke-width="3"/>
+  <rect x="0" y="0" width="150" height="32" rx="16" fill="#000000" stroke="#ffffff" stroke-width="1"/>
   <!-- left blue pill -->
   <rect x="0" y="0" width="80" height="32" rx="16" fill="#1e90ff"/>
   <!-- cover the right rounded of left pill to make straight seam -->
