@@ -5,7 +5,7 @@
 
 **Desind: A lightweight and fast experience**
 
-**Desind** is a revolutionary operating system designed from the ground up for speed, efficiency, and elegance. Built on `Wayland` with a `QML``-based` `interface`, Desind offers an unparalleled user experience.
+**Desind** is a revolutionary operating system designed from the ground up for speed, efficiency, and elegance. Built on `Wayland` with a `QML-based interface`, Desind offers an unparalleled user experience.
 
 At the heart of **Desind** lies an innovative user interface paradigm based on "capsules." Instead of traditional icons or menus, **Desind** offers a clean and simple interface where each function is represented by a dynamic capsule that expands to reveal functions when needed. This design eliminates visual clutter while maintaining immediate access to all system features.
 
