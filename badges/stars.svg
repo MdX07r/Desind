@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="140" height="32" viewBox="0 0 140 32" role="img" aria-label="Stars 1">
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="32" viewBox="0 0 140 32" role="img" aria-label="Stars 1">
   <!-- outer rounded black with white border -->
   <rect x="0" y="0" width="140" height="32" rx="16" fill="#000000" stroke="#ffffff" stroke-width="3"/>
   <!-- left blue pill -->
