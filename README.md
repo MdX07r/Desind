@@ -1,4 +1,4 @@
-<h1 align=center>Desind Shell Desktop (DSD)</h1>
+<h1 align=right>Desind Shell Desktop (DSD)</h1>
 
 [[العربية](https://github.com/MdX07r/Desind/tree/AR)] | [[English](https://github.com/MdX07r/Desind)]
 
