@@ -1,9 +1,6 @@
-[[English](https://github.com/MdX07r/Desind)] [[العربية](https://github.com/MdX07r/Desind/tree/AR)]
----
+<h1 align=center>Desind Shell Desktop (DSD)</h1>
 
-## English (`US`)
-
-**Desind: A lightweight and fast experience**
+**[[English](https://github.com/MdX07r/Desind)] [[العربية](https://github.com/MdX07r/Desind/tree/AR)]**
 
 **Desind** is a revolutionary operating system designed from the ground up for speed, efficiency, and elegance. Built on `Wayland` with a `QML-based interface`, Desind offers an unparalleled user experience.
 
