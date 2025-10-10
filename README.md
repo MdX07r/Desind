@@ -1,4 +1,4 @@
-[[English](https://github.com/MdX07r/Desind)] | [[Pусский](https://github.com/MdX07r/Desind/tree/RU)] | [[العربية](https://github.com/MdX07r/Desind/tree/AR)] | [[日本語](https://github.com/MdX07r/Desind/tree/JP)] | [[简体中文](https://github.com/MdX07r/Desind/tree/CN)]
+[[English](https://github.com/MdX07r/Desind)] [[العربية](https://github.com/MdX07r/Desind/tree/AR)]
 ---
 
 ## English (US)
