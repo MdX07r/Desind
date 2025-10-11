@@ -1,0 +1,81 @@
+{
+    // === Logo Settings (ASCII Art) ===
+    "logo": {
+        // Logo type: "file" to use custom ASCII from an external file.
+        "type": "file",
+        // Path to the custom ASCII technical file. 
+        "key": "~/.config/fastfetch/desind.txt",
+        
+        // Use Pywal colors to encode ASCII art
+        // These colors are set as environment variables by Pywal
+        "color": {
+            //$color0: background color (dark color)
+            "0": "$color0", 
+            // $color1: First highlight color (Pywal red)
+            "1": "$color1",
+            "2": "$color2", 
+            "3": "$color3", 
+            "4": "$color4",
+            "5": "$color5", 
+            "6": "$color6", 
+            "7": "$color7",
+            // Bright colors
+            "8": "$color8",
+            "9": "$color9",
+            "A": "$colorA",
+            "B": "$colorB",
+            "C": "$colorC",
+            "D": "$colorD",
+            "E": "$colorE",
+            "F": "$colorF"
+        },
+        
+        // Logo and text formatting settings
+        "padding": {
+            "top": 0,
+            "right": 4, 
+            "bottom": 0,
+            "left": 0
+        },
+        "side": "left"
+    },
+
+    // === Information Modules Settings (Modules) ===
+    // This order will determine the sequence in which information is displayed
+    "modules": [
+        "os",             // Operating system
+        "host",           //Host/Model
+        "kernel",         // Kernel version
+        "uptime",         // System runtime
+        "packages",       // Number of installed packages
+        "shell",          // Shell used
+        "display",        // Screen resolution
+        "wm",             // Window Manager
+        "cpu",            // Processor
+        "gpu",            // Graphics card
+        "memory",         // Random Access Memory (RAM) Usage
+        "disk",           // Disk usage
+        "Terminal"        // Name of the terminal used
+    ],
+
+    // === General Formatting Settings (Using Pywal Colors) ===
+    // Display a header (Header) that includes the username and hostname
+    "display-header": true,
+    "header": {
+        "format": "$user@$hostname"
+    },
+    
+    // Color of information keys (e.g. "OS:", "CPU:")
+    // We use $color4 (usually blue or purple from Pywal)
+    "key-color": "$color4",   
+    
+    // Color the information value (e.g. "Arch Linux", "Intel i7")
+    // We use $colorF (usually white or a light foreground color)
+    "text-color": "$colorF", 
+    
+    // Separator color
+    "separator-color": "default", 
+    
+    // The symbol separating the key from the value
+    "separator": ": "
+}
