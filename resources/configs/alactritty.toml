@@ -1,0 +1,121 @@
+import = [
+    "~/.cache/wal/alacritty.toml"
+]
+
+[window]
+# Window dimensions at startup (optional)
+# dimensions = {columns = 82, lines = 24}
+
+# Specify the window display location (optional)
+# position = { x = 0, y = 0}
+
+# Internal padding to leave space between the window edge and the text
+padding = { x = 10, y = 10}
+
+# Window Decoration (Title Bar)
+# You can choose "none" to hide it completely and rarely on your window manager.
+decorations = "full"
+
+# Transparency and Ambiguity
+# Here we adjust the simple transparency and pure blur.
+opacity = 0.95 # Simple transparency (95%). You can adjust it between 0.0 and 1.0.
+blur = true   # Enable blur. Requires a composer like picom.
+
+[scrolling]
+# The number of lines kept in memory for backward scrolling.
+history = 10000
+# Multiplication factor for scrolling speed.
+multiplier = 3
+
+[font]
+# Basic Font Settings
+normal = {family = "JetBrainsMono Nerd Font", style = "Regular" }
+bold = {family = "JetBrainsMono Nerd Font", style = "Bold"}
+italic = {family = "JetBrainsMono Nerd Font", style = "Italic" }
+bold_italic = {family = "JetBrainsMono Nerd Font", style = "Bold Italic" }
+
+# Font Size
+size = 11.0
+
+# Additional settings to improve the appearance of the font
+# Glyph displacement to adjust the letters of the letters (useful for some lines)
+glyph_offset = { x = 0, y = 0}
+# Calligraphy thickness (not supported by all systems)
+# builtin_box_drawing = true
+
+[bell]
+# Alarm Sound (Bell) Settings
+animation = "EaseOutExpo"
+duration = 100 # in ms
+color = "#ffffff"
+
+[selection]
+# When determining the text with the mouse button, it is automatically copied to the clipboard.
+save_to_clipboard = true
+
+[cursor]
+# Indicator Settings
+# Indicator style: Block, Beam, Underline
+style = {shape = "Block", blinking = "On"}
+
+# Smooth Indicator Settings
+# These settings are specific to the modified version you are using.
+# Make the cursor movement smooth instruction of jumping initially.
+smooth_cursor = true
+
+[keyboard]
+# Key Bindings
+# You can add custom shortcuts here. For example, to copy and paste:
+# (These are usually the default settings on Linux)
+# bindings = [
+#   { key = "C", mods = "Control|Shift", action = "Copy"},
+#   { key = "V", mods = "Control|Shift", action = "Paste"},
+# ]
+
+[mouse]
+# Hide the cursor while typing.
+hide_when_typing = true
+
+# Mouse Bindings
+# For example, to change the font size using Ctrl + Scroll
+bindings = [
+  { mouse = "ScrollUp", mods = "Control", action = "IncreaseFontSize"},
+  { mouse = "ScrollDown", mods = "Control", action = "DecreaseFontSize"},
+]
+
+[colors]
+# Color settings
+# When using PYWAL, most color settings should be in a file
+# ~/.
+# But we will put here the basic "pure black" color settings as a background
+# Default if PYWAL does not work for any reason.
+
+# Primary Colors
+primary = {background = "#000000", foreground = "#ffffff" }
+
+# Indicator Colors
+cursor = {text = "CellBackground", cursor = "CellForeground"}
+vi_mode_cursor = {text = "CellBackground", cursor = "CellForeground"}
+
+# Selection Colors
+selection = {text = "CellBackground", background = "#b3b3b3" }
+
+# Normal colors (will be overridden by pywal)
+normal = {black = "#1d1f21", red = "#cc6666", green = "#b5bd68", yellow = "#f0c674", blue = "#81a2be", magenta = "#b294bb", cyan = "#8abeb7", white = "#c5c8c6" }
+
+# Bright colors (will be overridden by pywal)
+bright = {black = "#666666", red = "#d54e53", green = "#b9ca4a", yellow = "#e7c547", blue = "#7aa6da", magenta = "#c397d8", cyan = "#70c0b1", white = "#eaeaea" }
+
+# Fake colors (unused in abundance)
+# dim = { ... }
+
+# The main window wallpaper
+# Here we guide that the background is fully pure black.
+draw_bold_text_with_bright_colors = true
+
+[terminal.shell]
+program = "/bin/bash"
+args = [
+  "-c",
+  "fastfetch && exec bash",
+]
